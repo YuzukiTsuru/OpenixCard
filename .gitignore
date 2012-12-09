@@ -1,2 +1,4 @@
 awflash
 awimage
+*.img
+*.dump
