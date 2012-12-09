@@ -4,7 +4,7 @@ clean:
 		rm awimage awflash
 
 awimage:	twofish.c rc6.c awimage.c
-		$(CC) -o $@ $^
+		$(CC) -Wall -o $@ $^
 
 awflash:	awflash.c
-		$(CC) -o $@ $^ -lusb
+		$(CC) -Wall -o $@ $^ -lusb
