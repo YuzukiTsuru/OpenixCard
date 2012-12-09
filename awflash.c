@@ -151,8 +151,6 @@ main(int argc, char *argv[])
 {
 	struct usb_dev_handle *xsv_handle;
 	int open_status;
-//	struct cmd c;
-//	struct ret r;
 	uint32_t off;
 	int32_t size;
 	uint8_t *buf;
