@@ -211,7 +211,7 @@ unpack_image(const char *infn, const char *outdn)
     }
 
     if (flag_compat_output == OUTPUT_UNIMG) {
-        FILE *lfp = dir_fopen(outdn, "base.hdr", "wb");
+        lfp = dir_fopen(outdn, "base.hdr", "wb");
         if (lfp) {
             uint32_t *hdr = image + IMAGEWTY_MAGIC_LEN;
             fprintf(lfp, "%.8s\r\n", header->magic);
