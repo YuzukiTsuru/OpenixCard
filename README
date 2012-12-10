@@ -1,0 +1,12 @@
+awflash
+=======
+
+This tool enables you too flash an Allwinner A10 devices over USB using the same USB protocol as used
+in Allwinnners Livesuit software. This finally makes it possible to flash A10 devices from Linux!
+
+awimage
+=======
+
+This tool is able to pack/unpack Allwinner A10 images in the format as used by the Allwinner Livesuit
+software. It has compatibility modes for imgRepacker/unimg.exe tools, so it should be easily integrated
+with existing scripts.

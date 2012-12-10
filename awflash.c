@@ -1,3 +1,14 @@
+/*
+ * awflash.c, flash Allwinner A10 devices with Livesuit USB protocol.
+ * Copyright (c) 2012, Ithamar R. Adema <ithamar@upgrade-android.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * See README and COPYING for more details.
+ */
+
 #include <err.h>
 #include <fcntl.h>
 #include <limits.h>
