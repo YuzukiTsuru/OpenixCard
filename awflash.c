@@ -98,6 +98,9 @@ usage(void)
 
 #define FEX_TIMEOUT	500
 
+#define FEX_EP_OUT	1
+#define FEX_EP_IN	2
+
 #define FEX_DIR_IN	0x11
 #define FEX_DIR_OUT	0x12
 
@@ -129,32 +132,175 @@ fex_xfer(struct usb_dev_handle *hdl, void *buffer, size_t len, uint8_t dir)
 	cmd.len1 = cmd.len2 = len;
 	cmd.val_0c = 0x0c;
 	cmd.dir = dir;
-	status = usb_bulk_write(hdl, 1, (void*)&cmd, sizeof(cmd), FEX_TIMEOUT);
-	if (verbose)
-		printf("%s: write1=%d/%lu\n", __func__, status, sizeof(cmd));
 
-	if (dir == FEX_DIR_IN) {
-		status = usb_bulk_read(hdl, 2, buffer, len, FEX_TIMEOUT);
-		if (verbose)
-			printf("%s: read1=%d/%lu\n", __func__, status, len);
-	} else if (dir == FEX_DIR_OUT) {
-		status = usb_bulk_write(hdl, 1, buffer, len, FEX_TIMEOUT);
-		if (verbose)
-			printf("%s: write2=%d/%lu\n", __func__, status, len);
+	status = usb_bulk_write(hdl, FEX_EP_OUT, (void*)&cmd, sizeof(cmd), FEX_TIMEOUT);
+	if (status != sizeof(cmd)) {
+		if (verbose) printf("%s: cmd write failed (%d/%lu)!\n", __func__, status, sizeof(cmd));
+		return (status < 0) ? status : -EIO;
 	}
 
-	status = usb_bulk_read(hdl, 2, ackbuf, FEX_ACK_LEN, FEX_TIMEOUT);
-	if (verbose)
-		printf("%s: read2=%d/%d\n", __func__, status, FEX_ACK_LEN);
+	if (dir == FEX_DIR_IN) {
+		status = usb_bulk_read(hdl, FEX_EP_IN, buffer, len, FEX_TIMEOUT);
+		if (status != len) {
+			if (verbose) printf("%s: data read failed (%d/%lu)!\n", __func__, status, len);
+			return (status < 0) ? status : -EIO;
+		}
+	} else if (dir == FEX_DIR_OUT) {
+		status = usb_bulk_write(hdl, FEX_EP_OUT, buffer, len, FEX_TIMEOUT);
+		if (status != len) {
+			if (verbose) printf("%s: data write failed (%d/%lu)!\n", __func__, status, len);
+			return (status < 0) ? status : -EIO;
+		}
+	}
 
-	if (memcmp(ackbuf, FEX_SMAGIC, 4) != 0)
-		printf("%s: Invalid response magic!\n", __func__);
+	status = usb_bulk_read(hdl, FEX_EP_IN, ackbuf, FEX_ACK_LEN, FEX_TIMEOUT);
+	if (status != FEX_ACK_LEN) {
+		if (verbose) printf("%s: status read failed (%d/%d)!\n", __func__, status, FEX_ACK_LEN);
+		return (status < 0) ? status : -EIO;
+	}
+
+	if (memcmp(ackbuf, FEX_SMAGIC, 4) != 0) {
+		if (verbose) printf("%s: Invalid response magic!\n", __func__);
+		return -EINVAL;
+	}
+
+	return 0;
 }
 
 static void
-fex_command(struct usb_dev_handle *hdl, void *buffer, size_t len)
+fex_command(struct usb_dev_handle *hdl, void *buffer1, void *buffer2, size_t len)
 {
-	fex_xfer(hdl, buffer, 16, FEX_DIR_OUT);
+	int status = fex_xfer(hdl, buffer1, 16, FEX_DIR_OUT);
+	if (status < 0)
+		return status;
+
+	uint16_t cmd = *(uint16_t*)buffer1;
+	switch(cmd) {
+		case 0x0001:
+			if (buffer2 != NULL) {
+				status = fex_xfer(hdl, buffer2, len, FEX_DIR_IN);
+				if (status < 0)
+					return status;
+
+				if (strncmp(buffer2, "AWUSBFEX", 8) != 0) {
+					if (verbose) printf("%s: non-AWUSBFEX response!\n", __func__);
+					return -EINVAL;
+				}
+			} else {
+				if (verbose) printf("%s: No buffer passed for cmd 0x0001!\n", __func__);
+				return -EINVAL;
+			}
+			break;
+		case 0x0002:
+			break;
+		case 0x0003:
+			if (buffer2 != NULL) {
+				status = fex_xfer(hdl, buffer2, len, FEX_DIR_IN);
+				if (status < 0)
+					return status;
+			} else {
+				if (verbose) printf("%s: No buffer passed for cmd 0x0003!\n", __func__);
+				return -EINVAL;
+			}
+			break;
+		case 0x0004:
+			if (buffer2 != NULL) {
+				status = fex_xfer(hdl, buffer2, len, FEX_DIR_IN);
+				if (status < 0)
+					return status;
+			} else {
+				if (verbose) printf("%s: No buffer passed for command 0x0004!\n", __func__);
+				return -EINVAL;
+			}
+			break;
+		case 0x0010:
+			break;
+		case 0x0101:
+			if (buffer2 != NULL && len != 0) {
+				status = fex_xfer(hdl, buffer2, len, FEX_DIR_OUT);
+				if (status < 0)
+					return status;
+			}
+			break;
+		case 0x0102:
+			break;
+		case 0x0103:
+			if (buffer2 != NULL) {
+				status = fex_xfer(hdl, buffer2, len, FEX_DIR_IN);
+				if (status < 0)
+					return status;
+			}
+			break;
+		case 0x0201:
+			if (buffer2 != NULL && len != 0) {
+				switch((((uint8_t*)buffer1)[13] >> 4) & 3) {
+					case 0:
+					case 1:
+						status = fex_xfer(hdl, buffer2, len, FEX_DIR_OUT);
+						if (status < 0)
+							return status;
+						break;
+					case 2:
+						status = fex_xfer(hdl, buffer2, len, FEX_DIR_IN);
+						if (status < 0)
+							return status;
+						break;
+					case 3:
+						if (verbose) printf("%s: Invalid subcommand 3 in command 0x0201!\n", __func__);
+						return -EINVAL;
+				}
+			}
+			break;
+		case 0x0202:
+			if (buffer2 != NULL) {
+				status = fex_xfer(hdl, buffer2, len, FEX_DIR_OUT);
+				if (status < 0)
+					return status;
+			} else {
+				if (verbose) printf("%s: No buffer passed for command 0x0202!\n", __func__);
+				return -EINVAL;
+			}
+			break;
+		case 0x0203:
+			{
+				uint8_t subcmd = ((uint8_t*)buffer1)[4];
+				if (subcmd & 0xF0) {
+					if ((subcmd & 0xF0) != 0x10) {
+						if (verbose) printf("%s: Unrecognized subcommand 0x%x for command 0x0203!\n",
+							__func__, subcmd);
+						return -EINVAL;
+					} else {
+						status = fex_xfer(hdl, buffer2, len, (subcmd & 8) ? FEX_DIR_OUT : FEX_DIR_IN);
+						if (status < 0)
+							return status;
+					}
+				} else {
+					if (buffer2 != NULL) {
+						status = fex_xfer(hdl, buffer2, len, FEX_DIR_IN);
+						if (status < 0)
+							return status;
+					} else {
+						if (verbose) printf("%s: No buffer specified for command 0x0203!\n", __func__);
+						return -EINVAL;
+					}
+				}
+			}
+			break;
+		default:
+			if (verbose) printf("%s: Unknown command 0x%04x passed!\n", __func__, cmd);
+			return -EINVAL;
+	}
+
+	uint8_t statusbuf[8];
+	status = fex_xfer(hdl, statusbuf, 8, FEX_DIR_IN);
+	if (status < 0)
+		return status;
+	if (statusbuf[4] != 0) {
+		printf("%s: Invalid status %d!\n", __func__, statusbuf[4]);
+		return -EINVAL;
+	}
+
+	return 0;
 }
 
 int
