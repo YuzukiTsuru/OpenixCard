@@ -388,7 +388,9 @@ main(int argc, char **argv)
         if (out == NULL) {
             strcpy(outfn, in);
             strcat(outfn, ".dump");
-        }
+        } else {
+            strcpy(outfn, out);
+	}
 	out = outfn;
 
         fprintf(stderr, "%s: unpacking %s to %s\n", argv[0], in, out);
