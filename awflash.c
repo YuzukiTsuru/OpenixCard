@@ -109,7 +109,7 @@ usage(void)
 
 #define FEX_ACK_LEN	13
 
-static void
+static int
 fex_xfer(struct usb_dev_handle *hdl, void *buffer, size_t len, uint8_t dir)
 {
 	char ackbuf[FEX_ACK_LEN];
@@ -167,7 +167,7 @@ fex_xfer(struct usb_dev_handle *hdl, void *buffer, size_t len, uint8_t dir)
 	return 0;
 }
 
-static void
+static int
 fex_command(struct usb_dev_handle *hdl, void *buffer1, void *buffer2, size_t len)
 {
 	int status = fex_xfer(hdl, buffer1, 16, FEX_DIR_OUT);
