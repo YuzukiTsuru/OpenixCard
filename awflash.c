@@ -18,6 +18,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <ctype.h>
+#include <errno.h>
 
 #include <usb.h>
 
