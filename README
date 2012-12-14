@@ -11,3 +11,21 @@ awimage
 This tool is able to pack/unpack Allwinner A10 images in the format as used by the
 Allwinner Livesuit software. It has compatibility modes for imgRepacker/unimg.exe
 tools, so it should be easily integrated with existing scripts.
+
+log2bin
+=======
+
+Since I used UsbSnoop on Windows XP to capture a log of flashing an Allwinner
+device for analysis, I wanted to minimize the log file size, and after a while
+came up with the following grep line to convert the captured log file:
+
+egrep '( URB |    0)' usb.log | less
+
+This just lists the "URB going out/coming down" lines and the actual data
+sent/received. For the protocol used by Allwinner, this is fine.
+
+Now, the log2bin tool can be used as a filter to convert a piece of such a
+log to a binary file, so you can use your favorite tools (hd for ex. :P) to
+analyze the data. Simple, but very effective.
+
+log2bin < snippet.log > snippet.bin

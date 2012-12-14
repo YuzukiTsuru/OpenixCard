@@ -6,7 +6,7 @@ endif
 all:		awimage awflash log2bin
 
 clean:
-		rm awimage awflash
+		rm awimage awflash log2bin
 
 log2bin:	log2bin.c
 		$(CC) $(EXTRACFLAGS) -Wall -o $@ $^
