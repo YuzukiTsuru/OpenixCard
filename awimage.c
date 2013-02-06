@@ -30,7 +30,8 @@ enum {
 	OUTPUT_UNIMG,
 };
 
-int	flag_compat_output,
+int	flag_encryption_enabled,
+	flag_compat_output,
 	flag_verbose;
 
 /* Crypto */
@@ -97,6 +98,10 @@ static void *rc6_decrypt_inplace(void *p, size_t len, rc6_ctx_t *ctx)
 {
     int i;
 
+    /* If encryption is disabled, we've got nothing to do */
+    if (!flag_encryption_enabled)
+        return p + len;
+
     for (i = 0; i < len/16; i++) {
         rc6_dec(p, ctx);
         p += 16;
@@ -109,6 +114,10 @@ static void *rc6_decrypt_inplace(void *p, size_t len, rc6_ctx_t *ctx)
 static void *tf_decrypt_inplace(void *p, size_t len)
 {
     int i;
+
+    /* If encryption is disabled, we've got nothing to do */
+    if (!flag_encryption_enabled)
+        return p + len;
 
     tf_init(tf_key, 128);
 
@@ -155,6 +164,7 @@ pack_image(const char *indn, const char *outfn)
 static int
 unpack_image(const char *infn, const char *outdn)
 {
+    int num_files, pid, vid, hardware_id, firmware_id;
     struct imagewty_header *header;
     FILE *ifp, *lfp, *ofp;
     void *image, *curr;
@@ -186,15 +196,38 @@ unpack_image(const char *infn, const char *outdn)
     fread(image, imagesize, 1, ifp);
     fclose(ifp);
 
+    /* Check for encryption; see bug #2 (A31 unencrypted images) */
+    header = (struct imagewty_header*)image;
+    if (memcmp(header->magic, IMAGEWTY_MAGIC, IMAGEWTY_MAGIC_LEN) == 0)
+        flag_encryption_enabled = 0;
+
     /* Decrypt header (padded to 1024 bytes) */
     curr = rc6_decrypt_inplace(image, 1024, &header_ctx);
 
+
+    /* Check version of header and setup our local state */
+    if (header->header_version == 0x0300) {
+        num_files = header->v3.num_files;
+        hardware_id = header->v3.hardware_id;
+        firmware_id = header->v3.firmware_id;
+        pid = header->v3.pid;
+        vid = header->v3.vid;
+    } else /*if (header->version == 0x0100)*/ {
+        num_files = header->v1.num_files;
+        hardware_id = header->v1.hardware_id;
+        firmware_id = header->v1.firmware_id;
+        pid = header->v1.pid;
+        vid = header->v1.vid;
+    }
+
+    printf("IRA: version=0x%08x num_files=0x%08x/%d\n", header->header_version,
+           num_files, num_files);
+
     /* Decrypt file headers */
-    header = (struct imagewty_header*)image;
-    curr = rc6_decrypt_inplace(curr, header->num_files * 1024, &fileheaders_ctx);
+    curr = rc6_decrypt_inplace(curr, num_files * 1024, &fileheaders_ctx);
 
     /* Decrypt file contents */
-    for (i=0; i < header->num_files; i++) {
+    for (i=0; i < num_files; i++) {
         struct imagewty_file_header *filehdr;
         void *next;
 
@@ -242,7 +275,7 @@ unpack_image(const char *infn, const char *outdn)
         }
     }
 
-    for (i=0; i < header->num_files; i++) {
+    for (i=0; i < num_files; i++) {
         struct imagewty_file_header *filehdr;
         char hdrfname[32], contfname[32];
 
@@ -286,10 +319,10 @@ unpack_image(const char *infn, const char *outdn)
         /* Now print the relevant stuff for the image.cfg */
         fputs("\r\n[IMAGE_CFG]\r\n", lfp);
         fprintf(lfp, "version = 0x%06x\r\n", header->version);
-        fprintf(lfp, "pid = 0x%08x\r\n", header->pid);
-        fprintf(lfp, "vid = 0x%08x\r\n", header->vid);
-        fprintf(lfp, "hardwareid = 0x%03x\r\n", header->hardware_id);
-        fprintf(lfp, "firmwareid = 0x%03x\r\n", header->firmware_id);
+        fprintf(lfp, "pid = 0x%08x\r\n", pid);
+        fprintf(lfp, "vid = 0x%08x\r\n", vid);
+        fprintf(lfp, "hardwareid = 0x%03x\r\n", hardware_id);
+        fprintf(lfp, "firmwareid = 0x%03x\r\n", firmware_id);
         fprintf(lfp, "imagename = %s\r\n", infn);
         fputs("filelist = FILELIST\r\n", lfp);
     }
@@ -312,6 +345,9 @@ main(int argc, char **argv)
     progname = argv[0];
     if (progname[0] == '.' && progname[1] == '/')
         progname += 2;
+
+    /* assume we're encrypted */
+    flag_encryption_enabled = 1;
 
     /* Setup default output format */
     flag_compat_output = OUTPUT_UNIMG;
