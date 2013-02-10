@@ -212,7 +212,7 @@ unpack_image(const char *infn, const char *outdn)
         firmware_id = header->v3.firmware_id;
         pid = header->v3.pid;
         vid = header->v3.vid;
-    } else /*if (header->version == 0x0100)*/ {
+    } else /*if (header->header_version == 0x0100)*/ {
         num_files = header->v1.num_files;
         hardware_id = header->v1.hardware_id;
         firmware_id = header->v1.firmware_id;
@@ -226,10 +226,20 @@ unpack_image(const char *infn, const char *outdn)
     /* Decrypt file contents */
     for (i=0; i < num_files; i++) {
         struct imagewty_file_header *filehdr;
+	uint64_t stored_length;
+	const char *filename;
         void *next;
 
         filehdr = (struct imagewty_file_header*)(image + 1024 + (i * 1024));
-        next = rc6_decrypt_inplace(curr, filehdr->stored_length, &filecontent_ctx);
+        if (header->header_version == 0x0300) {
+            stored_length = filehdr->v3.stored_length;
+            filename = filehdr->v3.filename;
+        } else {
+            stored_length = filehdr->v1.stored_length;
+            filename = filehdr->v1.filename;
+        }
+
+        next = rc6_decrypt_inplace(curr, stored_length, &filecontent_ctx);
 #if TF_DECRYPT_WORKING
         if (!(strlen(filehdr->filename) >= 4 &&
             strncmp(filehdr->filename + strlen(filehdr->filename) -4, ".fex", 4) == 0)) {
@@ -273,14 +283,29 @@ unpack_image(const char *infn, const char *outdn)
     }
 
     for (i=0; i < num_files; i++) {
+        uint64_t stored_length, original_length;
         struct imagewty_file_header *filehdr;
         char hdrfname[32], contfname[32];
+        const char *filename;
+        uint64_t offset;
 
         filehdr = (struct imagewty_file_header*)(image + 1024 + (i * 1024));
+        if (header->header_version == 0x0300) {
+            stored_length = filehdr->v3.stored_length;
+            original_length = filehdr->v3.original_length;
+            filename = filehdr->v3.filename;
+            offset = filehdr->v3.offset;
+        } else {
+            stored_length = filehdr->v1.stored_length;
+            original_length = filehdr->v1.original_length;
+            filename = filehdr->v1.filename;
+            offset = filehdr->v1.offset;
+        }
+
         if (flag_compat_output == OUTPUT_UNIMG) {
-            printf("Extracting: %.8s %.16s (%u, %u)\n", 
+            printf("Extracting: %.8s %.16s (%Lu, %Lu)\n", 
                 filehdr->maintype, filehdr->subtype,
-                filehdr->original_length, filehdr->stored_length);
+                original_length, stored_length);
 
             sprintf(hdrfname, "%.8s_%.16s.hdr", filehdr->maintype, filehdr->subtype);
             ofp = dir_fopen(outdn, hdrfname, "wb");
@@ -292,22 +317,22 @@ unpack_image(const char *infn, const char *outdn)
             sprintf(contfname, "%.8s_%.16s", filehdr->maintype, filehdr->subtype);
             ofp = dir_fopen(outdn, contfname, "wb");
             if (ofp) {
-                fwrite(image + filehdr->offset, filehdr->original_length, 1, ofp);
+                fwrite(image + offset, original_length, 1, ofp);
                 fclose(ofp);
             }
 
             fprintf(lfp, "%s\t%s\r\n", hdrfname, contfname);
         } else if (flag_compat_output == OUTPUT_IMGREPACKER) {
-	    printf("Extracting %s\n", filehdr->filename);
+	    printf("Extracting %s\n", filename);
 
-            ofp = dir_fopen(outdn, filehdr->filename, "wb");
+            ofp = dir_fopen(outdn, filename, "wb");
             if (ofp) {
-                fwrite(image + filehdr->offset, filehdr->original_length, 1, ofp);
+                fwrite(image + offset, original_length, 1, ofp);
                 fclose(ofp);
             }
 
             fprintf(lfp, "\t{filename = INPUT_DIR .. \"%s\", maintype = \"%.8s\", subtype = \"%.16s\",},\r\n",
-                filehdr->filename[0] == '/' ? filehdr->filename+1 : filehdr->filename,
+                filename[0] == '/' ? filename+1 : filename,
                 filehdr->maintype, filehdr->subtype);
         }
     }

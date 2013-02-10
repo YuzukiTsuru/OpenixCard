@@ -63,13 +63,25 @@ struct imagewty_file_header {
 	uint32_t total_header_size;
 	const char maintype[IMAGEWTY_FHDR_MAINTYPE_LEN];
 	const char subtype[IMAGEWTY_FHDR_SUBTYPE_LEN];
-	uint32_t unknown_3;
-	uint32_t stored_length;
-	uint32_t original_length;
-	uint32_t offset;
-	uint32_t unknown;
-	const char filename[IMAGEWTY_FHDR_FILENAME_LEN];
-	/* 0x300 */
+	union {
+		struct {
+			uint32_t unknown_3;
+			uint32_t stored_length;
+			uint32_t original_length;
+			uint32_t offset;
+			uint32_t unknown;
+			const char filename[IMAGEWTY_FHDR_FILENAME_LEN];
+		} v1;
+		struct {
+			uint32_t unknown_0;
+			const char filename[IMAGEWTY_FHDR_FILENAME_LEN];
+			uint32_t stored_length;
+			uint32_t pad1;
+			uint32_t original_length;
+			uint32_t pad2;
+			uint32_t offset;
+		} v3;
+	};
 };
 
 #endif /* IMAGEWTY_H */
