@@ -220,9 +220,6 @@ unpack_image(const char *infn, const char *outdn)
         vid = header->v1.vid;
     }
 
-    printf("IRA: version=0x%08x num_files=0x%08x/%d\n", header->header_version,
-           num_files, num_files);
-
     /* Decrypt file headers */
     curr = rc6_decrypt_inplace(curr, num_files * 1024, &fileheaders_ctx);
 
