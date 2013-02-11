@@ -116,7 +116,6 @@ static void *rc6_decrypt_inplace(void *p, size_t len, rc6_ctx_t *ctx)
     return p;
 }
 
-#if TF_DECRYPT_WORKING
 static void *tf_decrypt_inplace(void *p, size_t len)
 {
     int i;
@@ -134,7 +133,6 @@ static void *tf_decrypt_inplace(void *p, size_t len)
 
     return p;
 }
-#endif
 
 static FILE*
 dir_fopen(const char *dir, const char *path, const char *mode)
@@ -246,13 +244,12 @@ unpack_image(const char *infn, const char *outdn)
         }
 
         next = rc6_decrypt_inplace(curr, stored_length, &filecontent_ctx);
-#if TF_DECRYPT_WORKING
-        if (!(strlen(filehdr->filename) >= 4 &&
-            strncmp(filehdr->filename + strlen(filehdr->filename) -4, ".fex", 4) == 0)) {
+        if (TF_DECRYPT_WORKING &&
+            !(strlen(filename) >= 4 &&
+            strncmp(filename + strlen(filename) -4, ".fex", 4) == 0)) {
             /* Not a 'FEX' file, so we need to decrypt it even more! */
-            tf_decrypt_inplace(curr, filehdr->stored_length);
+            tf_decrypt_inplace(curr, stored_length);
         }
-#endif
         curr = next;
     }
 
