@@ -286,11 +286,11 @@ unpack_image(const char *infn, const char *outdn)
     }
 
     for (i=0; i < num_files; i++) {
-        uint64_t stored_length, original_length;
+        uint32_t stored_length, original_length;
         struct imagewty_file_header *filehdr;
         char hdrfname[32], contfname[32];
         const char *filename;
-        uint64_t offset;
+        uint32_t offset;
 
         filehdr = (struct imagewty_file_header*)(image + 1024 + (i * 1024));
         if (header->header_version == 0x0300) {
@@ -306,7 +306,7 @@ unpack_image(const char *infn, const char *outdn)
         }
 
         if (flag_compat_output == OUTPUT_UNIMG) {
-            printf("Extracting: %.8s %.16s (%Lu, %Lu)\n", 
+            printf("Extracting: %.8s %.16s (%u, %u)\n",
                 filehdr->maintype, filehdr->subtype,
                 original_length, stored_length);
 
