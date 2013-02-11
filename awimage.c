@@ -25,6 +25,12 @@
 
 #undef TF_DECRYPT_WORKING
 
+#ifdef WIN32
+	#define MKDIR(p)	mkdir(p)
+#else
+	#define MKDIR(p)	mkdir(p,S_IRWXU)
+#endif
+
 enum {
 	OUTPUT_IMGREPACKER,
 	OUTPUT_UNIMG,
@@ -58,12 +64,12 @@ recursive_mkdir(const char *dir)
 	for(p = tmp + 1; *p; p++) {
 		if (*p == '/') {
 			*p = 0;
-			mkdir(tmp, S_IRWXU);
+			MKDIR(tmp);
 			*p = '/';
 		}
 	}
 
-	mkdir(tmp, S_IRWXU);
+	MKDIR(tmp);
 }
 
 static void
