@@ -23,7 +23,7 @@
 
 #include "imagewty.h"
 
-#undef TF_DECRYPT_WORKING
+#define TF_DECRYPT_WORKING 0
 
 #ifdef WIN32
 	#define MKDIR(p)	mkdir(p)
