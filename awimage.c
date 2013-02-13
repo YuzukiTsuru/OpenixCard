@@ -379,10 +379,13 @@ main(int argc, char **argv)
 
     /* Now scan the cmdline options */
     do {
-        c = getopt(argc, argv, "vurh");
+        c = getopt(argc, argv, "vurhn");
         if (c == EOF)
             break;
         switch (c) {
+	case 'n':
+            flag_encryption_enabled = 0;
+            break;
         case 'u':
             flag_compat_output = OUTPUT_UNIMG;
             break;
@@ -396,6 +399,7 @@ main(int argc, char **argv)
             fprintf(stderr, "%s [-vurh] {image dir|dir image}\n"
                     "  -r         imgRepacker compatibility\n"
                     "  -u         unimg.exe compatibility\n"
+                    "  -n         disable encryption/decryption\n"
                     "  -v         Be verbose\n"
                     "  -h         Print help\n", argv[0]);
             return -1;
