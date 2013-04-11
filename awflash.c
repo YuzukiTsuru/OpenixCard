@@ -30,6 +30,7 @@
 static char *progname;
 static int verbose = 0;
 
+#ifdef DEBUG
 static const char *sTabTab = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
 #define DS "%.*s"
 #define DA depth - 1, sTabTab
@@ -56,7 +57,7 @@ static void dump_hex(const uint32_t *data, int len, int depth)
 		printf(DS"    %-48.48s	%s\n", DA, str, astr);
 	}
 }
-
+#endif /* DEBUG */
 
 static int
 match_device(int vendorid, int productid)

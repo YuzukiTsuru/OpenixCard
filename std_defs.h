@@ -9,30 +9,6 @@ typedef signed char     s1byte; /* an 8 bit signed character type   */
 typedef signed short    s2byte; /* a 16 bit signed integer type     */
 typedef signed long     s4byte; /* a 32 bit signed integer type     */
 
-/* 2. Standard interface for AES cryptographic routines             */
-
-/* These are all based on 32 bit unsigned values and may therefore  */
-/* require endian conversions                                       */
-
-#ifdef  __cplusplus
-
-extern "C"
-{
-    char **cipher_name(void);
-    u4byte *set_key(const u4byte in_key[], const u4byte key_len);
-    void encrypt(const u4byte in_blk[4], u4byte out_blk[4]);
-    void decrypt(const u4byte in_blk[4], u4byte out_blk[4]);
-};
-
-#else
-
-char **cipher_name(void);
-u4byte *set_key(const u4byte in_key[], const u4byte key_len);
-void encrypt(const u4byte in_blk[4], u4byte out_blk[4]);
-void decrypt(const u4byte in_blk[4], u4byte out_blk[4]);
-
-#endif
-
 /* 3. Basic macros for speeding up generic operations               */
 
 /* Circular rotate of 32 bit values                                 */
