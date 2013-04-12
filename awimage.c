@@ -353,7 +353,7 @@ unpack_image(const char *infn, const char *outdn)
         fprintf(cfp, "vid = 0x%08x\r\n", vid);
         fprintf(cfp, "hardwareid = 0x%03x\r\n", hardware_id);
         fprintf(cfp, "firmwareid = 0x%03x\r\n", firmware_id);
-        fprintf(cfp, "imagename = %s\r\n", infn);
+        fprintf(cfp, "imagename = \"%s\"\r\n", infn);
         fputs("filelist = FILELIST\r\n", cfp);
         fclose(cfp);
     }
