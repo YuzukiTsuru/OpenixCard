@@ -282,7 +282,11 @@ unpack_image(const char *infn, const char *outdn)
         fprintf(cfp, "; %s\r\n", infn);
         fputs(";/**************************************************************************/\r\n", cfp);
         fputs("[DIR_DEF]\r\n", cfp);
+#ifdef WIN32
         fputs("INPUT_DIR = \".\\\\\"\r\n\r\n", cfp);
+#else
+        fputs("INPUT_DIR = \"./\"\r\n\r\n", cfp);
+#endif
         fputs("[FILELIST]\r\n", cfp);
     }
 
