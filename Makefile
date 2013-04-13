@@ -6,7 +6,7 @@ endif
 all:		awimage awflash log2bin
 
 clean:
-		rm awimage awflash log2bin
+		rm awimage awflash log2bin parsecfg
 
 log2bin:	log2bin.c
 		$(CC) $(EXTRACFLAGS) -Wall -o $@ $^
@@ -16,3 +16,6 @@ awimage:	twofish.c rc6.c awimage.c
 
 awflash:	awflash.c
 		$(CC) $(EXTRACFLAGS) -Wall -o $@ $^ -lusb
+
+parsecfg:	parsecfg.c
+		$(CC) $(CEXTRAFLAGS) -DSTANDALONE -Wall -o $@ $^
