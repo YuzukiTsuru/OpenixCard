@@ -3,19 +3,19 @@ ifeq ($(shell uname -s),Darwin)
 EXTRACFLAGS:=-I/opt/local/include -L/opt/local/lib
 endif
 
-all:		awimage awflash log2bin
+all:		log2bin$(EXE) awimage$(EXE) awflash$(EXE)
 
 clean:
-		rm awimage awflash log2bin parsecfg
+		rm awimage$(EXE) awflash$(EXE) log2bin$(EXE) parsecfg$(EXE)
 
-log2bin:	log2bin.c
+log2bin$(EXE):	log2bin.c
 		$(CC) $(EXTRACFLAGS) -Wall -o $@ $^
 
-awimage:	twofish.c rc6.c awimage.c
+awimage$(EXE):	awimage.c twofish.c rc6.c
 		$(CC) $(EXTRACFLAGS) -Wall -o $@ $^
 
-awflash:	awflash.c
+awflash$(EXE):	awflash.c
 		$(CC) $(EXTRACFLAGS) -Wall -o $@ $^ -lusb
 
-parsecfg:	parsecfg.c
+parsecfg$(EXE):	parsecfg.c
 		$(CC) $(CEXTRAFLAGS) -DSTANDALONE -Wall -o $@ $^
