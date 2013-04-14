@@ -25,6 +25,8 @@
  *
  */
 
+#include "parsecfg.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -33,32 +35,6 @@
 
 #define false 0
 #define true 1
-
-#define MAXIDLEN	32
-#define MAXLINELEN	256
-
-typedef enum valtype_e {
-     VT_NUMBER,
-     VT_STRING,
-     VT_LISTITEM,
-} valtype_t;
-
-typedef struct variable_s {
-    const char *name;
-    valtype_t type;
-    union {
-        char *str;
-        long number;
-        struct variable_s *items;
-    };
-    struct variable_s *next;
-} variable_t;
-
-typedef struct group_s {
-    const char *name;
-    variable_t *vars;
-    struct group_s *next;
-} group_t;
 
 static int lineno;
 
@@ -313,14 +289,14 @@ parse_listitem(char *line, group_t *head) {
 }
 
 group_t*
-cfg_load(const char *fname) {
+cfg_load(FILE *fp) {
     char line[MAXLINELEN];
     group_t *head = NULL, *curr = NULL;
-    FILE *fp;
 
-    fp = fopen(fname, "r");
     if (fp == NULL)
         return NULL;
+
+    rewind(fp);
 
     lineno = 0;
     while(fgets(line, sizeof(line), fp)) {
@@ -376,6 +352,61 @@ cfg_load(const char *fname) {
     return head;
 }
 
+static variable_t *
+free_var(variable_t *var) {
+    variable_t *next = var->next;
+
+    /* free name */
+    if (var->name) {
+        free((void*)var->name);
+        var->name = NULL;
+    }
+
+    /* free values */
+    switch(var->type) {
+        case VT_NUMBER:
+            break;
+        case VT_STRING:
+            free((void*)var->str);
+            var->str = NULL;
+            break;
+        case VT_LISTITEM:
+            {
+                /* free subitems in listitem */
+                variable_t *v;
+                for (v=var->items; v; v = free_var(v))
+                    ;
+                var->items = NULL;
+            }
+            break;
+    }
+
+    free((void*)var);
+
+    return next;
+}
+
+void
+cfg_free(group_t *head) {
+    while (head) {
+        variable_t *var;
+        group_t *group;
+
+        if (head->name) {
+            free((void*)head->name);
+            head->name = NULL;
+        }
+
+        for (var = head->vars; var; var = free_var(var))
+            ;
+        head->vars = NULL;
+
+        group = head->next;
+        free(head);
+        head = group;
+    }
+}
+
 /* below is a small test framework for the parser. It can be comoiled
  * by using something like:
  *    cc -DSTANDALONE -o parsecfg parsecfg.c
@@ -401,9 +432,8 @@ dump_vars(variable_t *var) {
                     printf("},\n");
                 }
                 break;
-            }
         }
-
+    }
 }
 
 static void
@@ -422,6 +452,7 @@ cfg_dump(group_t *head) {
 int
 main(int argc, char **argv) {
     group_t *head;
+    FILE *fp;
     int i;
     if (argc < 2) {
         fprintf(stderr, "Usage: %s <cfgfile>...\n", argv[0]);
@@ -429,9 +460,15 @@ main(int argc, char **argv) {
     }
 
     for (i=1; i < argc; i++) {
+        fp = fopen(argv[i], "r");
+        if (!fp) {
+            fprintf(stderr, "error: unable to open file %s!\n", argv[1]);
+            continue;
+        }
         fprintf(stderr, "Parsing file %s...\n", argv[i]);
-        head = cfg_load(argv[i]);
+        head = cfg_load(fp);
         cfg_dump(head);
+        cfg_free(head);
     }
 
     exit(EXIT_SUCCESS);
