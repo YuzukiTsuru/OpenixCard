@@ -18,4 +18,4 @@ awflash$(EXE):	awflash.c
 		$(CC) $(EXTRACFLAGS) -Wall -o $@ $^ -lusb
 
 parsecfg$(EXE):	parsecfg.c
-		$(CC) $(CEXTRAFLAGS) -DSTANDALONE -Wall -o $@ $^
+		$(CC) $(EXTRACFLAGS) -DSTANDALONE -Wall -o $@ $^
