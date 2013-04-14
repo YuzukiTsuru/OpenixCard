@@ -6,7 +6,7 @@ endif
 all:		log2bin$(EXE) awimage$(EXE) awflash$(EXE)
 
 clean:
-		rm awimage$(EXE) awflash$(EXE) log2bin$(EXE) parsecfg$(EXE)
+		rm -f awimage$(EXE) awflash$(EXE) log2bin$(EXE) parsecfg$(EXE)
 
 log2bin$(EXE):	log2bin.c
 		$(CC) $(EXTRACFLAGS) -Wall -o $@ $^
