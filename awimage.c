@@ -446,7 +446,6 @@ main(int argc, char **argv)
             int len = strlen(in);
             strcpy(outfn, in);
             if (in[len-1] == '/') len--;
-            printf("%s\n", in+len-5);
             if (len > 5 && strncmp(in+len-5, ".dump", 5) == 0)
 		outfn[len-5] = '\0';
             else {
