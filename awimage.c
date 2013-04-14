@@ -9,6 +9,13 @@
  * See README and COPYING for more details.
  */
 
+#include "parsecfg.h"
+
+#include "twofish.h"
+#include "rc6.h"
+
+#include "imagewty.h"
+
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -17,11 +24,6 @@
 #include <time.h>
 
 #include <sys/stat.h>
-
-#include "twofish.h"
-#include "rc6.h"
-
-#include "imagewty.h"
 
 #define TF_DECRYPT_WORKING 0
 
@@ -162,6 +164,180 @@ dir_fopen(const char *dir, const char *path, const char *mode)
 static int
 pack_image(const char *indn, const char *outfn)
 {
+    struct imagewty_header *header;
+    group_t *head, *filelist;
+    uint32_t i, num_files;
+    variable_t *var;
+    FILE *cfp, *ofp;
+    void *p;
+
+    /* try to open image configuration */
+    cfp = dir_fopen(indn, "image.cfg", "r");
+    if (cfp == NULL) {
+        fprintf(stderr, "Error: unable to open %s/%s!\n", indn, "image.cfg");
+        return -ENOENT;
+    }
+
+    ofp = fopen(outfn, "wb");
+    if (ofp == NULL) {
+        fprintf(stderr, "Error: could not create image file %s!\n", outfn);
+        fclose(cfp);
+        return -ENOENT;
+    }
+
+    /* file is there, now try to load it */
+    head = cfg_load(cfp);
+    fclose(cfp);
+    if (head == NULL) {
+        fprintf(stderr, "Error: failed to parse %s/%s!\n", indn, "image.cfg");
+        return -EINVAL;
+    }
+
+    /* Got configuration, time to start packing it all up! */
+    var = cfg_find_var("filelist", head);
+    if (var == NULL || var->type != VT_STRING) {
+        fprintf(stderr, "Error: Unable to find filelist string "
+                        "variable in configuration!\n");
+        cfg_free(head);
+        return -EINVAL;
+    }
+
+    filelist = cfg_find_group(var->str, head);
+    if (filelist == NULL) {
+        fprintf(stderr, "Error: unable to find group %s!\n", var->str);
+        cfg_free(head);
+        return -EINVAL;
+    }
+
+    num_files = cfg_count_vars(filelist);
+    if (!num_files) {
+        fprintf(stderr, "Error: no files to pack found in configuration!\n");
+        cfg_free(head);
+        return -EINVAL;
+    }
+
+    p = malloc(1024 + num_files * 1024);
+    if (p == NULL) {
+        fprintf(stderr, "Error: failed to allocate memory for image!\n");
+        cfg_free(head);
+        return -ENOMEM;
+    }
+
+    /* Initialize image file header */
+    memset(p, 0, 1024 + num_files * 1024);
+    header = p;
+    memcpy(header->magic, IMAGEWTY_MAGIC, sizeof(header->magic));
+    header->header_version = 0x0100;
+    header->header_size = sizeof(*header);
+    header->ram_base = 0x40000000;
+    header->version = cfg_get_number("version", head);
+    header->v1.size = 0; // XXX
+    header->v1.filehdr_len = 0; // XXX
+    header->v1.pid = cfg_get_number("pid", head);
+    header->v1.vid = cfg_get_number("vid", head);
+    header->v1.hardware_id = cfg_get_number("hardwareid", head);
+    header->v1.firmware_id = cfg_get_number("firmwareid", head);
+    header->v1.val1 = 1;
+    header->v1.val1024 = 1024;
+    header->v1.num_files = num_files;
+    header->v1.num_files = cfg_count_vars(filelist);
+    header->v1.val1024_2 = 1024;
+
+    /* Setup file headers */
+    {
+        uint32_t offset = (num_files +1) * 1024;
+        struct imagewty_file_header *fheaders;
+        variable_t *var;
+
+        fheaders = (struct imagewty_file_header*) (p + 1024);
+        for(var=filelist->vars; var; var=var->next) {
+            variable_t *v, *fn = NULL, *mt = NULL, *st = NULL;
+            uint32_t size;
+            FILE *fp;
+            for (v=var->items; v; v=v->next) {
+                if (v->type != VT_STRING)
+                    continue;
+                if (strcmp(v->name, "filename") == 0)
+                    fn = v;
+                else if (strcmp(v->name, "maintype") == 0)
+                    mt = v;
+                else if (strcmp(v->name, "subtype") == 0)
+                    st = v;
+            }
+
+            if (!fn || !mt || !st) {
+                fprintf(stderr, "Error: incomplete filelist item!\n");
+                return -EINVAL;
+            }
+
+            fheaders->filename_len = IMAGEWTY_FHDR_FILENAME_LEN;
+            fheaders->total_header_size = 1024;
+            strcpy((char*)fheaders->v1.filename, fn->str);
+            strcpy((char*)fheaders->maintype, mt->str);
+            strcpy((char*)fheaders->subtype, st->str);
+
+            fp = dir_fopen(indn, fn->str, "rb");
+            if (fp) {
+                fseek(fp, 0, SEEK_END);
+                size = ftell(fp);
+                fclose(fp);
+            } else {
+                fprintf(stderr, "Error: unable to read file '%s'!\n", fn->str);
+                continue;
+            }
+
+            fheaders->v1.offset = offset;
+            fheaders->v1.stored_length =
+            fheaders->v1.original_length = size;
+            if (fheaders->v1.stored_length & 0xF) {
+                fheaders->v1.stored_length &= ~0xF;
+                fheaders->v1.stored_length += 16;
+            }
+            offset += fheaders->v1.stored_length;
+            fheaders = (struct imagewty_file_header*) ((uint8_t*)fheaders + 1024);
+        }
+    }
+
+    /* Headers are prepared; encrypt if requested
+    if (flag_encryption_enabled) {
+        void *curr = rc6_decrypt_inplace(p, 1024, &header_ctx);
+        rc6_decrypt_inplace(curr, num_files * 1024, &fileheaders_ctx);
+    } */
+
+    /* Now we have all headers setup in memory, time to write out the image file */
+    fwrite(p, 1024, num_files +1, ofp);
+
+    /* now write the file content too */
+    for (i = 1; i <= num_files; i++) {
+        struct imagewty_file_header *h =
+            (struct imagewty_file_header*)(p + i * 1024);
+
+        FILE *fp = dir_fopen(indn, h->v1.filename, "rb");
+        if (fp != NULL) {
+            char buf[512];
+            size_t size = 0;
+            while(!feof(fp)) {
+                size_t bytesread = fread(buf, 1, 512, fp);
+                if (bytesread) {
+                    if (bytesread & 0xf)
+                        bytesread = (bytesread & ~0xf) + 16;
+
+                    /*if (flag_encryption_enabled)
+                        rc6_decrypt_inplace(buf, bytesread, &filecontent_ctx);*/
+                    fwrite(buf, 1, bytesread, ofp);
+                }
+                size += bytesread;
+            }
+            printf("IRA: %i: %zu %u\n", i, size, h->v1.stored_length);
+            fclose(fp);
+        }
+    }
+
+    fclose(ofp);
+
+    /* Done, free configuration, no longer needed */
+    cfg_free(head);
+
     return 0;
 }
 

@@ -11,7 +11,7 @@ clean:
 log2bin$(EXE):	log2bin.c
 		$(CC) $(EXTRACFLAGS) -Wall -o $@ $^
 
-awimage$(EXE):	awimage.c twofish.c rc6.c
+awimage$(EXE):	awimage.c parsecfg.c twofish.c rc6.c
 		$(CC) $(EXTRACFLAGS) -Wall -o $@ $^
 
 awflash$(EXE):	awflash.c
