@@ -41,6 +41,9 @@ typedef struct group_s {
 } group_t;
 
 variable_t *cfg_find_var(const char *name, group_t *head);
+group_t *cfg_find_group(const char *name, group_t *head);
+long cfg_get_number(const char *name, group_t *head);
+long cfg_count_vars(group_t *head);
 group_t *cfg_load(FILE *fp);
 void cfg_free(group_t *head);
 

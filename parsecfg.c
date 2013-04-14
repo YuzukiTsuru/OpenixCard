@@ -38,9 +38,17 @@
 
 static int lineno;
 
+group_t*
+cfg_find_group(const char *name, group_t *head) {
+    for (; head; head = head->next)
+        if (strcmp(name, head->name) == 0)
+            return head;
+
+    return NULL;
+}
+
 variable_t*
 cfg_find_var(const char *name, group_t *head) {
-
     for (; head; head = head->next) {
         variable_t *var;
         for (var = head->vars; var; var=var->next)
@@ -49,6 +57,27 @@ cfg_find_var(const char *name, group_t *head) {
     }
 
     return NULL;
+}
+
+
+long
+cfg_get_number(const char *name, group_t *head) {
+    variable_t *var = cfg_find_var(name, head);
+    if (var && var->type == VT_NUMBER)
+        return var->number;
+
+    return 0;
+}
+
+long
+cfg_count_vars(group_t *head) {
+    variable_t *var;
+    long count;
+
+    for (count=0, var=head->vars; var; count++,var=var->next)
+        ;
+
+    return count;
 }
 
 static variable_t*
