@@ -40,6 +40,7 @@ enum {
 
 int	flag_encryption_enabled,
 	flag_compat_output,
+        flag_dump_decrypted,
 	flag_verbose;
 
 /* Crypto */
@@ -341,6 +342,106 @@ pack_image(const char *indn, const char *outfn)
 }
 
 static int
+decrypt_image(const char *infn, const char *outfn)
+{
+    int num_files, pid, vid, hardware_id, firmware_id;
+    struct imagewty_header *header;
+    void *image, *curr;
+    FILE *ifp, *ofp;
+    long imagesize;
+    int i;
+
+    ifp = fopen(infn, "rb");
+    if (ifp == NULL) {
+        fprintf(stderr, "Error: unable to open %s!\n", infn);
+        return 2;
+    }
+
+    fseek(ifp, 0, SEEK_END);
+    imagesize = ftell(ifp);
+    fseek(ifp, 0, SEEK_SET);
+
+    if (imagesize <= 0) {
+        fprintf(stderr, "Error: Invalid file size %ld (%s)\n",
+            imagesize, strerror(errno));
+        return 3;
+    }
+
+    image = malloc(imagesize);
+    if (!image) {
+        fprintf(stderr, "Error: Unable to allocate memory for image: %ld\n", imagesize);
+        return 4;
+    }
+
+    fread(image, imagesize, 1, ifp);
+    fclose(ifp);
+
+    /* Check for encryption; see bug #2 (A31 unencrypted images) */
+    header = (struct imagewty_header*)image;
+    if (memcmp(header->magic, IMAGEWTY_MAGIC, IMAGEWTY_MAGIC_LEN) == 0)
+        flag_encryption_enabled = 0;
+
+    /* Decrypt header (padded to 1024 bytes) */
+    curr = rc6_decrypt_inplace(image, 1024, &header_ctx);
+
+
+    /* Check version of header and setup our local state */
+    if (header->header_version == 0x0300) {
+        num_files = header->v3.num_files;
+        hardware_id = header->v3.hardware_id;
+        firmware_id = header->v3.firmware_id;
+        pid = header->v3.pid;
+        vid = header->v3.vid;
+    } else /*if (header->header_version == 0x0100)*/ {
+        num_files = header->v1.num_files;
+        hardware_id = header->v1.hardware_id;
+        firmware_id = header->v1.firmware_id;
+        pid = header->v1.pid;
+        vid = header->v1.vid;
+    }
+
+    /* Decrypt file headers */
+    curr = rc6_decrypt_inplace(curr, num_files * 1024, &fileheaders_ctx);
+
+    /* Decrypt file contents */
+    for (i=0; i < num_files; i++) {
+        struct imagewty_file_header *filehdr;
+	uint64_t stored_length;
+	const char *filename;
+        void *next;
+
+        filehdr = (struct imagewty_file_header*)(image + 1024 + (i * 1024));
+        if (header->header_version == 0x0300) {
+            stored_length = filehdr->v3.stored_length;
+            filename = filehdr->v3.filename;
+        } else {
+            stored_length = filehdr->v1.stored_length;
+            filename = filehdr->v1.filename;
+        }
+
+        next = rc6_decrypt_inplace(curr, stored_length, &filecontent_ctx);
+        if (TF_DECRYPT_WORKING &&
+            !(strlen(filename) >= 4 &&
+            strncmp(filename + strlen(filename) -4, ".fex", 4) == 0)) {
+            /* Not a 'FEX' file, so we need to decrypt it even more! */
+            tf_decrypt_inplace(curr, stored_length);
+        }
+        curr = next;
+    }
+
+    ofp = fopen(outfn, "wb");
+    if (ofp == NULL) {
+        fprintf(stderr, "Error: unable to open output file %s!\n", outfn);
+        return 4;
+    }
+
+    fwrite(image, imagesize, 1, ofp);
+    fclose(ofp);
+
+    return 0;
+}
+
+static int
 unpack_image(const char *infn, const char *outdn)
 {
     int num_files, pid, vid, hardware_id, firmware_id;
@@ -564,7 +665,7 @@ main(int argc, char **argv)
 
     /* Now scan the cmdline options */
     do {
-        c = getopt(argc, argv, "vurhn");
+        c = getopt(argc, argv, "vdurhn");
         if (c == EOF)
             break;
         switch (c) {
@@ -577,6 +678,9 @@ main(int argc, char **argv)
         case 'r':
             flag_compat_output = OUTPUT_IMGREPACKER;
             break;
+        case 'd':
+            flag_dump_decrypted = 1;
+            break;
         case 'v':
             flag_verbose++;
             break;
@@ -585,6 +689,7 @@ main(int argc, char **argv)
                     "  -r         imgRepacker compatibility\n"
                     "  -u         unimg.exe compatibility\n"
                     "  -n         disable encryption/decryption\n"
+                    "  -d         dump decrypted image\n"
                     "  -v         Be verbose\n"
                     "  -h         Print help\n", argv[0]);
             return -1;
@@ -634,7 +739,16 @@ main(int argc, char **argv)
         pack_image(in, out);
     } else {
         /* We're unpacking, lets see if we have to generate the output directory name ourself */
-        if (out == NULL) {
+        if (flag_dump_decrypted) {
+            /* Special case for only decrypting image */
+            if (out == NULL) {
+                strcpy(outfn, in);
+                strcat(outfn, ".decrypted");
+                out = outfn;
+            }
+            fprintf(stderr, "%s: decrypting %s into %s\n", argv[0], in, out);
+            return decrypt_image(in, out);
+        } else if (out == NULL) {
             strcpy(outfn, in);
             strcat(outfn, ".dump");
         } else {
