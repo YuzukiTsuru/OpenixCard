@@ -119,6 +119,22 @@ static void *rc6_decrypt_inplace(void *p, size_t len, rc6_ctx_t *ctx)
     return p;
 }
 
+static void *rc6_encrypt_inplace(void *p, size_t len, rc6_ctx_t *ctx)
+{
+    int i;
+
+    /* If encryption is disabled, we've got nothing to do */
+    if (!flag_encryption_enabled)
+        return p + len;
+
+    for (i = 0; i < len/16; i++) {
+        rc6_enc(p, ctx);
+        p += 16;
+    }
+
+    return p;
+}
+
 static void *tf_decrypt_inplace(void *p, size_t len)
 {
     int i;
@@ -305,12 +321,6 @@ pack_image(const char *indn, const char *outfn)
         header->image_size = offset;
     }
 
-    /* Headers are prepared; encrypt if requested
-    if (flag_encryption_enabled) {
-        void *curr = rc6_decrypt_inplace(p, 1024, &header_ctx);
-        rc6_decrypt_inplace(curr, num_files * 1024, &fileheaders_ctx);
-    } */
-
     /* Now we have all headers setup in memory, time to write out the image file */
     fwrite(p, 1024, num_files +1, ofp);
 
@@ -329,14 +339,22 @@ pack_image(const char *indn, const char *outfn)
                     if (bytesread & 0x1ff)
                         bytesread = (bytesread & ~0x1ff) + 0x200;
 
-                    /*if (flag_encryption_enabled)
-                        rc6_decrypt_inplace(buf, bytesread, &filecontent_ctx);*/
+                    if (flag_encryption_enabled)
+                        rc6_encrypt_inplace(buf, bytesread, &filecontent_ctx);
                     fwrite(buf, 1, bytesread, ofp);
                 }
                 size += bytesread;
             }
             fclose(fp);
         }
+    }
+
+    /* Headers no longer used; encrypt and write if requested */
+    if (flag_encryption_enabled) {
+        void *curr = rc6_encrypt_inplace(p, 1024, &header_ctx);
+        rc6_encrypt_inplace(curr, num_files * 1024, &fileheaders_ctx);
+        rewind(ofp);
+        fwrite(p, 1024, num_files +1, ofp);
     }
 
     fclose(ofp);
