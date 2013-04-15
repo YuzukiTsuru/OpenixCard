@@ -5,4 +5,4 @@ parsecfg
 *.img
 *.dump
 *.cfg
-
+*.decrypted
