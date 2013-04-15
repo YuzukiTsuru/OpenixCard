@@ -229,11 +229,11 @@ pack_image(const char *indn, const char *outfn)
     header = p;
     memcpy(header->magic, IMAGEWTY_MAGIC, sizeof(header->magic));
     header->header_version = 0x0100;
-    header->header_size = sizeof(*header);
+    header->header_size = 0x50; /* should be 0x60 for version == 0x0300 */
     header->ram_base = 0x04D00000;
     header->version = cfg_get_number("version", head);
-    header->image_size = 0; // XXX
-    header->image_header_size = 0; // XXX
+    header->image_size = 0; /* this will be filled in later on */
+    header->image_header_size = 1024;
     header->v1.pid = cfg_get_number("pid", head);
     header->v1.vid = cfg_get_number("vid", head);
     header->v1.hardware_id = cfg_get_number("hardwareid", head);
@@ -297,6 +297,12 @@ pack_image(const char *indn, const char *outfn)
             offset += fheaders->v1.stored_length;
             fheaders = (struct imagewty_file_header*) ((uint8_t*)fheaders + 1024);
         }
+
+        /* We now know the total size of the file; patch it into the main header */
+        if (offset & 0xFF)
+            offset = (offset & 0xFF) + 0x100;
+
+        header->image_size = offset;
     }
 
     /* Headers are prepared; encrypt if requested
