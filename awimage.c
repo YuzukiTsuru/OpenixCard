@@ -328,7 +328,6 @@ pack_image(const char *indn, const char *outfn)
                 }
                 size += bytesread;
             }
-            printf("IRA: %i: %zu %u\n", i, size, h->v1.stored_length);
             fclose(fp);
         }
     }
