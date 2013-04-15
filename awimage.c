@@ -290,9 +290,9 @@ pack_image(const char *indn, const char *outfn)
             fheaders->v1.offset = offset;
             fheaders->v1.stored_length =
             fheaders->v1.original_length = size;
-            if (fheaders->v1.stored_length & 0xF) {
-                fheaders->v1.stored_length &= ~0xF;
-                fheaders->v1.stored_length += 16;
+            if (fheaders->v1.stored_length & 0x1FF) {
+                fheaders->v1.stored_length &= ~0x1FF;
+                fheaders->v1.stored_length += 0x200;
             }
             offset += fheaders->v1.stored_length;
             fheaders = (struct imagewty_file_header*) ((uint8_t*)fheaders + 1024);
@@ -326,8 +326,8 @@ pack_image(const char *indn, const char *outfn)
             while(!feof(fp)) {
                 size_t bytesread = fread(buf, 1, 512, fp);
                 if (bytesread) {
-                    if (bytesread & 0xf)
-                        bytesread = (bytesread & ~0xf) + 16;
+                    if (bytesread & 0x1ff)
+                        bytesread = (bytesread & ~0x1ff) + 0x200;
 
                     /*if (flag_encryption_enabled)
                         rc6_decrypt_inplace(buf, bytesread, &filecontent_ctx);*/
