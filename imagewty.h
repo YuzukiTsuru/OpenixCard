@@ -15,10 +15,10 @@ struct imagewty_header {
 	uint32_t header_size;		/* Image header size (sizeof(struct imagewty_header)) */
 	uint32_t ram_base;
 	uint32_t version;		/* format version (IMAGEWTY_VERSION) */
+        uint32_t image_size;            /* total size of image file (rounded up to 256 bytes?) */
+        uint32_t image_header_size;     /* image header size (including padding) */
 	union {
 		struct {
-			uint32_t size;			/* total size of file headers? */
-			uint32_t filehdr_len;		/* size of image (seems too large!) */
 			uint32_t pid;			/* USB peripheral ID (from image.cfg) */
 			uint32_t vid;			/* USB vendor ID (from image.cfg) */
 			uint32_t hardware_id;		/* Hardware ID (from image.cfg) */
@@ -34,8 +34,6 @@ struct imagewty_header {
 			/* 0x0050 */
 		} v1;
 		struct {
-			uint32_t size;			/* total size of file headers? */
-			uint32_t filehdr_len;		/* size of image (seems too large!) */
 			uint32_t unknown;
 			uint32_t pid;			/* USB peripheral ID (from image.cfg) */
 			uint32_t vid;			/* USB vendor ID (from image.cfg) */

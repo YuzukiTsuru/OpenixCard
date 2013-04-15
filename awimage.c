@@ -229,10 +229,10 @@ pack_image(const char *indn, const char *outfn)
     memcpy(header->magic, IMAGEWTY_MAGIC, sizeof(header->magic));
     header->header_version = 0x0100;
     header->header_size = sizeof(*header);
-    header->ram_base = 0x40000000;
+    header->ram_base = 0x04D00000;
     header->version = cfg_get_number("version", head);
-    header->v1.size = 0; // XXX
-    header->v1.filehdr_len = 0; // XXX
+    header->image_size = 0; // XXX
+    header->image_header_size = 0; // XXX
     header->v1.pid = cfg_get_number("pid", head);
     header->v1.vid = cfg_get_number("vid", head);
     header->v1.hardware_id = cfg_get_number("hardwareid", head);
