@@ -112,7 +112,7 @@ usage(void)
 #define FEX_ACK_LEN	13
 
 static int
-fex_xfer(struct usb_dev_handle *hdl, void *buffer, size_t len, uint8_t dir)
+fex_xfer(libusb_device_handle *hdl, void *buffer, size_t len, uint8_t dir)
 {
 	char ackbuf[FEX_ACK_LEN];
 	int status;
@@ -169,22 +169,27 @@ fex_xfer(struct usb_dev_handle *hdl, void *buffer, size_t len, uint8_t dir)
 	return 0;
 }
 
+#define AW_FEL_VERSION	0x0001
+#define AW_FEL_1_WRITE	0x0101
+#define AW_FEL_1_EXEC	0x0102
+#define AW_FEL_1_READ	0x0103
+
 static int
-fex_command(struct usb_dev_handle *hdl, void *buffer1, void *buffer2, size_t len)
+fex_command(libusb_device_handle *hdl, uint32_t cmd, uint32_t arg1, uint32_t arg2, uint32_t arg3, void *data, size_t len)
 {
-	int status = fex_xfer(hdl, buffer1, 16, FEX_DIR_OUT);
+	uint32_t cmdbuffer[4] = { cmd, arg1, arg2, arg3 };
+	int status = fex_xfer(hdl, cmdbuffer, 16, FEX_DIR_OUT);
 	if (status < 0)
 		return status;
 
-	uint16_t cmd = *(uint16_t*)buffer1;
 	switch(cmd) {
-		case 0x0001:
-			if (buffer2 != NULL) {
-				status = fex_xfer(hdl, buffer2, len, FEX_DIR_IN);
+		case AW_FEL_VERSION:
+			if (data != NULL) {
+				status = fex_xfer(hdl, data, len, FEX_DIR_IN);
 				if (status < 0)
 					return status;
 
-				if (strncmp(buffer2, "AWUSBFEX", 8) != 0) {
+				if (strncmp(data, "AWUSBFEX", 8) != 0) {
 					if (verbose) printf("%s: non-AWUSBFEX response!\n", __func__);
 					return -EINVAL;
 				}
@@ -196,8 +201,8 @@ fex_command(struct usb_dev_handle *hdl, void *buffer1, void *buffer2, size_t len
 		case 0x0002:
 			break;
 		case 0x0003:
-			if (buffer2 != NULL) {
-				status = fex_xfer(hdl, buffer2, len, FEX_DIR_IN);
+			if (data != NULL) {
+				status = fex_xfer(hdl, data, len, FEX_DIR_IN);
 				if (status < 0)
 					return status;
 			} else {
@@ -206,8 +211,8 @@ fex_command(struct usb_dev_handle *hdl, void *buffer1, void *buffer2, size_t len
 			}
 			break;
 		case 0x0004:
-			if (buffer2 != NULL) {
-				status = fex_xfer(hdl, buffer2, len, FEX_DIR_IN);
+			if (data != NULL) {
+				status = fex_xfer(hdl, data, len, FEX_DIR_IN);
 				if (status < 0)
 					return status;
 			} else {
@@ -217,33 +222,33 @@ fex_command(struct usb_dev_handle *hdl, void *buffer1, void *buffer2, size_t len
 			break;
 		case 0x0010:
 			break;
-		case 0x0101:
-			if (buffer2 != NULL && len != 0) {
-				status = fex_xfer(hdl, buffer2, len, FEX_DIR_OUT);
+		case AW_FEL_1_WRITE:
+			if (data != NULL && len != 0) {
+				status = fex_xfer(hdl, data, len, FEX_DIR_OUT);
 				if (status < 0)
 					return status;
 			}
 			break;
-		case 0x0102:
+		case AW_FEL_1_EXEC:
 			break;
-		case 0x0103:
-			if (buffer2 != NULL) {
-				status = fex_xfer(hdl, buffer2, len, FEX_DIR_IN);
+		case AW_FEL_1_READ:
+			if (data != NULL) {
+				status = fex_xfer(hdl, data, len, FEX_DIR_IN);
 				if (status < 0)
 					return status;
 			}
 			break;
 		case 0x0201:
-			if (buffer2 != NULL && len != 0) {
-				switch((((uint8_t*)buffer1)[13] >> 4) & 3) {
+			if (data != NULL && len != 0) {
+				switch((((uint8_t*)cmdbuffer)[13] >> 4) & 3) {
 					case 0:
 					case 1:
-						status = fex_xfer(hdl, buffer2, len, FEX_DIR_OUT);
+						status = fex_xfer(hdl, data, len, FEX_DIR_OUT);
 						if (status < 0)
 							return status;
 						break;
 					case 2:
-						status = fex_xfer(hdl, buffer2, len, FEX_DIR_IN);
+						status = fex_xfer(hdl, data, len, FEX_DIR_IN);
 						if (status < 0)
 							return status;
 						break;
@@ -254,8 +259,8 @@ fex_command(struct usb_dev_handle *hdl, void *buffer1, void *buffer2, size_t len
 			}
 			break;
 		case 0x0202:
-			if (buffer2 != NULL) {
-				status = fex_xfer(hdl, buffer2, len, FEX_DIR_OUT);
+			if (data != NULL) {
+				status = fex_xfer(hdl, data, len, FEX_DIR_OUT);
 				if (status < 0)
 					return status;
 			} else {
@@ -265,20 +270,20 @@ fex_command(struct usb_dev_handle *hdl, void *buffer1, void *buffer2, size_t len
 			break;
 		case 0x0203:
 			{
-				uint8_t subcmd = ((uint8_t*)buffer1)[4];
+				uint8_t subcmd = ((uint8_t*)cmdbuffer)[4];
 				if (subcmd & 0xF0) {
 					if ((subcmd & 0xF0) != 0x10) {
 						if (verbose) printf("%s: Unrecognized subcommand 0x%x for command 0x0203!\n",
 							__func__, subcmd);
 						return -EINVAL;
 					} else {
-						status = fex_xfer(hdl, buffer2, len, (subcmd & 8) ? FEX_DIR_OUT : FEX_DIR_IN);
+						status = fex_xfer(hdl, data, len, (subcmd & 8) ? FEX_DIR_OUT : FEX_DIR_IN);
 						if (status < 0)
 							return status;
 					}
 				} else {
-					if (buffer2 != NULL) {
-						status = fex_xfer(hdl, buffer2, len, FEX_DIR_IN);
+					if (data != NULL) {
+						status = fex_xfer(hdl, data, len, FEX_DIR_IN);
 						if (status < 0)
 							return status;
 					} else {
@@ -305,30 +310,43 @@ fex_command(struct usb_dev_handle *hdl, void *buffer1, void *buffer2, size_t len
 	return 0;
 }
 
+/* Return protocol version; or negative error code */
+static int
+aw_fel_get_version(libusb_device_handle *usb) {
+        struct aw_fel_version {
+                char signature[8];
+                uint32_t unknown_08;    /* 0x00162300 */
+                uint32_t unknown_0a;    /* 1 */
+                uint16_t protocol;      /* 1 */
+                uint8_t  unknown_12;    /* 0x44 */
+                uint8_t  unknown_13;    /* 0x08 */
+                uint32_t scratchpad;    /* 0x7e00 */
+                uint32_t pad[2];        /* unused */
+        } __attribute__((packed)) buf;
+	int status;
+
+	status = fex_command(usb, AW_FEL_VERSION, 0, 0, 0, buf, sizeof(buf));
+	if (status < 0)
+		return status;
+
+	return buf.protocol;
+}
+
 int
 main(int argc, char *argv[])
 {
-	struct usb_dev_handle *xsv_handle;
+	libusb_device_handle *usb;
+
 	int open_status;
-	uint32_t off;
-	int32_t size;
 	uint8_t *buf;
-	int ch, img, boot;
+	int ch, img;
 
 	progname = argv[0];
 
-	boot = 0;
-	size = 0;
-	while ((ch = getopt(argc, argv, "vBr:")) != -1) {
+	while ((ch = getopt(argc, argv, "v")) != -1) {
 		switch (ch) {
 		case 'v':
 			verbose++;
-			break;
-		case 'B':
-			boot = 1;
-			break;
-		case 'r':
-			size = strtoul(optarg, NULL, 0);
 			break;
 		default:
 			usage();
@@ -340,14 +358,7 @@ main(int argc, char *argv[])
 	if (argc != 2)
 		usage();
 
-	if ((off = strtoul(argv[0], NULL, 0)) & 0x1f)
-		errx(EXIT_FAILURE, "offset must be multiple of 0x20\n");
-
-	if (size == 0)
-		img = open(argv[1], O_RDONLY, 0);
-	else
-		img = open(argv[1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-
+	img = open(argv[1], O_RDONLY, 0);
 	if (img == -1)
 		err(EXIT_FAILURE, "%s", argv[1]);
 
@@ -360,75 +371,108 @@ main(int argc, char *argv[])
 	if (verbose)
 		usb_set_debug(verbose);
 
-	if ((xsv_handle = locate_device()) == 0) {
+	if ((usb = locate_device()) == 0) {
 		err(EXIT_FAILURE, "Could not find device\n");
 		return (-1);
 	}
 
-	open_status = usb_set_configuration(xsv_handle,1);
+	open_status = usb_set_configuration(usb,1);
 	if (verbose)
 		printf("conf_stat=%d\n",open_status);
 
-	open_status = usb_claim_interface(xsv_handle,0);
+	open_status = usb_claim_interface(usb,0);
 	if (verbose)
 		printf("claim_stat=%d\n",open_status);
 
-	open_status = usb_set_altinterface(xsv_handle,0);
+	open_status = usb_set_altinterface(usb,0);
 	if (verbose)
 		printf("alt_stat=%d\n",open_status);
 
-	char in2[0x08];
-#if SIMULATE_UPGRADE_START
-	char out1[] = {
-		0x01, 0x00, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00,
-		0x00, 0x00, 0x00, 0x00
-	};
-	char in1[0x20];
+	/* Check device mode (FEX protocol version) */
+	if (aw_get_version(usb) == 1) {
+		/* We're version 1, so lets load the v2 protocol */
+		char buffer[0x100];
+		aw_get_version(usb);
+		if (fex_command(usb, AW_FEL_1_READ, 0x7e00, sizeof(buffer), buffer, sizeof(buffer)) < 0 ||
+		    *(uint32_t*)buffer == 0) {
+			fprintf(stderr, "Error: device previously failed to switch; please power off/on device\n");
+			exit(EXIT_FAILURE);
+		}
+		aw_get_version(usb);
+		*(uint32_t*)buffer = 0;
+		if (fex_command(usb, AW_FEL_1_WRITE, 0x7e00, sizeof(buffer), buffer, sizeof(buffer)) < 0) {
+			fprintf(stderr, "Error: unable to write command to prepare to switch\n");
+			exit(EXIT_FAILURE);
+		}
 
-	/* URB 5/6/7 */
-	fex_xfer(xsv_handle, out1, sizeof(out1), FEX_DIR_OUT);
-	/* URB 8/9/10 */
-	fex_xfer(xsv_handle, in1, sizeof(in1), FEX_DIR_IN);
-	/* URB 11/12/13 */
-	fex_xfer(xsv_handle, in2, sizeof(in2), FEX_DIR_IN);
-#else /* Flash recovery */
+		fex_command(usb, AW_FEL_1_WRITE, 0x7010, 180, buffer, 180);
 
-	struct {
-		uint32_t cmd;
-		uint32_t arg1;
-		uint32_t arg2;
-		uint32_t arg3;
-	} __attribute__((packed)) pos = {
-		.cmd = 0x0201,
-		.arg1 = off,
-		.arg2 = _BLOCKSIZE,
-		.arg3 = 0x5020,
-	};
+		memset(buffer, 0, 16);
+		fex_command(usb, AW_FEL_1_WRITE, 0x7210, 16, buffer, 16);
 
-	do {
-		int buflen = read(img, buf, _BLOCKSIZE);
-		if (buflen <= 0)
-			break;
+		fex_write_file(0x7220, "fex_1_1.fex", 0xae0);
+		fex_command(usb, AW_FEL_1_EXEC, 0x7220, 0, NULL, 0);
 
-		pos.arg2 = buflen;
+		fex_command(usb, AW_FEL_1_READ, 0x7210, 16, buffer, 16);
+		if (memcmp(buffer, "DRAM\x01", 5) != 0) {
+			fprintf(stderr, "Error: could not find DRAM magic!\n");
+			exit(EXIT_FAILURE);
+		}
 
-		/* URB 32063/32064/32065 */
-		fex_xfer(xsv_handle, &pos, sizeof(pos), FEX_DIR_OUT);
+		fex_write_file(0x2000, "fes_1-2.fex", 0);
+		fex_command(usb, AWL_FEL_1_EXEC, 0x2000, 0, NULL, 0);
+	}
 
-		/* URB 32066/32067/32068 */
-		fex_xfer(xsv_handle, buf, buflen, FEX_DIR_OUT);
-
-		/* URB 32069/32070/32071 */
-		fex_xfer(xsv_handle, in2, sizeof(in2), FEX_DIR_IN);
-
-		pos.arg1 += (buflen / 512);
-		pos.arg3 = 0x1020;
-	} while( 1 );
-#endif
 	close(img);
 
 	return 0;
 }
 
+/*
+ 0x00002000 0x00000c1c fes_1-2.fex load area
+ 0x00007010 0x000000b4 see sys_para.txt
+ 0x00007210 0x00000010 "DRAM" magic
+ 0x00007220 0x00000ae0 fex_1_1.fex load area
+ 0x00007e00 0x00000100 marker block containing 0xcc values (first 4 bytes 0 after successful switch)
+ 0x00023000 0x00010000
+ 0x40100000 0x00002000
+ 0x40200000 0x00010000 fes.fex load area???
+ 0x40210000 0x00003c40 all 0x05 bytes
+*/
+
+/*
+ A10 flash sequence:
+
+ AW_FEL_VERSION
+ AW_FEL_VERSION
+ AW_FEL_1_READ  0x00007e00 0x100 (reads back block of 0xcc)
+ AW_FEL_VERSION
+ AW_FEL_1_WRITE 0x00007e00 0x100 (writes block of 0xcc; first 4 bytes 0x00)
+ AW_FEL_1_WRITE 0x00007010 0xb4 (board & dram config)
+ AW_FEL_1_WRITE 0x00007210 0x10 (all zeroes)
+ AW_FEL_1_WRITE 0x00007220 0xae0 (fex_1_1.fex padded with zeroes at end)
+ AW_FEL_1_EXEC  0x00007220
+ AW_FEL_1_READ  0x00007210 0x10 (reads back "DRAM" padded with zeroes at end)
+ AW_FEL_1_WRITE 0x00007210 0x10 (all zeroes)
+ AW_FEL_1_WRITE 0x00002000 0xc1c (fes_1-2.fex)
+ AW_FEL_1_EXEC  0x00002000
+ AW_FEL_1_READ  0x00007210 0x10 ("DRAM\x01" padded with zeroes at end)
+ AW_FEL_1_READ  0x00007010 0xb4 ()
+ AW_FEL_1_WRITE 0x40100000 0x2000 ()
+ AW_FEL_1_READ  0x40100000 0x2000 ()
+ AW_FEL_1_WRITE 0x00007210 0x10 (all zeroes)
+ AW_FEL_1_WRITE 0x00023000 0x10000 (all zeroes)
+ AW_FEL_1_WRITE 0x40200000 0x10000 (fes.fex?)
+ AW_FEL_1_WRITE 0x00023000 0x10000 (all zeroes)
+ AW_FEL_1_WRITE 0x00033000 0x3c40 (all zeroes)
+ AW_FEL_1_WRITE 0x40210000 0x3c40 (all 0x05 bytes)
+ AW_FEL_1_WRITE 0x00033000 0x3c40 (all zeroes)
+ AW_FEL_1_WRITE 0x00023000 0x5d0 (all zeroes)
+ AW_FEL_1_WRITE 0x00007220 0x5d0 (fes_2.fex)
+ AW_FEL_1_WRITE 0x00023000 0x5d0 (all zeroes)
+ AW_FEL_1_EXEC  0x00007220
+ <device reset>
+ AW_FEL_VERSION
+ AW_FEL_VERSION
+
+*/
