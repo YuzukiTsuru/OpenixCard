@@ -1,4 +1,3 @@
-
 /* 1. Standard types for AES cryptography source code               */
 
 typedef unsigned char u1byte; /* an 8 bit unsigned character type */
