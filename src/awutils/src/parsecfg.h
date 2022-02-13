@@ -6,7 +6,7 @@
  * it under the terms of the GNU General Public License version 2 as
  * published by the Free Software Foundation.
  *
- * See README and COPYING for more details.
+ * See README and LICENSE for more details.
  */
 
 #ifndef PARSECFG_H
@@ -14,13 +14,13 @@
 
 #include <stdio.h>
 
-#define MAXIDLEN	32
-#define MAXLINELEN	256
+#define MAXIDLEN    32
+#define MAXLINELEN    256
 
 typedef enum valtype_e {
-     VT_NUMBER,
-     VT_STRING,
-     VT_LISTITEM,
+    VT_NUMBER,
+    VT_STRING,
+    VT_LISTITEM,
 } valtype_t;
 
 typedef struct variable_s {
@@ -41,10 +41,15 @@ typedef struct group_s {
 } group_t;
 
 variable_t *cfg_find_var(const char *name, group_t *head);
+
 group_t *cfg_find_group(const char *name, group_t *head);
+
 long cfg_get_number(const char *name, group_t *head);
+
 long cfg_count_vars(group_t *head);
+
 group_t *cfg_load(FILE *fp);
+
 void cfg_free(group_t *head);
 
 #endif /* PARSECFG_H */

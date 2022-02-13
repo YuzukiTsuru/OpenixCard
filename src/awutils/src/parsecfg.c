@@ -6,7 +6,7 @@
  * it under the terms of the GNU General Public License version 2 as
  * published by the Free Software Foundation.
  *
- * See README and COPYING for more details.
+ * See README and LICENSE for more details.
  */
 
 /*
@@ -38,7 +38,7 @@
 
 static int lineno;
 
-group_t*
+group_t *
 cfg_find_group(const char *name, group_t *head) {
     for (; head; head = head->next)
         if (strcmp(name, head->name) == 0)
@@ -47,11 +47,11 @@ cfg_find_group(const char *name, group_t *head) {
     return NULL;
 }
 
-variable_t*
+variable_t *
 cfg_find_var(const char *name, group_t *head) {
     for (; head; head = head->next) {
         variable_t *var;
-        for (var = head->vars; var; var=var->next)
+        for (var = head->vars; var; var = var->next)
             if (var->name && strcmp(name, var->name) == 0)
                 return var;
     }
@@ -74,13 +74,12 @@ cfg_count_vars(group_t *head) {
     variable_t *var;
     long count;
 
-    for (count=0, var=head->vars; var; count++,var=var->next)
-        ;
+    for (count = 0, var = head->vars; var; count++, var = var->next);
 
     return count;
 }
 
-static variable_t*
+static variable_t *
 new_variable(const char *name, valtype_t type) {
     variable_t *var = malloc(sizeof(variable_t));
     if (var) {
@@ -100,7 +99,7 @@ add_to_listitem(variable_t *listitem, variable_t *sub) {
         return 0;
     }
 
-    while(last->next != NULL)
+    while (last->next != NULL)
         last = last->next;
 
     last->next = sub;
@@ -115,29 +114,28 @@ add_var_to_group(group_t *group, variable_t *var) {
         return 0;
     }
 
-    while(last->next != NULL)
+    while (last->next != NULL)
         last = last->next;
 
     last->next = var;
     return 0;
 }
 
-static char*
+static char *
 skip_whitespace(char **ptr) {
     char *p = *ptr;
-    while(*p && isspace(*p)) ++p;
+    while (*p && isspace(*p)) ++p;
     if (*p == ';')
-        while(*p) ++p;
+        while (*p) ++p;
 
     *ptr = p;
     return p;
 }
 
-static char*
-parse_identifier(char **ptr, char *buf, size_t buflen)
-{
+static char *
+parse_identifier(char **ptr, char *buf, size_t buflen) {
     char *p = *ptr;
-    while(*p && (isalnum(*p) || *p == '_')) {
+    while (*p && (isalnum(*p) || *p == '_')) {
         if (buflen > 0) {
             *buf++ = *p;
             --buflen;
@@ -152,16 +150,15 @@ parse_identifier(char **ptr, char *buf, size_t buflen)
 }
 
 /* Parse a string; assuming *ptr == '"' or '\'' */
-static char*
-parse_string(char **ptr, char *buf, size_t buflen)
-{
+static char *
+parse_string(char **ptr, char *buf, size_t buflen) {
     char *s = buf, *p = *ptr;
     char delim = *p++;
 
-    while(*p && *p != delim) {
-       if (*p == '\\' && p[1])
-           ++p;
-       if (buflen > 0) {
+    while (*p && *p != delim) {
+        if (*p == '\\' && p[1])
+            ++p;
+        if (buflen > 0) {
             *buf++ = *p;
             --buflen;
         }
@@ -175,7 +172,7 @@ parse_string(char **ptr, char *buf, size_t buflen)
     return s;
 }
 
-static variable_t*
+static variable_t *
 parse_expr(char **ptr, variable_t *var, group_t *head) {
     char value[MAXLINELEN];
     char *buf = value;
@@ -202,7 +199,7 @@ parse_expr(char **ptr, variable_t *var, group_t *head) {
             variable_t *var;
             parse_identifier(&p, ident, sizeof(ident));
             var = cfg_find_var(ident, head);
-            if (var  == NULL || var->type == VT_STRING) {
+            if (var == NULL || var->type == VT_STRING) {
                 const char *str = var ? var->str : ident;
                 strncpy(buf, str, buflen);
                 buflen -= strlen(str);
@@ -224,7 +221,7 @@ parse_expr(char **ptr, variable_t *var, group_t *head) {
         } else {
             break;
         }
-    } while( true );
+    } while (true);
 
     if (is_str) {
         var->type = VT_STRING;
@@ -239,14 +236,14 @@ parse_expr(char **ptr, variable_t *var, group_t *head) {
     return var;
 }
 
-static group_t*
+static group_t *
 parse_group(char *line) {
-    char *grp, *p = line +1;
+    char *grp, *p = line + 1;
     group_t *group;
 
     skip_whitespace(&p);
     grp = p;
-    while(*p && !isspace(*p) && *p != ']') ++p;
+    while (*p && !isspace(*p) && *p != ']') ++p;
     if (*p)
         *p = '\0';
 
@@ -259,11 +256,11 @@ parse_group(char *line) {
     return group;
 }
 
-static variable_t*
+static variable_t *
 parse_keyvalue(char **ptr, group_t *head) {
     char *p = *ptr;
     char name[MAXIDLEN];
-    variable_t* var;
+    variable_t *var;
 
     parse_identifier(&p, name, sizeof(name));
 
@@ -285,7 +282,7 @@ parse_keyvalue(char **ptr, group_t *head) {
     return var;
 }
 
-static variable_t*
+static variable_t *
 parse_listitem(char *line, group_t *head) {
     int found_comma = false;
     variable_t *listitem;
@@ -296,28 +293,28 @@ parse_listitem(char *line, group_t *head) {
     if (listitem == NULL)
         return NULL;
 
-    p = line +1; /* skip past { */
+    p = line + 1; /* skip past { */
 
     do {
         /* Skip whitespace before identifier */
         skip_whitespace(&p);
-        subitem = parse_keyvalue(&p,head);
+        subitem = parse_keyvalue(&p, head);
         add_to_listitem(listitem, subitem);
         skip_whitespace(&p);
         if (*p == ',') {
-           p++;
-           found_comma = true;
-       }
-       if (*p == '}') {
-           p++;
-           break;
+            p++;
+            found_comma = true;
         }
-    } while( found_comma );
+        if (*p == '}') {
+            p++;
+            break;
+        }
+    } while (found_comma);
 
     return listitem;
 }
 
-group_t*
+group_t *
 cfg_load(FILE *fp) {
     char line[MAXLINELEN];
     group_t *head = NULL, *curr = NULL;
@@ -328,42 +325,42 @@ cfg_load(FILE *fp) {
     rewind(fp);
 
     lineno = 0;
-    while(fgets(line, sizeof(line), fp)) {
+    while (fgets(line, sizeof(line), fp)) {
         char *p = line;
-	++lineno;
+        ++lineno;
         /* Skip any whitespace at start of line */
         skip_whitespace(&p);
         /* Skip line if only whitespace */
         if (!*p) continue;
 
-        switch(*p) {
+        switch (*p) {
             case '[':
                 /* parse config group */
-                {
-                    group_t *newgrp = parse_group(p);
-                    if (curr == NULL) {
-                        head = curr = newgrp;
-                    } else {
-                        curr->next = newgrp;
-                        curr = newgrp;
-                    }
+            {
+                group_t *newgrp = parse_group(p);
+                if (curr == NULL) {
+                    head = curr = newgrp;
+                } else {
+                    curr->next = newgrp;
+                    curr = newgrp;
                 }
+            }
                 break;
             case '{':
                 /* parse list item */
-                {
-                    variable_t *var = parse_listitem(p,head);
-                    if (curr != NULL) {
-                        add_var_to_group(curr, var);
-                    } else {
-                        fprintf(stderr, "%s:%d: Found list item but no current group!\n", __func__, lineno);
-                    }
+            {
+                variable_t *var = parse_listitem(p, head);
+                if (curr != NULL) {
+                    add_var_to_group(curr, var);
+                } else {
+                    fprintf(stderr, "%s:%d: Found list item but no current group!\n", __func__, lineno);
                 }
+            }
                 break;
             default:
                 /* check for simple key/value */
                 if (isalpha(*p)) {
-                    variable_t *var = parse_keyvalue(&p,head);
+                    variable_t *var = parse_keyvalue(&p, head);
                     if (curr != NULL) {
                         add_var_to_group(curr, var);
                     } else {
@@ -387,30 +384,28 @@ free_var(variable_t *var) {
 
     /* free name */
     if (var->name) {
-        free((void*)var->name);
+        free((void *) var->name);
         var->name = NULL;
     }
 
     /* free values */
-    switch(var->type) {
+    switch (var->type) {
         case VT_NUMBER:
             break;
         case VT_STRING:
-            free((void*)var->str);
+            free((void *) var->str);
             var->str = NULL;
             break;
-        case VT_LISTITEM:
-            {
-                /* free subitems in listitem */
-                variable_t *v;
-                for (v=var->items; v; v = free_var(v))
-                    ;
-                var->items = NULL;
-            }
+        case VT_LISTITEM: {
+            /* free subitems in listitem */
+            variable_t *v;
+            for (v = var->items; v; v = free_var(v));
+            var->items = NULL;
+        }
             break;
     }
 
-    free((void*)var);
+    free((void *) var);
 
     return next;
 }
@@ -422,12 +417,11 @@ cfg_free(group_t *head) {
         group_t *group;
 
         if (head->name) {
-            free((void*)head->name);
+            free((void *) head->name);
             head->name = NULL;
         }
 
-        for (var = head->vars; var; var = free_var(var))
-            ;
+        for (var = head->vars; var; var = free_var(var));
         head->vars = NULL;
 
         group = head->next;

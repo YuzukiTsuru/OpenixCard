@@ -1,4 +1,0 @@
-* Improve error checking in awimage
-* Further rework awflash to properly emulate LiveSuit or PhoenixSuit flasher
-* Document FEL v1 & v2 protocols on sunxi wiki
-* Investigate using U-Boot based flasher solution
