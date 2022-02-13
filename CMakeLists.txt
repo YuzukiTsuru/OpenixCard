@@ -14,3 +14,5 @@ else ()
 endif ()
 
 project(OpenixCard LANGUAGES CXX VERSION 1.0.${git_version})
+
+add_subdirectory(src/awutils)

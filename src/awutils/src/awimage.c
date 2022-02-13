@@ -9,15 +9,9 @@
  * See README.md and LICENSE for more details.
  */
 
-#include "parsecfg.h"
-
-#include "twofish.h"
-#include "rc6.h"
-
-#include "imagewty.h"
+#include "awimage.h"
 
 #include <stdio.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
@@ -25,34 +19,7 @@
 
 #include <sys/stat.h>
 
-#define TF_DECRYPT_WORKING 0
-
-#ifdef WIN32
-#define MKDIR(p)	mkdir(p)
-#else
-#define MKDIR(p)    mkdir(p,S_IRWXU)
-#endif
-
-enum {
-    OUTPUT_IMGREPACKER,
-    OUTPUT_UNIMG,
-};
-
-int flag_encryption_enabled,
-        flag_compat_output,
-        flag_dump_decrypted,
-        flag_verbose;
-
-/* Crypto */
-rc6_ctx_t header_ctx;
-rc6_ctx_t fileheaders_ctx;
-rc6_ctx_t filecontent_ctx;
-u4byte tf_key[32];
-
-const char *progname;
-
-static void
-recursive_mkdir(const char *dir) {
+void recursive_mkdir(const char *dir) {
     char tmp[256];
     char *p = NULL;
     size_t len;
@@ -74,11 +41,9 @@ recursive_mkdir(const char *dir) {
     MKDIR(tmp);
 }
 
-static void
-crypto_init(void) {
+void crypto_init(void) {
     char key[32];
     int i;
-
     /* Initialize RC6 context for header */
     memset(key, 0, sizeof(key));
     key[sizeof(key) - 1] = 'i';
@@ -101,7 +66,7 @@ crypto_init(void) {
         tf_key[i] = tf_key[i - 2] + tf_key[i - 1];
 }
 
-static void *rc6_decrypt_inplace(void *p, size_t len, rc6_ctx_t *ctx) {
+void *rc6_decrypt_inplace(void *p, size_t len, rc6_ctx_t *ctx) {
     int i;
 
     /* If encryption is disabled, we've got nothing to do */
@@ -116,7 +81,7 @@ static void *rc6_decrypt_inplace(void *p, size_t len, rc6_ctx_t *ctx) {
     return p;
 }
 
-static void *rc6_encrypt_inplace(void *p, size_t len, rc6_ctx_t *ctx) {
+void *rc6_encrypt_inplace(void *p, size_t len, rc6_ctx_t *ctx) {
     int i;
 
     /* If encryption is disabled, we've got nothing to do */
@@ -131,7 +96,7 @@ static void *rc6_encrypt_inplace(void *p, size_t len, rc6_ctx_t *ctx) {
     return p;
 }
 
-static void *tf_decrypt_inplace(void *p, size_t len) {
+void *tf_decrypt_inplace(void *p, size_t len) {
     int i;
 
     /* If encryption is disabled, we've got nothing to do */
@@ -148,8 +113,7 @@ static void *tf_decrypt_inplace(void *p, size_t len) {
     return p;
 }
 
-static FILE *
-dir_fopen(const char *dir, const char *path, const char *mode) {
+FILE *dir_fopen(const char *dir, const char *path, const char *mode) {
     char outfn[512];
     char *p;
     int len;
@@ -172,8 +136,7 @@ dir_fopen(const char *dir, const char *path, const char *mode) {
     return fopen(outfn, mode);
 }
 
-static int
-pack_image(const char *indn, const char *outfn) {
+int pack_image(const char *indn, const char *outfn) {
     struct imagewty_header *header;
     group_t *head, *filelist;
     uint32_t i, num_files;
@@ -358,8 +321,7 @@ pack_image(const char *indn, const char *outfn) {
     return 0;
 }
 
-static int
-decrypt_image(const char *infn, const char *outfn) {
+int decrypt_image(const char *infn, const char *outfn) {
     int num_files, pid, vid, hardware_id, firmware_id;
     struct imagewty_header *header;
     void *image, *curr;
@@ -436,9 +398,7 @@ decrypt_image(const char *infn, const char *outfn) {
         }
 
         next = rc6_decrypt_inplace(curr, stored_length, &filecontent_ctx);
-        if (TF_DECRYPT_WORKING &&
-            !(strlen(filename) >= 4 &&
-              strncmp(filename + strlen(filename) - 4, ".fex", 4) == 0)) {
+        if (TF_DECRYPT_WORKING && !(strlen(filename) >= 4 && strncmp(filename + strlen(filename) - 4, ".fex", 4) == 0)) {
             /* Not a 'FEX' file, so we need to decrypt it even more! */
             tf_decrypt_inplace(curr, stored_length);
         }
@@ -457,8 +417,7 @@ decrypt_image(const char *infn, const char *outfn) {
     return 0;
 }
 
-static int
-unpack_image(const char *infn, const char *outdn) {
+int unpack_image(const char *infn, const char *outdn) {
     int num_files, pid, vid, hardware_id, firmware_id;
     FILE *ifp, *lfp = NULL, *ofp, *cfp;
     struct imagewty_header *header;
@@ -535,9 +494,7 @@ unpack_image(const char *infn, const char *outdn) {
         }
 
         next = rc6_decrypt_inplace(curr, stored_length, &filecontent_ctx);
-        if (TF_DECRYPT_WORKING &&
-            !(strlen(filename) >= 4 &&
-              strncmp(filename + strlen(filename) - 4, ".fex", 4) == 0)) {
+        if (TF_DECRYPT_WORKING && !(strlen(filename) >= 4 && strncmp(filename + strlen(filename) - 4, ".fex", 4) == 0)) {
             /* Not a 'FEX' file, so we need to decrypt it even more! */
             tf_decrypt_inplace(curr, stored_length);
         }
@@ -655,124 +612,6 @@ unpack_image(const char *infn, const char *outdn) {
 
     if (lfp)
         fclose(lfp);
-
-    return 0;
-}
-
-int
-main(int argc, char **argv) {
-    struct stat statbuf;
-    char outfn[512];
-    char *out, *in;
-    int c, rc;
-
-    /* Generate program name from argv[0] */
-    progname = argv[0];
-    if (progname[0] == '.' && progname[1] == '/')
-        progname += 2;
-
-    /* assume we're encrypted */
-    flag_encryption_enabled = 1;
-
-    /* Setup default output format */
-    flag_compat_output = OUTPUT_UNIMG;
-
-    /* Now scan the cmdline options */
-    do {
-        c = getopt(argc, argv, "vdurhn");
-        if (c == EOF)
-            break;
-        switch (c) {
-            case 'n':
-                flag_encryption_enabled = 0;
-                break;
-            case 'u':
-                flag_compat_output = OUTPUT_UNIMG;
-                break;
-            case 'r':
-                flag_compat_output = OUTPUT_IMGREPACKER;
-                break;
-            case 'd':
-                flag_dump_decrypted = 1;
-                break;
-            case 'v':
-                flag_verbose++;
-                break;
-            case 'h':
-                fprintf(stderr, "%s [-vurh] {image dir|dir image}\n"
-                                "  -r         imgRepacker compatibility\n"
-                                "  -u         unimg.exe compatibility\n"
-                                "  -n         disable encryption/decryption\n"
-                                "  -d         dump decrypted image\n"
-                                "  -v         Be verbose\n"
-                                "  -h         Print help\n", argv[0]);
-                return -1;
-            case '?':
-                fprintf(stderr, "%s: invalid option -%c\n",
-                        argv[0], optopt);
-                return 1;
-        }
-    } while (1);
-
-    if (argc - optind > 2) {
-        fprintf(stderr, "%s: extra arguments\n", argv[0]);
-        return 1;
-    } else if (argc - optind < 1) {
-        fprintf(stderr, "%s: missing file argument\n", argv[0]);
-        return 1;
-    }
-
-    /* If we get here, we have a file spec and possibly options */
-    crypto_init();
-
-    rc = stat(argv[optind], &statbuf);
-    if (rc) {
-        fprintf(stderr, "%s: cannot stat '%s'!\n", argv[0], argv[optind]);
-        return 1;
-    }
-
-    out = (argc - optind) == 2 ? argv[optind + 1] : NULL;
-    in = argv[optind];
-
-    if (S_ISDIR(statbuf.st_mode)) {
-        /* We're packing, lets see if we have to generate the output image filename ourselfs */
-        if (out == NULL) {
-            int len = strlen(in);
-            strcpy(outfn, in);
-            if (in[len - 1] == '/') len--;
-            if (len > 5 && strncmp(in + len - 5, ".dump", 5) == 0)
-                outfn[len - 5] = '\0';
-            else {
-                outfn[len] = '\0';
-                strcat(outfn, ".img");
-            }
-
-            out = outfn;
-        }
-        fprintf(stderr, "%s: packing %s into %s\n", argv[0], in, out);
-        pack_image(in, out);
-    } else {
-        /* We're unpacking, lets see if we have to generate the output directory name ourself */
-        if (flag_dump_decrypted) {
-            /* Special case for only decrypting image */
-            if (out == NULL) {
-                strcpy(outfn, in);
-                strcat(outfn, ".decrypted");
-                out = outfn;
-            }
-            fprintf(stderr, "%s: decrypting %s into %s\n", argv[0], in, out);
-            return decrypt_image(in, out);
-        } else if (out == NULL) {
-            strcpy(outfn, in);
-            strcat(outfn, ".dump");
-        } else {
-            strcpy(outfn, out);
-        }
-        out = outfn;
-
-        fprintf(stderr, "%s: unpacking %s to %s\n", argv[0], in, out);
-        unpack_image(in, out);
-    }
 
     return 0;
 }
