@@ -9,7 +9,8 @@
 
 #include "awimage.h"
 
-int main(int argc, char **argv) {
+int
+main(int argc, char **argv) {
     struct stat statbuf;
     char outfn[512];
     char *out, *in;

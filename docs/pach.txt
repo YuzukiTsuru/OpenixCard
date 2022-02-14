@@ -1,0 +1,1 @@
+/home/yuzuki/WorkSpace/tina-d1-open/scripts/pack_img.sh -c sun20iw1p1 -p tina -b d1-lichee_rv           -d uart0 -s none -m normal -w none -v none -i none -t /home/yuzuki/WorkSpace/tina-d1-open

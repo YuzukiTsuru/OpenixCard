@@ -6,12 +6,19 @@
  * it under the terms of the GNU General Public License version 2 as
  * published by the Free Software Foundation.
  *
- * See README.md and LICENSE for more details.
+ * See README and COPYING for more details.
  */
-
 #include "awimage.h"
 
+#include "parsecfg.h"
+
+#include "twofish.h"
+#include "rc6.h"
+
+#include "imagewty.h"
+
 #include <stdio.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
@@ -44,6 +51,7 @@ void recursive_mkdir(const char *dir) {
 void crypto_init(void) {
     char key[32];
     int i;
+
     /* Initialize RC6 context for header */
     memset(key, 0, sizeof(key));
     key[sizeof(key) - 1] = 'i';
@@ -67,7 +75,7 @@ void crypto_init(void) {
 }
 
 void *rc6_decrypt_inplace(void *p, size_t len, rc6_ctx_t *ctx) {
-    int i;
+    size_t i;
 
     /* If encryption is disabled, we've got nothing to do */
     if (!flag_encryption_enabled)
@@ -82,7 +90,7 @@ void *rc6_decrypt_inplace(void *p, size_t len, rc6_ctx_t *ctx) {
 }
 
 void *rc6_encrypt_inplace(void *p, size_t len, rc6_ctx_t *ctx) {
-    int i;
+    size_t i;
 
     /* If encryption is disabled, we've got nothing to do */
     if (!flag_encryption_enabled)
@@ -97,7 +105,7 @@ void *rc6_encrypt_inplace(void *p, size_t len, rc6_ctx_t *ctx) {
 }
 
 void *tf_decrypt_inplace(void *p, size_t len) {
-    int i;
+    size_t i;
 
     /* If encryption is disabled, we've got nothing to do */
     if (!flag_encryption_enabled)
@@ -113,7 +121,7 @@ void *tf_decrypt_inplace(void *p, size_t len) {
     return p;
 }
 
-FILE *dir_fopen(const char *dir, const char *path, const char *mode) {
+FILE * dir_fopen(const char *dir, const char *path, const char *mode) {
     char outfn[512];
     char *p;
     int len;
@@ -321,8 +329,9 @@ int pack_image(const char *indn, const char *outfn) {
     return 0;
 }
 
-int decrypt_image(const char *infn, const char *outfn) {
-    int num_files, pid, vid, hardware_id, firmware_id;
+int
+decrypt_image(const char *infn, const char *outfn) {
+    int num_files;
     struct imagewty_header *header;
     void *image, *curr;
     FILE *ifp, *ofp;
@@ -366,16 +375,8 @@ int decrypt_image(const char *infn, const char *outfn) {
     /* Check version of header and setup our local state */
     if (header->header_version == 0x0300) {
         num_files = header->v3.num_files;
-        hardware_id = header->v3.hardware_id;
-        firmware_id = header->v3.firmware_id;
-        pid = header->v3.pid;
-        vid = header->v3.vid;
     } else /*if (header->header_version == 0x0100)*/ {
         num_files = header->v1.num_files;
-        hardware_id = header->v1.hardware_id;
-        firmware_id = header->v1.firmware_id;
-        pid = header->v1.pid;
-        vid = header->v1.vid;
     }
 
     /* Decrypt file headers */
@@ -398,7 +399,9 @@ int decrypt_image(const char *infn, const char *outfn) {
         }
 
         next = rc6_decrypt_inplace(curr, stored_length, &filecontent_ctx);
-        if (TF_DECRYPT_WORKING && !(strlen(filename) >= 4 && strncmp(filename + strlen(filename) - 4, ".fex", 4) == 0)) {
+        if (TF_DECRYPT_WORKING &&
+            !(strlen(filename) >= 4 &&
+              strncmp(filename + strlen(filename) - 4, ".fex", 4) == 0)) {
             /* Not a 'FEX' file, so we need to decrypt it even more! */
             tf_decrypt_inplace(curr, stored_length);
         }
@@ -417,13 +420,15 @@ int decrypt_image(const char *infn, const char *outfn) {
     return 0;
 }
 
-int unpack_image(const char *infn, const char *outdn) {
-    int num_files, pid, vid, hardware_id, firmware_id;
+int
+unpack_image(const char *infn, const char *outdn) {
+    int pid, vid, hardware_id, firmware_id;
     FILE *ifp, *lfp = NULL, *ofp, *cfp;
     struct imagewty_header *header;
     void *image, *curr;
     long imagesize;
-    int i;
+    uint32_t num_files;
+    size_t i;
 
     ifp = fopen(infn, "rb");
     if (ifp == NULL) {
@@ -494,7 +499,9 @@ int unpack_image(const char *infn, const char *outdn) {
         }
 
         next = rc6_decrypt_inplace(curr, stored_length, &filecontent_ctx);
-        if (TF_DECRYPT_WORKING && !(strlen(filename) >= 4 && strncmp(filename + strlen(filename) - 4, ".fex", 4) == 0)) {
+        if (TF_DECRYPT_WORKING &&
+            !(strlen(filename) >= 4 &&
+              strncmp(filename + strlen(filename) - 4, ".fex", 4) == 0)) {
             /* Not a 'FEX' file, so we need to decrypt it even more! */
             tf_decrypt_inplace(curr, stored_length);
         }
@@ -596,7 +603,6 @@ int unpack_image(const char *infn, const char *outdn) {
                     filehdr->maintype, filehdr->subtype);
         }
     }
-
     if (cfp != NULL) {
         /* Now print the relevant stuff for the image.cfg */
         fputs("\r\n[IMAGE_CFG]\r\n", cfp);
@@ -609,9 +615,7 @@ int unpack_image(const char *infn, const char *outdn) {
         fputs("filelist = FILELIST\r\n", cfp);
         fclose(cfp);
     }
-
     if (lfp)
         fclose(lfp);
-
     return 0;
 }

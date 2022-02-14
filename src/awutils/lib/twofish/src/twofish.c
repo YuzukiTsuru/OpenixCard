@@ -232,11 +232,13 @@ u4byte h_fun(const u4byte x, const u4byte key[]) {
             b1 = q(0, b1) ^ byte(key[3], 1);
             b2 = q(0, b2) ^ byte(key[3], 2);
             b3 = q(1, b3) ^ byte(key[3], 3);
+            /* FALLTHRU */
         case 3:
             b0 = q(1, b0) ^ byte(key[2], 0);
             b1 = q(1, b1) ^ byte(key[2], 1);
             b2 = q(0, b2) ^ byte(key[2], 2);
             b3 = q(0, b3) ^ byte(key[2], 3);
+            /* FALLTHRU */
         case 2:
             b0 = q(0, q(0, b0) ^ byte(key[1], 0)) ^ byte(key[0], 0);
             b1 = q(0, q(1, b1) ^ byte(key[1], 1)) ^ byte(key[0], 1);
@@ -299,7 +301,7 @@ gen_mk_tab(u4byte key[]) {
                 mk_tab[2][i] = mds(2, q22(by));
                 mk_tab[3][i] = mds(3, q23(by));
 #else
-                sb[0][i] = q20(by); sb[1][i] = q21(by); 
+                sb[0][i] = q20(by); sb[1][i] = q21(by);
                 sb[2][i] = q22(by); sb[3][i] = q23(by);
 #endif
             }
@@ -314,7 +316,7 @@ gen_mk_tab(u4byte key[]) {
                 mk_tab[2][i] = mds(2, q32(by));
                 mk_tab[3][i] = mds(3, q33(by));
 #else
-                sb[0][i] = q30(by); sb[1][i] = q31(by); 
+                sb[0][i] = q30(by); sb[1][i] = q31(by);
                 sb[2][i] = q32(by); sb[3][i] = q33(by);
 #endif
             }
@@ -329,7 +331,7 @@ gen_mk_tab(u4byte key[]) {
                 mk_tab[2][i] = mds(2, q42(by));
                 mk_tab[3][i] = mds(3, q43(by));
 #else
-                sb[0][i] = q40(by); sb[1][i] = q41(by); 
+                sb[0][i] = q40(by); sb[1][i] = q41(by);
                 sb[2][i] = q42(by); sb[3][i] = q43(by);
 #endif
             }
@@ -362,22 +364,22 @@ gen_mk_tab(u4byte key[]) {
 where the coefficients are in the finite field GF(2^8) with a
 modular polynomial a^8 + a^6 + a^3 + a^2 + 1. To generate the
 remainder we have to start with a 12th order polynomial with our
-eight input bytes as the coefficients of the 4th to 11th terms. 
+eight input bytes as the coefficients of the 4th to 11th terms.
 That is:
 
   m[7] * x^11 + m[6] * x^10 ... + m[0] * x^4 + 0 * x^3 +... + 0
-  
+
 We then multiply the generator polynomial by m[7] * x^7 and subtract
-it - xor in GF(2^8) - from the above to eliminate the x^7 term (the 
-artihmetic on the coefficients is done in GF(2^8). We then multiply 
+it - xor in GF(2^8) - from the above to eliminate the x^7 term (the
+artihmetic on the coefficients is done in GF(2^8). We then multiply
 the generator polynomial by x^6 * coeff(x^10) and use this to remove
 the x^10 term. We carry on in this way until the x^4 term is removed
 so that we are left with:
 
   r[3] * x^3 + r[2] * x^2 + r[1] 8 x^1 + r[0]
 
-which give the resulting 4 bytes of the remainder. This is equivalent 
-to the matrix multiplication in the Twofish description but much faster 
+which give the resulting 4 bytes of the remainder. This is equivalent
+to the matrix multiplication in the Twofish description but much faster
 to implement.
 
 */
@@ -389,21 +391,18 @@ u4byte mds_rem(u4byte p0, u4byte p1) {
 
     for (i = 0; i < 8; ++i) {
         t = p1 >> 24;   // get most significant coefficient
-
         p1 = (p1 << 8) | (p0 >> 24);
         p0 <<= 8;  // shift others up
-
         // multiply t by a (the primitive element - i.e. left shift)
-
         u = (t << 1);
 
         if (t & 0x80)            // subtract modular polynomial on overflow
 
             u ^= G_MOD;
 
-        p1 ^= t ^ (u << 16);    // remove t * (a * x^2 + 1)  
+        p1 ^= t ^ (u << 16);    // remove t * (a * x^2 + 1)
 
-        u ^= (t >> 1);          // form u = a * t + t / a = t * (a + 1 / a); 
+        u ^= (t >> 1);          // form u = a * t + t / a = t * (a + 1 / a);
 
         if (t & 0x01)            // add the modular polynomial on underflow
 
@@ -418,7 +417,7 @@ u4byte mds_rem(u4byte p0, u4byte p1) {
 /* initialise the key schedule from the user supplied key   */
 
 u4byte *tf_init(const u4byte in_key[], const u4byte key_len) {
-    u4byte i, a, b, me_key[4], mo_key[4];
+    u4byte i, a, b;
 
 #ifdef Q_TABLES
     if (!qt_gen) {
@@ -438,9 +437,7 @@ u4byte *tf_init(const u4byte in_key[], const u4byte key_len) {
 
     for (i = 0; i < k_len; ++i) {
         a = in_key[i + i];
-        me_key[i] = a;
         b = in_key[i + i + 1];
-        mo_key[i] = b;
         s_key[k_len - i - 1] = mds_rem(a, b);
     }
     //printf("s_key: %08x %08x %08x %08x\n", s_key[0], s_key[1], s_key[2], s_key[3]);
