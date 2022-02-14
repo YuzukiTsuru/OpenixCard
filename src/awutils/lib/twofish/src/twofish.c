@@ -388,7 +388,6 @@ to implement.
 
 u4byte mds_rem(u4byte p0, u4byte p1) {
     u4byte i, t, u;
-
     for (i = 0; i < 8; ++i) {
         t = p1 >> 24;   // get most significant coefficient
         p1 = (p1 << 8) | (p0 >> 24);
