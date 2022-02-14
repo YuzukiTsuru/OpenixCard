@@ -395,7 +395,6 @@ u4byte mds_rem(u4byte p0, u4byte p1) {
         p0 <<= 8;  // shift others up
         // multiply t by a (the primitive element - i.e. left shift)
         u = (t << 1);
-
         if (t & 0x80)            // subtract modular polynomial on overflow
 
             u ^= G_MOD;
