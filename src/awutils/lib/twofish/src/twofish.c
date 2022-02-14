@@ -400,7 +400,6 @@ u4byte mds_rem(u4byte p0, u4byte p1) {
         u ^= (t >> 1);          // form u = a * t + t / a = t * (a + 1 / a);
         if (t & 0x01)            // add the modular polynomial on underflow
             u ^= G_MOD >> 1;
-
         p1 ^= (u << 24) | (u << 8); // remove t * (a + 1/a) * (x^3 + x)
     }
 
