@@ -121,7 +121,7 @@ void *tf_decrypt_inplace(void *p, size_t len) {
     return p;
 }
 
-FILE * dir_fopen(const char *dir, const char *path, const char *mode) {
+FILE *dir_fopen(const char *dir, const char *path, const char *mode) {
     char outfn[512];
     char *p;
     int len;
