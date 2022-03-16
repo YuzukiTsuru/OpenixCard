@@ -6,7 +6,6 @@
 #define IMAGEWTY_MAGIC        "IMAGEWTY"
 #define IMAGEWTY_MAGIC_LEN    8
 #define IMAGEWTY_VERSION    0x100234
-
 #define IMAGEWTY_FILEHDR_LEN    1024
 
 struct imagewty_header {

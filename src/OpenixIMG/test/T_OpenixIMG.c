@@ -7,7 +7,7 @@
 
 #include <sys/stat.h>
 
-#include "awimage.h"
+#include "OpenixIMG.h"
 
 int
 main(int argc, char **argv) {

@@ -25,7 +25,7 @@
  *
  */
 
-#include "parsecfg.h"
+#include "CFGParser.h"
 
 #include <stdlib.h>
 #include <stdio.h>

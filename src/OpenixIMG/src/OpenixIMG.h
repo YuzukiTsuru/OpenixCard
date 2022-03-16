@@ -2,15 +2,15 @@
 // Created by gloom on 2022/2/13.
 //
 
-#ifndef OPENIXCARD_AWIMAGE_H
-#define OPENIXCARD_AWIMAGE_H
+#ifndef OPENIXCARD_OPENIXIMG_H
+#define OPENIXCARD_OPENIXIMG_H
 
-#include "parsecfg.h"
+#include "CFGParser.h"
 
 #include "twofish.h"
-#include "rc6.h"
+#include "../lib/rc6/src/rc6.h"
 
-#include "imagewty.h"
+#include "IMAGEWTY.h"
 
 #define TF_DECRYPT_WORKING 0
 
@@ -45,4 +45,4 @@ int pack_image(const char *indn, const char *outfn);
 int decrypt_image(const char *infn, const char *outfn);
 int unpack_image(const char *infn, const char *outdn);
 
-#endif //OPENIXCARD_AWIMAGE_H
+#endif //OPENIXCARD_OPENIXIMG_H

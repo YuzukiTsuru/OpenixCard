@@ -8,14 +8,14 @@
  *
  * See README and COPYING for more details.
  */
-#include "awimage.h"
+#include "OpenixIMG.h"
 
-#include "parsecfg.h"
+#include "CFGParser.h"
 
 #include "twofish.h"
-#include "rc6.h"
+#include "../lib/rc6/src/rc6.h"
 
-#include "imagewty.h"
+#include "IMAGEWTY.h"
 
 #include <stdio.h>
 #include <unistd.h>
