@@ -16,3 +16,6 @@ endif ()
 project(OpenixCard LANGUAGES CXX VERSION 1.0.${git_version})
 
 add_subdirectory(src/awutils)
+
+add_executable(OpenixCard src/OpenixCard/main.cpp)
+target_link_libraries(OpenixCard awutils-awimg)
