@@ -15,7 +15,17 @@ endif ()
 
 project(OpenixCard LANGUAGES CXX VERSION 1.0.${git_version})
 
-add_subdirectory(src/awutils)
+add_subdirectory(src/AllwinnerIMGUtils)
+add_subdirectory(lib/ftxui)
+add_subdirectory(lib/argparse)
 
-add_executable(OpenixCard src/OpenixCard/main.cpp)
+include_directories(
+        src/OpenixCard
+        lib/ftxui/include
+        lib/argparse/include
+)
+
+file(GLOB OpenixCardSource src/OpenixCard/*.cpp)
+
+add_executable(OpenixCard ${OpenixCardSource})
 target_link_libraries(OpenixCard awutils-awimg)

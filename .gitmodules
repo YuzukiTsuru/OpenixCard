@@ -1,0 +1,6 @@
+[submodule "lib/ftxui"]
+	path = lib/ftxui
+	url = https://github.com/ArthurSonzogni/FTXUI
+[submodule "lib/argparse"]
+	path = lib/argparse
+	url = https://github.com/p-ranav/argparse
