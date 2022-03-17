@@ -9,8 +9,7 @@
 
 #include "OpenixIMG.h"
 
-int
-main(int argc, char **argv) {
+int main(int argc, char **argv) {
     struct stat statbuf;
     char outfn[512];
     char *out, *in;
@@ -25,7 +24,7 @@ main(int argc, char **argv) {
     flag_encryption_enabled = 1;
 
     /* Setup default output format */
-    flag_compat_output = OUTPUT_UNIMG;
+    flag_compat_output = OUTPUT_IMGREPACKER;
 
     /* Now scan the cmdline options */
     do {

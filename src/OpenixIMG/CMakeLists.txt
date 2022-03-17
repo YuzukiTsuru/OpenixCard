@@ -11,8 +11,8 @@ include_directories(
 add_subdirectory(lib/twofish)
 add_subdirectory(lib/rc6)
 
-add_library(OpenixIMG src/OpenixIMG.c src/CFGParser.c)
-target_link_libraries(OpenixIMG twofish)
+add_library(OpenixIMG src/OpenixIMG.cpp src/CFGParser.cpp)
+target_link_libraries(OpenixIMG twofish rc6)
 
-add_executable(T_OpenixIMG test/T_OpenixIMG.c)
+add_executable(T_OpenixIMG test/T_OpenixIMG.cpp)
 target_link_libraries(T_OpenixIMG OpenixIMG)
