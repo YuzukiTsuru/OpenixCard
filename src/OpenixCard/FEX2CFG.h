@@ -9,9 +9,9 @@
 
 #include "aw_img_para.h"
 
-class fex2cfg {
+class FEX2CFG {
 public:
-    fex2cfg(std::string dump_path);
+    FEX2CFG(std::string dump_path);
 
     void savefile(std::string file_path);
 

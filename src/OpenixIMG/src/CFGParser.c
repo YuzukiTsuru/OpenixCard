@@ -38,8 +38,7 @@
 
 static int lineno;
 
-group_t *
-cfg_find_group(const char *name, group_t *head) {
+group_t *cfg_find_group(const char *name, group_t *head) {
     for (; head; head = head->next)
         if (strcmp(name, head->name) == 0)
             return head;
@@ -47,8 +46,7 @@ cfg_find_group(const char *name, group_t *head) {
     return NULL;
 }
 
-variable_t *
-cfg_find_var(const char *name, group_t *head) {
+variable_t *cfg_find_var(const char *name, group_t *head) {
     for (; head; head = head->next) {
         variable_t *var;
         for (var = head->vars; var; var = var->next)
@@ -60,8 +58,7 @@ cfg_find_var(const char *name, group_t *head) {
 }
 
 
-long
-cfg_get_number(const char *name, group_t *head) {
+long cfg_get_number(const char *name, group_t *head) {
     variable_t *var = cfg_find_var(name, head);
     if (var && var->type == VT_NUMBER)
         return var->number;
@@ -69,8 +66,7 @@ cfg_get_number(const char *name, group_t *head) {
     return 0;
 }
 
-long
-cfg_count_vars(group_t *head) {
+long cfg_count_vars(group_t *head) {
     variable_t *var;
     long count;
 
@@ -79,8 +75,7 @@ cfg_count_vars(group_t *head) {
     return count;
 }
 
-static variable_t *
-new_variable(const char *name, valtype_t type) {
+static variable_t *new_variable(const char *name, valtype_t type) {
     variable_t *var = malloc(sizeof(variable_t));
     if (var) {
         memset(var, 0, sizeof(*var));
@@ -91,8 +86,7 @@ new_variable(const char *name, valtype_t type) {
     return var;
 }
 
-static int
-add_to_listitem(variable_t *listitem, variable_t *sub) {
+static int add_to_listitem(variable_t *listitem, variable_t *sub) {
     variable_t *last = listitem->items;
     if (last == NULL) {
         listitem->items = sub;
@@ -106,8 +100,7 @@ add_to_listitem(variable_t *listitem, variable_t *sub) {
     return 0;
 }
 
-static int
-add_var_to_group(group_t *group, variable_t *var) {
+static int add_var_to_group(group_t *group, variable_t *var) {
     variable_t *last = group->vars;
     if (last == NULL) {
         group->vars = var;
@@ -121,8 +114,7 @@ add_var_to_group(group_t *group, variable_t *var) {
     return 0;
 }
 
-static char *
-skip_whitespace(char **ptr) {
+static char *skip_whitespace(char **ptr) {
     char *p = *ptr;
     while (*p && isspace(*p)) ++p;
     if (*p == ';')
@@ -132,8 +124,7 @@ skip_whitespace(char **ptr) {
     return p;
 }
 
-static char *
-parse_identifier(char **ptr, char *buf, size_t buflen) {
+static char *parse_identifier(char **ptr, char *buf, size_t buflen) {
     char *p = *ptr;
     while (*p && (isalnum(*p) || *p == '_')) {
         if (buflen > 0) {
@@ -150,8 +141,7 @@ parse_identifier(char **ptr, char *buf, size_t buflen) {
 }
 
 /* Parse a string; assuming *ptr == '"' or '\'' */
-static char *
-parse_string(char **ptr, char *buf, size_t buflen) {
+static char *parse_string(char **ptr, char *buf, size_t buflen) {
     char *s = buf, *p = *ptr;
     char delim = *p++;
 
@@ -172,8 +162,7 @@ parse_string(char **ptr, char *buf, size_t buflen) {
     return s;
 }
 
-static variable_t *
-parse_expr(char **ptr, variable_t *var, group_t *head) {
+static variable_t *parse_expr(char **ptr, variable_t *var, group_t *head) {
     char value[MAXLINELEN];
     char *buf = value;
     size_t buflen = sizeof(value);
@@ -236,8 +225,7 @@ parse_expr(char **ptr, variable_t *var, group_t *head) {
     return var;
 }
 
-static group_t *
-parse_group(char *line) {
+static group_t *parse_group(char *line) {
     char *grp, *p = line + 1;
     group_t *group;
 
@@ -256,8 +244,7 @@ parse_group(char *line) {
     return group;
 }
 
-static variable_t *
-parse_keyvalue(char **ptr, group_t *head) {
+static variable_t *parse_keyvalue(char **ptr, group_t *head) {
     char *p = *ptr;
     char name[MAXIDLEN];
     variable_t *var;
@@ -282,8 +269,7 @@ parse_keyvalue(char **ptr, group_t *head) {
     return var;
 }
 
-static variable_t *
-parse_listitem(char *line, group_t *head) {
+static variable_t *parse_listitem(char *line, group_t *head) {
     int found_comma = false;
     variable_t *listitem;
     variable_t *subitem;
@@ -314,8 +300,7 @@ parse_listitem(char *line, group_t *head) {
     return listitem;
 }
 
-group_t *
-cfg_load(FILE *fp) {
+group_t *cfg_load(FILE *fp) {
     char line[MAXLINELEN];
     group_t *head = NULL, *curr = NULL;
 
@@ -378,8 +363,7 @@ cfg_load(FILE *fp) {
     return head;
 }
 
-static variable_t *
-free_var(variable_t *var) {
+static variable_t *free_var(variable_t *var) {
     variable_t *next = var->next;
 
     /* free name */
@@ -410,8 +394,7 @@ free_var(variable_t *var) {
     return next;
 }
 
-void
-cfg_free(group_t *head) {
+void cfg_free(group_t *head) {
     while (head) {
         variable_t *var;
         group_t *group;
@@ -438,8 +421,7 @@ cfg_free(group_t *head) {
  */
 
 #ifdef STANDALONE
-static void
-dump_vars(variable_t *var) {
+static void dump_vars(variable_t *var) {
     for (; var; var=var->next) {
         switch(var->type) {
             case VT_NUMBER:
@@ -459,8 +441,7 @@ dump_vars(variable_t *var) {
     }
 }
 
-static void
-cfg_dump(group_t *head) {
+static void cfg_dump(group_t *head) {
     if (head == NULL) {
         fprintf(stderr, "%s: head == NULL!\n", __func__);
         return;

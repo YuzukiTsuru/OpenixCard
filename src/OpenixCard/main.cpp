@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include "fex2cfg.h"
+#include "FEX2CFG.h"
 
 int main(int argc, char *argv[]) {
     return 0;
