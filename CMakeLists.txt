@@ -18,6 +18,7 @@ project(OpenixCard LANGUAGES CXX VERSION 1.0.${git_version})
 add_subdirectory(src/OpenixIMG)
 add_subdirectory(lib/ftxui)
 add_subdirectory(lib/argparse)
+add_subdirectory(lib/libfex)
 
 include_directories(
         src/OpenixCard
