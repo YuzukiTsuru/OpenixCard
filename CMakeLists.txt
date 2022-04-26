@@ -15,16 +15,18 @@ endif ()
 
 project(OpenixCard LANGUAGES C CXX VERSION 1.0.${git_version})
 
+set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/dist")
+
 include(FetchContent)
 
 set(FETCHCONTENT_UPDATES_DISCONNECTED TRUE)
 FetchContent_Declare(ftxui GIT_REPOSITORY https://github.com/ArthurSonzogni/ftxui)
 
 FetchContent_GetProperties(ftxui)
-if(NOT ftxui_POPULATED)
+if (NOT ftxui_POPULATED)
     FetchContent_Populate(ftxui)
     add_subdirectory(${ftxui_SOURCE_DIR} ${ftxui_BINARY_DIR} EXCLUDE_FROM_ALL)
-endif()
+endif ()
 
 include(CMake/genimage.cmake)
 
@@ -36,7 +38,8 @@ include_directories(
         src/OpenixIMG/include
         src/OpenixCard
         src/OpenixCard/payloads
-        lib/ftxui/include
+        src/OpenixIMG/lib/rc6/src
+        src/OpenixIMG/lib/twofish/src
         lib/argparse/include
         lib/inicpp/include
 )

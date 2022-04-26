@@ -38,6 +38,7 @@ Mean:          378 cycles =    67.8 mbits/sec
 
 */
 
+#include "std_defs.h"
 #include "twofish.h"
 
 #define Q_TABLES

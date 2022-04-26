@@ -2,7 +2,6 @@
 
 typedef unsigned char u1byte; /* an 8 bit unsigned character type */
 typedef unsigned short u2byte; /* a 16 bit unsigned integer type   */
-typedef unsigned long u4byte; /* a 32 bit unsigned integer type   */
 
 typedef signed char s1byte; /* an 8 bit signed character type   */
 typedef signed short s2byte; /* a 16 bit signed integer type     */
