@@ -7,6 +7,3 @@
 [submodule "lib/inicpp"]
 	path = lib/inicpp
 	url = https://github.com/SemaiCZE/inicpp
-[submodule "lib/libgenimage/genimage"]
-	path = lib/libgenimage/genimage
-	url = https://github.com/pengutronix/genimage
