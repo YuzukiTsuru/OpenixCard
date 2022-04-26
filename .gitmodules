@@ -4,6 +4,3 @@
 [submodule "lib/argparse"]
 	path = lib/argparse
 	url = https://github.com/p-ranav/argparse
-[submodule "lib/libfex"]
-	path = lib/libfex
-	url = https://github.com/YuzukiTsuru/libfex/
