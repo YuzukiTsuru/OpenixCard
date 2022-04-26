@@ -14,8 +14,6 @@ int main(int argc, char **argv) {
     char outfn[512];
     char *out, *in;
     int rc;
-    /* Setup default output format */
-    flag_compat_output = OUTPUT_IMGREPACKER;
     if (argc - optind > 2) {
         fprintf(stderr, "%s: extra arguments\n", argv[0]);
         return 1;

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.0)
 project(OpenixIMG)
 
 include_directories(
-        src
+        include
         lib/twofish/src
         lib/rc6/src
 )
@@ -11,7 +11,7 @@ include_directories(
 add_subdirectory(lib/twofish)
 add_subdirectory(lib/rc6)
 
-add_library(OpenixIMG src/OpenixIMG.c src/CFGParser.c)
+add_library(OpenixIMG src/OpenixIMG.c)
 target_link_libraries(OpenixIMG twofish rc6)
 
 add_executable(T_OpenixIMG test/T_OpenixIMG.c)

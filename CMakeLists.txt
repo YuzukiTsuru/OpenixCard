@@ -21,6 +21,7 @@ add_subdirectory(lib/ftxui)
 add_subdirectory(lib/argparse)
 
 include_directories(
+        src/OpenixIMG/include
         src/OpenixCard
         src/OpenixCard/payloads
         lib/ftxui/include

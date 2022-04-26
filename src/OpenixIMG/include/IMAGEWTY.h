@@ -1,12 +1,22 @@
-#ifndef IMAGEWTY_H
-#define IMAGEWTY_H
+/*
+ * IMAGEWTY.h Allwinner IMAGEWTY Handler
+ * Copyright (c) 2012, Ithamar R. Adema <ithamar@upgrade-android.com>
+ * Copyright (c) 2022, YuzukiTsuru <GloomyGhost@GloomyGhost.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * See README and LICENSE for more details.
+ */
+
+#ifndef OPENIXIMG_IMAGEWTY_H
+#define OPENIXIMG_IMAGEWTY_H
 
 #include <stdint.h>
 
 #define IMAGEWTY_MAGIC        "IMAGEWTY"
 #define IMAGEWTY_MAGIC_LEN    8
-#define IMAGEWTY_VERSION    0x100234
-#define IMAGEWTY_FILEHDR_LEN    1024
 
 struct imagewty_header {
     char magic[IMAGEWTY_MAGIC_LEN];
