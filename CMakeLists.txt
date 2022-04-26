@@ -16,6 +16,7 @@ endif ()
 project(OpenixCard LANGUAGES C CXX VERSION 1.0.${git_version})
 
 add_subdirectory(src/OpenixIMG)
+add_subdirectory(lib/libgenimage)
 add_subdirectory(lib/inicpp)
 add_subdirectory(lib/ftxui)
 add_subdirectory(lib/argparse)
