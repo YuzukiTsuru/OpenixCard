@@ -113,17 +113,11 @@ void FEX2CFG::gen_cfg() {
 
 void FEX2CFG::print_partition_table() {
     for (auto &sect: fex_classed) {
-        std::cout << "  Section: '" << sect.get_name() << "'" << std::endl;
+        std::cout << "  Partition: '" << sect.get_name() << "'" << std::endl;
         // Iterate through options in a section
         for (auto &opt: sect) {
             std::cout << "    Option: '" << opt.get_name() << "' with value(s): ";
-            if (!opt.is_list()) {
-                std::cout << "'" << opt.get<inicpp::string_ini_t>() << "'";
-            } else {
-                for (auto &list_item: opt.get_list<inicpp::string_ini_t>())
-                    std::cout << "'" << list_item << "' ";
-            }
-            std::cout << std::endl;
+            std::cout << "'" << opt.get<inicpp::string_ini_t>() << "'" << std::endl;
         }
     }
 }

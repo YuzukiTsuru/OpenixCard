@@ -7,7 +7,8 @@
 
 #include <chip.h>
 
-std::string gen_linux_cfg_from_fex_map(inicpp::config fex) {
+
+std::string gen_linux_cfg_from_fex_map(const inicpp::config &fex) {
     partition_table_struct patab;
     std::string cfg_data;
     for (auto &sect: fex) {

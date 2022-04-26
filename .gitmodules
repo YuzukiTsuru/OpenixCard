@@ -4,6 +4,3 @@
 [submodule "lib/argparse"]
 	path = lib/argparse
 	url = https://github.com/p-ranav/argparse
-[submodule "lib/inicpp"]
-	path = lib/inicpp
-	url = https://github.com/SemaiCZE/inicpp

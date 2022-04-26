@@ -23,6 +23,6 @@ std::string tostring(const T &t) {
     return ss.str();
 }
 
-std::string gen_linux_cfg_from_fex_map(inicpp::config fex);
+std::string gen_linux_cfg_from_fex_map(const inicpp::config& fex);
 
 #endif //OPENIXCARD_CHIP_H

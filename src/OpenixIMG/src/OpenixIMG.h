@@ -25,7 +25,7 @@ enum {
     OUTPUT_UNIMG,
 };
 
-int flag_encryption_enabled, flag_compat_output, flag_dump_decrypted, flag_verbose;
+int flag_encryption_enabled, flag_compat_output;
 
 /* Crypto */
 rc6_ctx_t header_ctx;
@@ -41,8 +41,6 @@ void *rc6_decrypt_inplace(void *p, size_t len, rc6_ctx_t *ctx);
 void *rc6_encrypt_inplace(void *p, size_t len, rc6_ctx_t *ctx);
 void *tf_decrypt_inplace(void *p, size_t len);
 FILE *dir_fopen(const char *dir, const char *path, const char *mode);
-int pack_image(const char *indn, const char *outfn);
-int decrypt_image(const char *infn, const char *outfn);
 int unpack_image(const char *infn, const char *outdn);
 
 #endif //OPENIXCARD_OPENIXIMG_H
