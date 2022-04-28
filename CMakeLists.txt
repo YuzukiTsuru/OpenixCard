@@ -34,6 +34,10 @@ else ()
     add_subdirectory(src/OpenixIMG)
     add_subdirectory(lib/inicpp)
     add_subdirectory(lib/argparse)
+    
+    set(FTXUI_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+    set(FTXUI_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+    set(FTXUI_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
     add_subdirectory(lib/ftxui)
 
     configure_file(
