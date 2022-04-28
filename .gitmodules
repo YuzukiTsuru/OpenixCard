@@ -4,3 +4,6 @@
 [submodule "lib/inicpp"]
 	path = lib/inicpp
 	url = https://github.com/SemaiCZE/inicpp
+[submodule "lib/ftxui"]
+	path = lib/ftxui
+	url = https://github.com/ArthurSonzogni/FTXUI
