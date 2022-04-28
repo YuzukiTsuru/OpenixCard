@@ -32,14 +32,15 @@ FEX2CFG::FEX2CFG(const std::string &dump_path) {
     gen_cfg();
 }
 
-void FEX2CFG::save_file(const std::string &file_path) {
-    std::ofstream out(file_path);
+std::string FEX2CFG::save_file(const std::string &file_path) {
+    std::ofstream out(file_path + "/" + awImgPara.image_name + ".cfg");
     // File not open, throw error.
     if (!out.is_open()) {
         throw file_open_error(file_path);
     }
     out << awImgCfg;
     out.close();
+    return file_path + "/" + awImgPara.image_name + ".cfg";
 }
 
 [[maybe_unused]] void FEX2CFG::save_file() {
@@ -93,7 +94,7 @@ void FEX2CFG::parse_fex() {
     fex_classed = inicpp::parser::load(awImgFexClassed);
 }
 
-[[maybe_unused]] std::string FEX2CFG::get_image_name() {
+[[maybe_unused]] std::string FEX2CFG::get_image_name() const {
     return awImgPara.image_name;
 }
 
@@ -124,7 +125,7 @@ void FEX2CFG::gen_cfg() {
                 "\t}\n";
 
     // For Debug
-    print_partition_table();
+    // print_partition_table();
 
     // Generate file from FEX
     awImgCfg += gen_linux_cfg_from_fex_map(fex_classed);
@@ -132,7 +133,7 @@ void FEX2CFG::gen_cfg() {
     awImgCfg += "}";
 }
 
-void FEX2CFG::print_partition_table() {
+[[maybe_unused]] void FEX2CFG::print_partition_table() {
     for (auto &sect: fex_classed) {
         std::cout << "  Partition: '" << sect.get_name() << "'" << std::endl;
         // Iterate through options in a section

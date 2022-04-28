@@ -22,15 +22,19 @@ class FEX2CFG {
 public:
     explicit FEX2CFG(const std::string &dump_path);
 
-    void save_file(const std::string &file_path);
+    // save the configuration to the dump file path
+    std::string save_file(const std::string &file_path);
 
+    //save the configuration to local path
     [[maybe_unused]] void save_file();
 
+    // load the configuration from the dump file
     [[maybe_unused]] std::string get_cfg();
 
-    [[maybe_unused]] std::string get_image_name();
+    // get image name
+    [[maybe_unused]] [[nodiscard]] std::string get_image_name() const;
 
-    void print_partition_table();
+    [[maybe_unused]] void print_partition_table();
 
 private:
     AW_IMG_PARA awImgPara;

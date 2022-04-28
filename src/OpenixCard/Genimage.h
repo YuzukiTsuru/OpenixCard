@@ -10,7 +10,7 @@
 
 class Genimage {
 public:
-    [[maybe_unused]] Genimage(std::string name, std::string config_path, std::string image_path, std::string output_path);
+    [[maybe_unused]] Genimage(std::string config_path, std::string image_path, std::string output_path);
 
     void print();
 
@@ -23,6 +23,8 @@ private:
 
     // subprocess runner for genimage
     void run_genimage();
+
+    void generate_blank_fex();
 };
 
 

@@ -19,6 +19,16 @@
 #include "OpenixIMG.h"
 #include "IMAGEWTY.h"
 
+int flag_encryption_enabled;
+
+/* Crypto */
+rc6_ctx_t header_ctx;
+rc6_ctx_t fileheaders_ctx;
+rc6_ctx_t filecontent_ctx;
+u4byte tf_key[32];
+
+const char *progname;
+
 void recursive_mkdir(const char *dir) {
     char tmp[256];
     char *p = NULL;
@@ -258,7 +268,7 @@ int unpack_image(const char *infn, const char *outdn) {
     return 0;
 }
 
-void dump_image(const char *image_file, char *outdir) {
+void dump_image(const char *image_file, const char *outdir) {
     char outfn[512];
     char *out = NULL;
     // initalize the crypto context

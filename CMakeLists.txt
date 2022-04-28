@@ -6,14 +6,23 @@ if (Git_FOUND AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/.git")
     execute_process(
             COMMAND ${GIT_EXECUTABLE} rev-list --count HEAD
             WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-            OUTPUT_VARIABLE git_version
+            OUTPUT_VARIABLE _git_version
             OUTPUT_STRIP_TRAILING_WHITESPACE
     )
+    execute_process(
+            COMMAND ${GIT_EXECUTABLE} log -1 --pretty=format:%h
+            OUTPUT_VARIABLE PROJECT_GIT_HASH
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            ERROR_QUIET
+            WORKING_DIRECTORY
+            ${CMAKE_CURRENT_SOURCE_DIR}
+    )
 else ()
-    set(git_version 0)
+    set(_git_version 0)
+    set(PROJECT_GIT_HASH "")
 endif ()
 
-project(OpenixCard LANGUAGES C CXX VERSION 0.0.${git_version})
+project(OpenixCard LANGUAGES C CXX VERSION ${_git_version})
 
 if (MSVC)
     message(ERROR "OpenixCard does not support MSVC")
@@ -39,6 +48,7 @@ else ()
             src/OpenixCard/payloads
             src/OpenixIMG/lib/rc6/src
             src/OpenixIMG/lib/twofish/src
+            lib/ColorCout/includes
             lib/argparse/include
             lib/inicpp/include
     )

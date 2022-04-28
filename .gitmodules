@@ -7,3 +7,6 @@
 [submodule "lib/ftxui"]
 	path = lib/ftxui
 	url = https://github.com/ArthurSonzogni/FTXUI
+[submodule "lib/ColorCout"]
+	path = lib/ColorCout
+	url = https://github.com/YuzukiTsuru/ColorCout
