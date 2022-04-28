@@ -14,3 +14,8 @@ usage:
     OpenixCard dump  if=<img> of=<target>                      - Convert Allwinner image to regular image
     
 ```
+
+# Build from source
+```
+git clone --recursive https://github.com/YuzukiTsuru/OpenixCard
+```
