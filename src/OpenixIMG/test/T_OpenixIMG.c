@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
         return 1;
     }
     /* If we get here, we have a file spec and possibly options */
-    crypto_init();
+    //crypto_init();
     rc = stat(argv[optind], &statbuf);
     if (rc) {
         fprintf(stderr, "%s: cannot stat '%s'!\n", argv[0], argv[optind]);

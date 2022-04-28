@@ -24,7 +24,11 @@ public:
 
     void save_file(const std::string &file_path);
 
-    std::string get_cfg();
+    [[maybe_unused]] void save_file();
+
+    [[maybe_unused]] std::string get_cfg();
+
+    [[maybe_unused]] std::string get_image_name();
 
     void print_partition_table();
 

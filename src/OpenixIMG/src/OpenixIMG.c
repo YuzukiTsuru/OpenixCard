@@ -257,3 +257,16 @@ int unpack_image(const char *infn, const char *outdn) {
     }
     return 0;
 }
+
+void dump_image(const char *image_file, char *outdir) {
+    char outfn[512];
+    char *out = NULL;
+    // initalize the crypto context
+    crypto_init();
+
+    strcpy(outfn, image_file);
+    strcat(outfn, ".dump");
+    out = outfn;
+    unpack_image(image_file, out);
+    outdir = out;
+}

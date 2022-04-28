@@ -38,9 +38,15 @@ u4byte tf_key[32];
 const char *progname;
 
 void recursive_mkdir(const char *dir);
+
 void crypto_init(void);
+
 void *rc6_decrypt_inplace(void *p, size_t len, rc6_ctx_t *ctx);
+
 FILE *dir_fopen(const char *dir, const char *path, const char *mode);
+
 int unpack_image(const char *infn, const char *outdn);
+
+void dump_image(const char *image_file, char *outdir);
 
 #endif //OPENIXIMG_OPENIXIMG_H

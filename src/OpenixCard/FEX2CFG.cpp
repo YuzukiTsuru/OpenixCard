@@ -42,6 +42,16 @@ void FEX2CFG::save_file(const std::string &file_path) {
     out.close();
 }
 
+[[maybe_unused]] void FEX2CFG::save_file() {
+    std::ofstream out(awImgPara.image_name + ".cfg");
+    // File not open, throw error.
+    if (!out.is_open()) {
+        throw file_open_error(awImgPara.image_name + ".cfg");
+    }
+    out << awImgCfg;
+    out.close();
+}
+
 void FEX2CFG::open_file(const std::string &file_path) {
     std::ifstream in;
     in.open(file_path, std::ios::in | std::ios::out | std::ios::binary);
@@ -83,7 +93,11 @@ void FEX2CFG::parse_fex() {
     fex_classed = inicpp::parser::load(awImgFexClassed);
 }
 
-std::string FEX2CFG::get_cfg() {
+[[maybe_unused]] std::string FEX2CFG::get_image_name() {
+    return awImgPara.image_name;
+}
+
+[[maybe_unused]] std::string FEX2CFG::get_cfg() {
     return awImgCfg;
 }
 
