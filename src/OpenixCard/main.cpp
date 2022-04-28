@@ -12,6 +12,7 @@
 #include <iostream>
 #include <ColorCout.hpp>
 #include <argparse/argparse.hpp>
+#include <filesystem>
 
 #include "exception.h"
 #include "config.h"
@@ -60,7 +61,8 @@ int main(int argc, char *argv[]) {
             .help("Input Allwinner image file")
             .required();
     parser.add_argument("-o", "--output")
-            .help("Output file path");
+            .help("Output file path")
+            .required();
     parser.add_argument("-b", "--blocksize")
             .help("Block size")
             .default_value("512"); // 512, 1024, 2048, 4096
@@ -106,14 +108,11 @@ int main(int argc, char *argv[]) {
 
         Genimage genimage(target_cfg_path, temp_file_path, parser.get<std::string>("output"));
 
-        LOG("Generate Done! Detals: ");
+        LOG("Generate Done! Cleaning up...");
 
-        std::cout << cc::yellow;
-        genimage.print();
-        std::cout << cc::reset;
+        std::filesystem::remove_all(temp_file_path);
     } else {
         std::cout << cc::red << "Sorry, Write function not implemented yet!" << cc::reset << std::endl;
     }
-
     return 0;
 }
