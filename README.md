@@ -16,5 +16,16 @@ usage:
 
 # Build from source
 ```
+# Download the source code
 git clone --recursive https://github.com/YuzukiTsuru/OpenixCard
+
+# Download the depends
+sudo apt install build-essential autoconf 
+
+# Make build directory
+mkdir build
+cd build
+
+# Make
+cmake .. && make -j
 ```
