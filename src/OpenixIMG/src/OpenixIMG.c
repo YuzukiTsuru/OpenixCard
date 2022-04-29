@@ -219,8 +219,9 @@ int unpack_image(const char *infn, const char *outdn) {
     }
 
     for (i = 0; i < num_files; i++) {
-        uint32_t original_length;
+        uint32_t stored_length, original_length;
         struct imagewty_file_header *filehdr;
+        char hdrfname[32], contfname[32];
         const char *filename;
         uint32_t offset;
 

@@ -84,9 +84,13 @@ int main(int argc, char *argv[]) {
         std::exit(1);
     }
 
-    // check args
-    // TODO: Support absolute path
     auto input_file = parser.get<std::string>("input");
+
+    // if input file path is absolute path, convert to relative path, #1
+    std::filesystem::path input_path(input_file);
+    if (input_path.is_absolute()) {
+        input_file = input_path.relative_path();
+    }
     auto temp_file_path = input_file + ".dump";
     auto output_file_path = parser.get<std::string>("output");
     auto is_unpack = parser.get<bool>("unpack");
