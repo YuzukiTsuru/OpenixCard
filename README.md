@@ -2,9 +2,14 @@
 
 Open Source Version of Allwinner PhoenixCard to Dump, Unpack, Flash Allwinner IMG Files
 
+[![forthebadge](https://forthebadge.com/images/badges/made-with-c-plus-plus.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/made-with-c.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/powered-by-black-magic.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/uses-git.svg)](https://forthebadge.com)
+
 [![CMake](https://github.com/YuzukiTsuru/OpenixCard/actions/workflows/cmake.yml/badge.svg)](https://github.com/YuzukiTsuru/OpenixCard/actions/workflows/cmake.yml)
 
-# Usage
+## Usage
 
 ```
 OpenixCard                                - TUI Interface -> NOT AVALIABLE
@@ -13,7 +18,8 @@ OpenixCard -c -i <img> -o <target dir>    - Generate Allwinner image partition t
 OpenixCard -d -i <img> -o <target dir>    - Convert Allwinner image to regular image
 ```
 
-# Build from source
+## Build from source
+
 ```
 # Download the source code
 git clone --recursive https://github.com/YuzukiTsuru/OpenixCard
@@ -29,7 +35,7 @@ cd build
 cmake .. && make -j
 ```
 
-# LICENSE
+## LICENSE
 ```
 GNU GENERAL PUBLIC LICENSE Version 2, June 1991
                        
