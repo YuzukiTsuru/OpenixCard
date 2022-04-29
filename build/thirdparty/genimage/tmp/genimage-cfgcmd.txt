@@ -1,0 +1,1 @@
+cmd='cd;/home/yuzuki/Github/OpenixCard/build/thirdparty/genimage/src/genimage/;&&;./configure'
