@@ -12,6 +12,27 @@ Open Source Version of Allwinner PhoenixCard to Dump, Unpack, Flash Allwinner IM
 ## Usage
 
 ```
+ _____             _     _____           _ 
+|     |___ ___ ___|_|_ _|     |___ ___ _| |
+|  |  | . | -_|   | |_'_|   --| .'|  _| . |
+|_____|  _|___|_|_|_|_,_|_____|__,|_| |___|
+      |_|
+Copyright (c) 2022, YuzukiTsuru <GloomyGhost@GloomyGhost.com>
+
+Usage: OpenixCard [options] 
+
+Optional arguments:
+-h --help       shows help message and exits [default: false]
+-v --version    prints version information and exits [default: false]
+-u --unpack     Unpack Allwinner Image to folder [default: false]
+-d --dump       Convert Allwinner image to regular image [default: false]
+-c --cfg        Get Allwinner image partition table cfg file [default: false]
+-i --input      Input Allwinner image file [required]
+-o --output     Output file path [default: "output"]
+
+
+eg.
+
 OpenixCard                                - TUI Interface -> NOT AVALIABLE
 OpenixCard -u -i <img> -o <target dir>    - Unpack Allwinner image to target
 OpenixCard -c -i <img> -o <target dir>    - Generate Allwinner image partition table cfg
