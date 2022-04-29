@@ -92,12 +92,16 @@ void *rc6_decrypt_inplace(void *p, size_t len, rc6_ctx_t *ctx) {
     return p;
 }
 
-FILE *dir_fopen(const char *dir, const char *path, const char *mode) {
+FILE *dir_fopen(const char *dir, const char *path, const char *mode, int is_absolute) {
     char outfn[512];
     char *p;
     int len;
 
-    strcpy(outfn, "./");
+    if (is_absolute) {
+        strcpy(outfn, "/");
+    } else {
+        strcpy(outfn, "./");
+    }
     strcat(outfn, dir);
     len = (int) strlen(outfn);
     if (outfn[len - 1] != '/' && path[0] != '/')
@@ -115,7 +119,7 @@ FILE *dir_fopen(const char *dir, const char *path, const char *mode) {
     return fopen(outfn, mode);
 }
 
-int unpack_image(const char *infn, const char *outdn) {
+int unpack_image(const char *infn, const char *outdn, int is_absolute) {
     uint32_t pid, vid, hardware_id, firmware_id;
     FILE *ifp, *ofp, *cfp;
     struct imagewty_header *header;
@@ -193,7 +197,7 @@ int unpack_image(const char *infn, const char *outdn) {
         curr = next;
     }
 
-    cfp = dir_fopen(outdn, "image.cfg", "wb");
+    cfp = dir_fopen(outdn, "image.cfg", "wb", is_absolute);
     if (cfp != NULL) {
         char timestr[256];
         struct tm *tm;
@@ -236,7 +240,7 @@ int unpack_image(const char *infn, const char *outdn) {
             offset = filehdr->v1.offset;
         }
 
-        ofp = dir_fopen(outdn, filename, "wb");
+        ofp = dir_fopen(outdn, filename, "wb", is_absolute);
         if (ofp) {
             fwrite(image + offset, original_length, 1, ofp);
             fclose(ofp);
@@ -266,17 +270,4 @@ int unpack_image(const char *infn, const char *outdn) {
         fclose(cfp);
     }
     return 0;
-}
-
-void dump_image(const char *image_file, const char *outdir) {
-    char outfn[512];
-    char *out = NULL;
-    // initialize the crypto context
-    crypto_init();
-
-    strcpy(outfn, image_file);
-    strcat(outfn, ".dump");
-    out = outfn;
-    unpack_image(image_file, out);
-    outdir = out;
 }

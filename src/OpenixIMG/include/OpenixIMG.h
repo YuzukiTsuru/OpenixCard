@@ -32,8 +32,8 @@ void crypto_init(void);
 
 void *rc6_decrypt_inplace(void *p, size_t len, rc6_ctx_t *ctx);
 
-FILE *dir_fopen(const char *dir, const char *path, const char *mode);
+FILE *dir_fopen(const char *dir, const char *path, const char *mode, int is_absolute);
 
-int unpack_image(const char *infn, const char *outdn);
+int unpack_image(const char *infn, const char *outdn, int is_absolute);
 
 #endif //OPENIXIMG_OPENIXIMG_H

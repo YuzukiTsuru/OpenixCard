@@ -85,12 +85,9 @@ void OpenixCard::parse_args(int argc, char **argv) {
 
     // if input file path is absolute path, convert to relative path, #1
     std::filesystem::path input_path(input_file);
-    if (input_path.is_absolute()) {
-        this->temp_file_path = std::string(input_path.relative_path()) + ".dump";
-    } else {
-        this->temp_file_path = input_file + ".dump";
-    }
 
+    this->is_absolute = input_path.is_absolute();
+    this->temp_file_path = input_file + ".dump";
     this->output_file_path = parser.get<std::string>("output");
     this->is_unpack = parser.get<bool>("unpack");
     this->is_dump = parser.get<bool>("dump");
@@ -118,7 +115,7 @@ void OpenixCard::show_logo() {
 void OpenixCard::unpack_target_image() {
     // dump the packed image
     crypto_init();
-    unpack_image(this->input_file.c_str(), this->temp_file_path.c_str());
+    unpack_image(this->input_file.c_str(), this->temp_file_path.c_str(), this->is_absolute);
 }
 
 void OpenixCard::dump_and_clean() {

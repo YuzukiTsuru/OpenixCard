@@ -25,6 +25,7 @@ private:
     bool is_unpack = false;
     bool is_dump = false;
     bool is_cfg = false;
+    bool is_absolute = false;
 
     static void show_logo();
 
