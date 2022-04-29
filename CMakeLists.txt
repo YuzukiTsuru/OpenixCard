@@ -66,7 +66,7 @@ else ()
 
     file(GLOB OpenixCardPayloads src/OpenixCard/payloads/*.cpp)
 
-    add_executable(OpenixCard ${OpenixCardSource} ${OpenixCardPayloads} src/OpenixCard/OpenixCard.cpp src/OpenixCard/OpenixCard.h)
+    add_executable(OpenixCard ${OpenixCardSource} ${OpenixCardPayloads} src/OpenixCard/OpenixCard.cpp src/OpenixCard/OpenixCard.h src/OpenixCard/LOG.cpp src/OpenixCard/LOG.h)
     target_link_libraries(OpenixCard PRIVATE OpenixIMG inicpp Threads::Threads)
 
     install(

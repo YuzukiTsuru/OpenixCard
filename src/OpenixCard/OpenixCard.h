@@ -12,9 +12,29 @@
 #ifndef OPENIXCARD_OPENIXCARD_H
 #define OPENIXCARD_OPENIXCARD_H
 
+#include <iostream>
 
 class OpenixCard {
+public:
+    OpenixCard(int argc, char **argv);
 
+private:
+    std::string input_file;
+    std::string temp_file_path;
+    std::string output_file_path;
+    bool is_unpack = false;
+    bool is_dump = false;
+    bool is_cfg = false;
+
+    static void show_logo();
+
+    void parse_args(int argc, char **argv);
+
+    void unpack_target_image();
+
+    void dump_and_clean();
+
+    void save_cfg_file();
 };
 
 
