@@ -35,6 +35,8 @@ cmake .. && make -j
 
 # LICENSE
 ```
+GNU GENERAL PUBLIC LICENSE Version 2, June 1991
+                       
 Copyright (c) 2022, YuzukiTsuru <GloomyGhost@GloomyGhost.com>
 
 This program is free software; you can redistribute it and/or modify
