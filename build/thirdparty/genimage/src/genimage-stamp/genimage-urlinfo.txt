@@ -1,3 +1,0 @@
-repository='external project URL'
-module='https://github.com/pengutronix/genimage/releases/download/v15/genimage-15.tar.xz'
-tag=''

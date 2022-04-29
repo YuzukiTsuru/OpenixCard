@@ -1,8 +1,0 @@
-includedir=/usr/local/include
-libdir=/usr/local/lib
-
-Name: inicpp
-Description: C++ parser of INI files with schema validation
-Version: 1.2.0
-Cflags: -I${includedir}/inicpp
-Libs: -L${libdir} -linicpp
