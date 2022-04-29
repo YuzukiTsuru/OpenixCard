@@ -33,14 +33,16 @@ else ()
 
     include(CMake/genimage.cmake)
 
-    add_subdirectory(src/OpenixIMG)
-    add_subdirectory(lib/inicpp)
-    add_subdirectory(lib/argparse)
-    
     set(FTXUI_BUILD_DOCS OFF CACHE BOOL "" FORCE)
     set(FTXUI_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
     set(FTXUI_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
-    add_subdirectory(lib/ftxui)
+    set(INICPP_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+    set(INICPP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+
+    add_subdirectory(src/OpenixIMG)
+    add_subdirectory(lib/inicpp EXCLUDE_FROM_ALL)
+    add_subdirectory(lib/argparse EXCLUDE_FROM_ALL)
+    add_subdirectory(lib/ftxui EXCLUDE_FROM_ALL)
 
     configure_file(
             "${PROJECT_SOURCE_DIR}/config.h.in"
@@ -67,4 +69,18 @@ else ()
     add_executable(OpenixCard ${OpenixCardSource} ${OpenixCardPayloads})
     target_link_libraries(OpenixCard PRIVATE OpenixIMG inicpp Threads::Threads)
 
+    install(
+            TARGETS OpenixCard
+            COMPONENT applications
+            DESTINATION "opt/openixcard/bin"
+    )
+
+    install(
+            FILES "${EXECUTABLE_OUTPUT_PATH}/bin/genimage"
+            COMPONENT headers
+            DESTINATION "opt/openixcard/bin/bin"
+    )
+
+    include(CMake/deb.cmake)
+    include(CPack)
 endif ()
