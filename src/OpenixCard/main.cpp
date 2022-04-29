@@ -17,15 +17,19 @@
 #include "exception.h"
 #include "config.h"
 
-#include "Genimage.h"
 #include "FEX2CFG.h"
+#include "Genimage.h"
 
 extern "C" {
 #include "OpenixIMG.h"
 }
 
-void LOG(std::string msg) {
+void LOG(const std::string &msg) {
     std::cout << cc::cyan << "[OpenixCard] " << msg << cc::reset << std::endl;
+}
+
+void ERR(const std::string &msg) {
+    std::cout << cc::red << "[OpenixCard ERROR] " << msg << cc::reset << std::endl;
 }
 
 void show_logo() {
@@ -34,8 +38,10 @@ void show_logo() {
               "|     |___ ___ ___|_|_ _|     |___ ___ _| |\n"
               "|  |  | . | -_|   | |_'_|   --| .'|  _| . |\n"
               "|_____|  _|___|_|_|_|_,_|_____|__,|_| |___|\n"
-              "      |_| Version: "
-              << PROJECT_GIT_HASH << cc::reset << std::endl;
+              "      |_| Version: " << PROJECT_GIT_HASH
+              << cc::yellow <<
+              "\nCopyright (c) 2022, YuzukiTsuru <GloomyGhost@GloomyGhost.com>\n"
+              << cc::reset << std::endl;
 }
 
 int main(int argc, char *argv[]) {
@@ -49,12 +55,16 @@ int main(int argc, char *argv[]) {
 
     show_logo();
 
-    parser.add_argument("-w", "--write")
-            .help("Write Allwinner Image to SD Card")
+    parser.add_argument("-u", "--unpack")
+            .help("Unpack Allwinner Image to folder")
             .default_value(false)
             .implicit_value(true);
     parser.add_argument("-d", "--dump")
             .help("Convert Allwinner image to regular image")
+            .default_value(false)
+            .implicit_value(true);
+    parser.add_argument("-c", "--cfg")
+            .help("Get Allwinner image partition table cfg file")
             .default_value(false)
             .implicit_value(true);
     parser.add_argument("-i", "--input")
@@ -62,10 +72,7 @@ int main(int argc, char *argv[]) {
             .required();
     parser.add_argument("-o", "--output")
             .help("Output file path")
-            .required();
-    parser.add_argument("-b", "--blocksize")
-            .help("Block size")
-            .default_value("512"); // 512, 1024, 2048, 4096
+            .default_value("output");
 
     try {
         // parser args
@@ -77,42 +84,51 @@ int main(int argc, char *argv[]) {
         std::exit(1);
     }
 
-    auto is_write = parser.get<bool>("write");
+    auto is_unpack = parser.get<bool>("unpack");
     auto is_dump = parser.get<bool>("dump");
+    auto is_cfg = parser.get<bool>("cfg");
 
-    if (!is_write && !is_dump) {
-        std::cout << cc::red << "INPUT ERROR: " << cc::reset << "You must specify --write or --dump\n" << std::endl;
+    if (!is_unpack && !is_dump && !is_cfg) {
+        ERR("No action selected, please select one of the following actions: -u, -d, -c");
         std::cout << parser; // show help
         std::exit(1);
     }
 
+    LOG("Input file: " + parser.get("input") + " Now converting...");
+
+    auto input_file = parser.get<std::string>("input");
+    auto temp_file_path = input_file + ".dump";
+    // dump the packed image
+    crypto_init();
+    unpack_image(input_file.c_str(), temp_file_path.c_str());
+
+    // parse the dump file 'sys_partition.fex' to get the partition config
+    LOG("Convert Done! Prasing the partition tables...");
+
     if (is_dump) {
-        LOG("Input file: " + parser.get("input") + " Now converting...");
-
-        auto input_file = parser.get<std::string>("input");
-        auto temp_file_path = input_file + ".dump";
-        // dump the packed image
-        crypto_init();
-        unpack_image(input_file.c_str(), temp_file_path.c_str());
-
-        // parse the dump file 'sys_partition.fex' to get the partition config
-
-        LOG("Convert Done! Prasing the partition tables...");
-
         FEX2CFG fex2Cfg(temp_file_path);
         auto target_cfg_path = fex2Cfg.save_file(temp_file_path);
-
+        auto image_name = fex2Cfg.get_image_name();
         // generate the image
-
         LOG("Prase Done! Generating target image...");
 
         Genimage genimage(target_cfg_path, temp_file_path, parser.get<std::string>("output"));
 
-        LOG("Generate Done! Cleaning up...");
+        // check genimage result
+        if (genimage.get_status() != 0) {
+            ERR("Generate image failed!");
+            std::exit(1);
+        }
 
+        LOG("Generate Done! Your image file at " + parser.get<std::string>("output") + " Cleaning up...");
         std::filesystem::remove_all(temp_file_path);
+    } else if (is_unpack) {
+        LOG("Unpack Done! Your image file at " + temp_file_path);
     } else {
-        std::cout << cc::red << "Sorry, Write function not implemented yet!" << cc::reset << std::endl;
+        FEX2CFG fex2Cfg(temp_file_path);
+        auto target_cfg_path = fex2Cfg.save_file(parser.get<std::string>("output"));
+        std::filesystem::remove_all(temp_file_path);
+        LOG("Prase Done! Your cfg file at " + target_cfg_path);
     }
     return 0;
 }

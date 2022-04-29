@@ -55,6 +55,7 @@ else ()
             lib/ColorCout/includes
             lib/argparse/include
             lib/inicpp/include
+            lib/cpp-subprocess
     )
 
     file(GLOB OpenixCardSource src/OpenixCard/*.cpp)
