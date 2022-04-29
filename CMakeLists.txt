@@ -29,6 +29,8 @@ if (MSVC)
 else ()
     set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/dist")
 
+    find_package(Threads REQUIRED)
+
     include(CMake/genimage.cmake)
 
     add_subdirectory(src/OpenixIMG)
@@ -63,6 +65,6 @@ else ()
     file(GLOB OpenixCardPayloads src/OpenixCard/payloads/*.cpp)
 
     add_executable(OpenixCard ${OpenixCardSource} ${OpenixCardPayloads})
-    target_link_libraries(OpenixCard OpenixIMG inicpp)
+    target_link_libraries(OpenixCard PRIVATE OpenixIMG inicpp Threads::Threads)
 
 endif ()
