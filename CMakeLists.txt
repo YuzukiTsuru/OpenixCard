@@ -81,6 +81,6 @@ else ()
             DESTINATION "opt/openixcard/bin/bin"
     )
 
-    include(CMake/deb.cmake)
+    include(CMake/cpack.cmake)
     include(CPack)
 endif ()
