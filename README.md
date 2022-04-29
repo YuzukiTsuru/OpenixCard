@@ -1,6 +1,6 @@
 # OpenixCard
 
-Open Source Version of Allwinner PhoenixCard
+Open Source Version of Allwinner PhoenixCard to Dump, Unpack, Flash Allwinner IMG Files
 
 [![CMake](https://github.com/YuzukiTsuru/OpenixCard/actions/workflows/cmake.yml/badge.svg)](https://github.com/YuzukiTsuru/OpenixCard/actions/workflows/cmake.yml)
 
