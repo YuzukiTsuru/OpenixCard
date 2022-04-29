@@ -66,7 +66,7 @@ else ()
 
     file(GLOB OpenixCardPayloads src/OpenixCard/payloads/*.cpp)
 
-    add_executable(OpenixCard ${OpenixCardSource} ${OpenixCardPayloads})
+    add_executable(OpenixCard ${OpenixCardSource} ${OpenixCardPayloads} src/OpenixCard/OpenixCard.cpp src/OpenixCard/OpenixCard.h)
     target_link_libraries(OpenixCard PRIVATE OpenixIMG inicpp Threads::Threads)
 
     install(
@@ -77,7 +77,7 @@ else ()
 
     install(
             FILES "${EXECUTABLE_OUTPUT_PATH}/bin/genimage"
-            COMPONENT headers
+            COMPONENT applications
             DESTINATION "opt/openixcard/bin/bin"
     )
 

@@ -84,6 +84,11 @@ int main(int argc, char *argv[]) {
         std::exit(1);
     }
 
+    // check args
+    // TODO: Support absolute path
+    auto input_file = parser.get<std::string>("input");
+    auto temp_file_path = input_file + ".dump";
+    auto output_file_path = parser.get<std::string>("output");
     auto is_unpack = parser.get<bool>("unpack");
     auto is_dump = parser.get<bool>("dump");
     auto is_cfg = parser.get<bool>("cfg");
@@ -94,10 +99,7 @@ int main(int argc, char *argv[]) {
         std::exit(1);
     }
 
-    LOG("Input file: " + parser.get("input") + " Now converting...");
-
-    auto input_file = parser.get<std::string>("input");
-    auto temp_file_path = input_file + ".dump";
+    LOG("Input file: " + input_file + " Now converting...");
     // dump the packed image
     crypto_init();
     unpack_image(input_file.c_str(), temp_file_path.c_str());
