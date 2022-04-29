@@ -19,7 +19,7 @@ OpenixCard -d -i <img> -o <target dir>    - Convert Allwinner image to regular i
 git clone --recursive https://github.com/YuzukiTsuru/OpenixCard
 
 # Download the depends
-sudo apt install build-essential autoconf libconfuse-dev
+sudo apt install cmake build-essential autoconf libconfuse-dev
 
 # Make build directory
 mkdir build
