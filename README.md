@@ -2,6 +2,8 @@
 
 Open Source Version of Allwinner PhoenixCard
 
+[![CMake](https://github.com/YuzukiTsuru/OpenixCard/actions/workflows/cmake.yml/badge.svg)](https://github.com/YuzukiTsuru/OpenixCard/actions/workflows/cmake.yml)
+
 # Usage
 
 ```
