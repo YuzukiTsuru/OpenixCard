@@ -1,6 +1,6 @@
 # OpenixCard
 
-Open Source Version of Allwinner PhoenixCard to Dump, Unpack, Flash Allwinner IMG Files
+Open Source Version of Allwinner PhoenixCard to Dump, Unpack, Flash Allwinner IMG Files on Linux
 
 [![forthebadge](https://forthebadge.com/images/badges/made-with-c-plus-plus.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/made-with-c.svg)](https://forthebadge.com)
