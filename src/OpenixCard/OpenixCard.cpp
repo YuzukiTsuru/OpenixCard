@@ -29,17 +29,20 @@ extern "C" {
 OpenixCard::OpenixCard(int argc, char **argv) {
     parse_args(argc, argv);
 
-    LOG::INFO("Input file: " + this->input_file + " Now converting...");
-    unpack_target_image();
-
-    LOG::INFO("Convert Done! Prasing the partition tables...");
-
     if (this->is_dump) {
+        LOG::INFO("Input file: " + this->input_file + " Now converting...");
+        unpack_target_image();
+        LOG::INFO("Convert Done! Prasing the partition tables...");
         dump_and_clean();
     } else if (this->is_unpack) {
-        LOG::INFO("Unpack Done! Your image file at " + this->temp_file_path);
-    } else {
-        save_cfg_file();
+        LOG::INFO("Input file: " + this->input_file + " Now converting...");
+        unpack_target_image();
+        if (this->is_cfg)
+            LOG::INFO("Unpack Done! Your image file and cfg file at " + this->temp_file_path);
+        else
+            LOG::INFO("Unpack Done! Your image file at " + this->temp_file_path);
+    } else if (this->is_pack) {
+        pack();
     }
 }
 
@@ -64,6 +67,10 @@ void OpenixCard::parse_args(int argc, char **argv) {
             .help("Get Allwinner image partition table cfg file")
             .default_value(false)
             .implicit_value(true);
+    parser.add_argument("-p", "--pack")
+            .help("Pack dumped Allwinner image to regular image from folder")
+            .default_value(false)
+            .implicit_value(true);
     parser.add_argument("-i", "--input")
             .help("Input Allwinner image file")
             .required();
@@ -86,12 +93,14 @@ void OpenixCard::parse_args(int argc, char **argv) {
     this->is_absolute = input_path.is_absolute();
     this->temp_file_path = input_file + ".dump";
     this->output_file_path = temp_file_path + ".out";
+
+    this->is_pack = parser.get<bool>("pack");
     this->is_unpack = parser.get<bool>("unpack");
     this->is_dump = parser.get<bool>("dump");
     this->is_cfg = parser.get<bool>("cfg");
 
-    if (!this->is_unpack && !this->is_dump && !this->is_cfg) {
-        LOG::ERROR("No action selected, please select one of the following actions: -u, -d, -c");
+    if (!this->is_unpack && !this->is_dump && !this->is_pack) {
+        LOG::ERROR("No action selected, please select one of the following actions: -u, -d");
         std::cout << parser; // show help
         std::exit(1);
     }
@@ -109,10 +118,45 @@ void OpenixCard::show_logo() {
               << cc::reset << std::endl;
 }
 
+void OpenixCard::pack() {
+    LOG::INFO("Generating target image...");
+
+    std::string target_cfg_path = {};
+
+    auto a = std::filesystem::directory_iterator(this->input_file);
+
+    for (const auto &entry: std::filesystem::directory_iterator(this->input_file)) {
+        if (entry.path().extension() == ".cfg") {
+            if (entry.path().filename() != "image.cfg") {
+                target_cfg_path = entry.path().string();
+            }
+        }
+    }
+
+    if (target_cfg_path.empty()) {
+        LOG::ERROR("Can't find target image partition table cfg file in target folder");
+        return;
+    }
+
+    Genimage genimage(target_cfg_path, this->input_file, this->input_file);
+
+    // check genimage result
+    if (genimage.get_status() != 0) {
+        LOG::ERROR("Generate image failed!");
+        std::exit(1);
+    }
+
+    LOG::INFO("Generate Done! Your image file at " + this->input_file + " Cleaning up...");
+}
+
 void OpenixCard::unpack_target_image() {
     // dump the packed image
+    std::filesystem::create_directories(this->output_file_path);
     crypto_init();
     unpack_image(this->input_file.c_str(), this->temp_file_path.c_str(), this->is_absolute);
+    if (this->is_cfg) {
+        save_cfg_file();
+    }
 }
 
 void OpenixCard::dump_and_clean() {
@@ -136,7 +180,7 @@ void OpenixCard::dump_and_clean() {
 
 void OpenixCard::save_cfg_file() {
     FEX2CFG fex2Cfg(this->temp_file_path);
-    auto target_cfg_path = fex2Cfg.save_file(this->output_file_path);
-    std::filesystem::remove_all(this->temp_file_path);
+    auto target_cfg_path = fex2Cfg.save_file(this->temp_file_path);
     LOG::INFO("Prase Done! Your cfg file at " + target_cfg_path);
 }
+

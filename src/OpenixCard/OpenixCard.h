@@ -22,6 +22,8 @@ private:
     std::string input_file;
     std::string temp_file_path;
     std::string output_file_path;
+
+    bool is_pack = false;
     bool is_unpack = false;
     bool is_dump = false;
     bool is_cfg = false;
@@ -30,6 +32,8 @@ private:
     static void show_logo();
 
     void parse_args(int argc, char **argv);
+
+    void pack();
 
     void unpack_target_image();
 
