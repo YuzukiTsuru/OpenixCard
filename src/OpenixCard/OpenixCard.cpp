@@ -151,7 +151,7 @@ void OpenixCard::pack() {
 
 void OpenixCard::unpack_target_image() {
     // dump the packed image
-    std::filesystem::create_directories(this->output_file_path);
+    std::filesystem::create_directories(this->temp_file_path);
     crypto_init();
     unpack_image(this->input_file.c_str(), this->temp_file_path.c_str(), this->is_absolute);
     if (this->is_cfg) {
