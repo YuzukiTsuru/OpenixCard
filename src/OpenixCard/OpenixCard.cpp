@@ -67,9 +67,6 @@ void OpenixCard::parse_args(int argc, char **argv) {
     parser.add_argument("-i", "--input")
             .help("Input Allwinner image file")
             .required();
-    parser.add_argument("-o", "--output")
-            .help("Output file path")
-            .default_value("output");
 
     try {
         // parser args
@@ -88,7 +85,7 @@ void OpenixCard::parse_args(int argc, char **argv) {
 
     this->is_absolute = input_path.is_absolute();
     this->temp_file_path = input_file + ".dump";
-    this->output_file_path = parser.get<std::string>("output");
+    this->output_file_path = temp_file_path + ".out";
     this->is_unpack = parser.get<bool>("unpack");
     this->is_dump = parser.get<bool>("dump");
     this->is_cfg = parser.get<bool>("cfg");

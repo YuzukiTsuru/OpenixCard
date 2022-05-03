@@ -22,8 +22,8 @@ FEX2CFG::FEX2CFG(const std::string &dump_path) {
     awImgPara.partition_table_fex_path = dump_path + '/' + awImgPara.partition_table_fex;
     awImgPara.image_name = dump_path.substr(dump_path.find_last_of('/') + 1, dump_path.length() - dump_path.find_last_of('/') + 1);
     awImgPara.image_name = awImgPara.image_name.substr(0, awImgPara.image_name.find('.'));
-    awImgPara.partition_table_fex = awImgPara.image_name.substr(0, awImgPara.image_name.rfind('.')) + ".cfg";
-    awImgPara.partition_table_cfg = awImgPara.image_name.substr(0, awImgPara.image_name.rfind('.')) + ".fex";
+    awImgPara.partition_table_fex = awImgPara.image_name.substr(0, awImgPara.image_name.rfind('.')) + ".fex";
+    awImgPara.partition_table_cfg = awImgPara.image_name.substr(0, awImgPara.image_name.rfind('.')) + ".cfg";
 
     // Parse File
     open_file(awImgPara.partition_table_fex_path);
@@ -33,14 +33,15 @@ FEX2CFG::FEX2CFG(const std::string &dump_path) {
 }
 
 std::string FEX2CFG::save_file(const std::string &file_path) {
-    std::ofstream out(file_path + "/" + awImgPara.image_name + ".cfg");
+    auto path = file_path + "/" + awImgPara.partition_table_cfg;
+    std::ofstream out(path);
     // File not open, throw error.
     if (!out.is_open()) {
-        throw file_open_error(file_path);
+        throw file_open_error(path);
     }
     out << awImgCfg;
     out.close();
-    return file_path + "/" + awImgPara.image_name + ".cfg";
+    return path;
 }
 
 [[maybe_unused]] void FEX2CFG::save_file() {
