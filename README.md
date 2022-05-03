@@ -19,7 +19,6 @@ Open Source Version of Allwinner PhoenixCard to Dump, Unpack, Flash Allwinner IM
       |_| 
 Copyright (c) 2022, YuzukiTsuru <GloomyGhost@GloomyGhost.com>
 
-INPUT ERROR: -i: required.
 Usage: OpenixCard [options] 
 
 Optional arguments:
@@ -38,7 +37,6 @@ OpenixCard -u -i <img>      - Unpack Allwinner image to target
 OpenixCard -u -c -i <img>   - Unpack Allwinner image to target and generate Allwinner image partition table cfg
 OpenixCard -d -i <img>      - Convert Allwinner image to regular image
 OpenixCard -p -i <dir>      - Pack dumped Allwinner image to regular image from folder
-
 ```
 
 ## Build from source
