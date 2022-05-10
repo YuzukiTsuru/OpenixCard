@@ -28,7 +28,7 @@ Optional arguments:
 -d --dump       Convert Allwinner image to regular image [default: false]
 -c --cfg        Get Allwinner image partition table cfg file [default: false]
 -p --pack       Pack dumped Allwinner image to regular image from folder [default: false]
--i --input      Input Allwinner image file [required]
+-i --input      Input Allwinner image file or dumped image directory [required]
 
 eg.
 
