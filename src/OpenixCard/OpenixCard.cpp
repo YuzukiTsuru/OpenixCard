@@ -72,7 +72,7 @@ void OpenixCard::parse_args(int argc, char **argv) {
             .default_value(false)
             .implicit_value(true);
     parser.add_argument("-i", "--input")
-            .help("Input Allwinner image file")
+            .help("Input Allwinner image file or dumped image directory")
             .required();
 
     try {
