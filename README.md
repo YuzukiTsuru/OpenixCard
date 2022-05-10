@@ -46,7 +46,7 @@ OpenixCard -p -i <dir>      - Pack dumped Allwinner image to regular image from 
 git clone --recursive https://github.com/YuzukiTsuru/OpenixCard
 
 # Download the depends
-sudo apt install cmake build-essential autoconf libconfuse-dev
+sudo apt install cmake build-essential autoconf libconfuse-dev pkg-config
 
 # Make build directory
 mkdir build
