@@ -28,11 +28,11 @@ private:
     std::string name;
     std::string image_path;
     std::string output_path;
-    std::string genimage_bin = "bin/genimage";
+    std::string genimage_bin = "bin/genimage-src";
 
     int status = 0;
 
-    // subprocess runner for genimage
+    // subprocess runner for genimage-src
     void run_genimage();
 
     void generate_blank_fex();

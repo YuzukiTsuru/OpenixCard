@@ -22,10 +22,10 @@
 
 [[maybe_unused]] Genimage::Genimage(std::string config_path, std::string image_path, std::string output_path)
         : config_path(std::move(config_path)), image_path(std::move(image_path)), output_path(std::move(output_path)) {
-    this->genimage_bin = std::filesystem::current_path() / "bin/genimage";
+    this->genimage_bin = std::filesystem::current_path() / "bin/genimage-src";
     // generate blank.fex file for commented partition
     generate_blank_fex();
-    // call genimage
+    // call genimage-src
     run_genimage();
 }
 
