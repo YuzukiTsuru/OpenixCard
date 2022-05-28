@@ -14,7 +14,6 @@ AM_CPPFLAGS = \
 
 noinst_LIBRARIES = libgenimage.a
 libgenimage_a_SOURCES = \
-	genimage.c \
 	config.c \
 	util.c \
 	crc32.c \
