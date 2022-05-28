@@ -2,24 +2,27 @@
 
 file(GLOB GenimageWrapperSource *.c)
 
+include_directories(
+        ${CMAKE_SOURCE_DIR}/src/Genimage/genimage-src
+)
+
 add_library(GenimageWrapper ${GenimageWrapperSource})
 
-set(LIBGENIMAGE_TARGET_BUILD_DIR ${CMAKE_BINARY_DIR}/thirdparty/genimage)
+set(LIBGENIMAGE_SOURCE_DIR "${CMAKE_SOURCE_DIR}/src/Genimage/genimage-src")
+set(LIBGENIMAGE_TARGET_BUILD_DIR "${CMAKE_BINARY_DIR}/thirdparty/genimage-src/")
 
-# Copy genimage files to build dir
+file(MAKE_DIRECTORY ${LIBGENIMAGE_TARGET_BUILD_DIR})
+
 add_custom_command(
         TARGET GenimageWrapper
         PRE_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${CMAKE_SOURCE_DIR}/src/Genimage/genimage-src/*"
-        "${LIBGENIMAGE_TARGET_BUILD_DIR}"
+        COMMAND cp -rf "${LIBGENIMAGE_SOURCE_DIR}/*" "${LIBGENIMAGE_TARGET_BUILD_DIR}"
 )
 
 # autoconf -i
 add_custom_command(
         TARGET GenimageWrapper
         PRE_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        "${CMAKE_SOURCE_DIR}/src/Genimage/genimage-src/*"
-        "${LIBGENIMAGE_TARGET_BUILD_DIR}"
+        WORKING_DIRECTORY ${LIBGENIMAGE_TARGET_BUILD_DIR}
+        COMMAND automake && autoconf -i && ./configure && make
 )

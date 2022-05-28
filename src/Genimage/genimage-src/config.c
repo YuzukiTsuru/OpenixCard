@@ -441,7 +441,7 @@ static struct config opts[] = {
 	}, {
 		.name = "config",
 		.env = "GENIMAGE_CONFIG",
-		.def = "Genimage-src.cfg",
+		.def = "genimage.cfg",
 	},
 };
 
