@@ -4,10 +4,10 @@ AC_INIT([genimage],
         [oss-tools@pengutronix.de],
         [genimage],
         [http://www.pengutronix.de/genimage/])
-AC_CONFIG_SRCDIR([genimage.c])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([foreign 1.11 -Wall -Wno-portability silent-rules tar-pax no-dist-gzip dist-xz subdir-objects])
 AC_PROG_CC_STDC
+AC_PROG_RANLIB
 
 # If possible, enable extensions to Posix
 AC_USE_SYSTEM_EXTENSIONS
@@ -113,17 +113,3 @@ AC_CONFIG_FILES([
 AC_REQUIRE_AUX_FILE([tap-driver.sh])
 
 AC_OUTPUT
-AC_MSG_RESULT([
-        $PACKAGE $VERSION
-        =====
-
-        prefix:                 ${prefix}
-
-        compiler:               ${CC}
-        cflags:                 ${CFLAGS} ${AM_CFLAGS}
-        ldflags:                ${LDFLAGS} ${AM_LDFLAGS}
-
-        debug:                  ${enable_debug}
-        hide symbols:           ${enable_hide}
-        libconfuse:             ${CONFUSE_LIBS}
-])
