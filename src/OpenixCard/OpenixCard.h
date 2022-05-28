@@ -29,8 +29,11 @@ private:
     bool is_cfg = false;
     bool is_absolute = false;
 
+private:
     static void show_logo();
 
+    static void check_file(const std::string& file_path);
+private:
     void parse_args(int argc, char **argv);
 
     void pack();

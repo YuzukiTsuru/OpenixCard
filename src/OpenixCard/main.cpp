@@ -11,8 +11,13 @@
 
 
 #include "OpenixCard.h"
+#include "LOG.h"
 
 int main(int argc, char *argv[]) {
-    OpenixCard openixCard(argc, argv);
+    try {
+        OpenixCard openixCard(argc, argv);
+    } catch (const std::runtime_error& error) {
+        LOG::ERROR(error.what());
+    }
     return 0;
 }
