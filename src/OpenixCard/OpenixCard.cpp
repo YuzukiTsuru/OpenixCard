@@ -23,7 +23,6 @@ extern "C" {
 #include "OpenixIMG.h"
 }
 
-
 #include "OpenixCard.h"
 
 OpenixCard::OpenixCard(int argc, char **argv) {
@@ -31,11 +30,13 @@ OpenixCard::OpenixCard(int argc, char **argv) {
 
     if (this->is_dump) {
         LOG::INFO("Input file: " + this->input_file + " Now converting...");
+        check_file(this->input_file);
         unpack_target_image();
         LOG::INFO("Convert Done! Prasing the partition tables...");
         dump_and_clean();
     } else if (this->is_unpack) {
         LOG::INFO("Input file: " + this->input_file + " Now converting...");
+        check_file(this->input_file);
         unpack_target_image();
         if (this->is_cfg)
             LOG::INFO("Unpack Done! Your image file and cfg file at " + this->temp_file_path);
@@ -182,5 +183,11 @@ void OpenixCard::save_cfg_file() {
     FEX2CFG fex2Cfg(this->temp_file_path);
     auto target_cfg_path = fex2Cfg.save_file(this->temp_file_path);
     LOG::INFO("Prase Done! Your cfg file at " + target_cfg_path);
+}
+
+void OpenixCard::check_file(const std::string& file_path) {
+    if(!std::filesystem::exists(file_path)){
+        throw file_open_error(file_path);
+    }
 }
 
