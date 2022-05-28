@@ -27,7 +27,6 @@ private:
     std::string name;
     std::string image_path;
     std::string output_path;
-    std::string genimage_bin = "bin/genimage-src";
 
     int status = 0;
 

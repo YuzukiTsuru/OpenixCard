@@ -25,7 +25,6 @@ extern "C" {
 
 [[maybe_unused]] GenIMG::GenIMG(std::string config_path, std::string image_path, std::string output_path)
         : config_path(std::move(config_path)), image_path(std::move(image_path)), output_path(std::move(output_path)) {
-    this->genimage_bin = std::filesystem::current_path() / "bin/genimage-src";
     // generate blank.fex file for commented partition
     generate_blank_fex();
     // call genimage-src
@@ -51,13 +50,15 @@ void GenIMG::run_genimage() {
     char arg3[] = "--tmppath";
     char arg4[] = "--inputpath";
     char arg5[] = "--outputpath";
-    char *argv[] = {&arg0[0],
-                    &arg1[0], const_cast<char *>(this->config_path.c_str()),
-                    &arg2[0], const_cast<char *>(temp_dir[0].c_str()),
-                    &arg3[0], const_cast<char *>(temp_dir[1].c_str()),
-                    &arg4[0], const_cast<char *>(this->image_path.c_str()),
-                    &arg5[0], const_cast<char *>(this->output_path.c_str()),
-                    nullptr};
+    char *argv[] = {
+            &arg0[0],
+            &arg1[0], const_cast<char *>(this->config_path.c_str()),
+            &arg2[0], const_cast<char *>(temp_dir[0].c_str()),
+            &arg3[0], const_cast<char *>(temp_dir[1].c_str()),
+            &arg4[0], const_cast<char *>(this->image_path.c_str()),
+            &arg5[0], const_cast<char *>(this->output_path.c_str()),
+            nullptr
+    };
 
     int argc = (int) (sizeof(argv) / sizeof(argv[0])) - 1;
 
