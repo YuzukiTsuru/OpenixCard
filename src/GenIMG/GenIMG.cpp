@@ -1,5 +1,5 @@
 /*
- * Genimage.cpp
+ * GenIMG.cpp
  * Copyright (c) 2022, YuzukiTsuru <GloomyGhost@GloomyGhost.com>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,11 +16,14 @@
 
 #include <subprocess.hpp>
 
-#include "Genimage.h"
+#include "GenIMG.h"
 #include "exception.h"
 
+extern "C" {
+#include "GenimageWrapper.h"
+}
 
-[[maybe_unused]] Genimage::Genimage(std::string config_path, std::string image_path, std::string output_path)
+[[maybe_unused]] GenIMG::GenIMG(std::string config_path, std::string image_path, std::string output_path)
         : config_path(std::move(config_path)), image_path(std::move(image_path)), output_path(std::move(output_path)) {
     this->genimage_bin = std::filesystem::current_path() / "bin/genimage-src";
     // generate blank.fex file for commented partition
@@ -29,7 +32,7 @@
     run_genimage();
 }
 
-void Genimage::run_genimage() {
+void GenIMG::run_genimage() {
     auto temp_dir = std::vector<std::string>{};
     for (int i = 0; i < 2; ++i)
         temp_dir.emplace_back([]() -> std::string {
@@ -42,6 +45,25 @@ void Genimage::run_genimage() {
             return dir_name_str;
         }());
 
+    char arg0[] = "OpenixCard";
+    char arg1[] = "--config";
+    char arg2[] = "--rootpath";
+    char arg3[] = "--tmppath";
+    char arg4[] = "--inputpath";
+    char arg5[] = "--outputpath";
+    char *argv[] = {&arg0[0],
+                    &arg1[0], const_cast<char *>(this->config_path.c_str()),
+                    &arg2[0], const_cast<char *>(temp_dir[0].c_str()),
+                    &arg3[0], const_cast<char *>(temp_dir[1].c_str()),
+                    &arg4[0], const_cast<char *>(this->image_path.c_str()),
+                    &arg5[0], const_cast<char *>(this->output_path.c_str()),
+                    nullptr};
+
+    int argc = (int) (sizeof(argv) / sizeof(argv[0])) - 1;
+
+    GenimageWrapper(argc, argv);
+
+    /*
     auto process = subprocess::Popen({genimage_bin,
                                       "--config", this->config_path,
                                       "--rootpath", temp_dir[0],
@@ -53,15 +75,16 @@ void Genimage::run_genimage() {
     auto output = process.communicate().first;
     auto error = process.communicate().second;
     this->status = process.retcode();
+     */
 }
 
-[[maybe_unused]] void Genimage::print() {
+[[maybe_unused]] void GenIMG::print() {
     std::cout << "\tconfig_path: " << this->config_path << std::endl;
     std::cout << "\timage_path: " << this->image_path << std::endl;
     std::cout << "\toutput_path: " << this->output_path << std::endl;
 }
 
-void Genimage::generate_blank_fex() {
+void GenIMG::generate_blank_fex() {
     std::ofstream out(this->image_path + "/blank.fex");
     // File not open, throw error.
     if (!out.is_open()) {
@@ -71,6 +94,6 @@ void Genimage::generate_blank_fex() {
     out.close();
 }
 
-[[maybe_unused]] int Genimage::get_status() const {
+[[maybe_unused]] int GenIMG::get_status() const {
     return this->status;
 }

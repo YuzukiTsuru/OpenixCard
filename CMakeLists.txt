@@ -50,7 +50,9 @@ else ()
             ${PROJECT_BINARY_DIR}
             src/OpenixIMG/include
             src/OpenixCard
+            src/GenIMG
             src/OpenixCard/payloads
+            src/GenIMG/genimage-src
             src/OpenixIMG/lib/rc6/src
             src/OpenixIMG/lib/twofish/src
             lib/ColorCout/includes

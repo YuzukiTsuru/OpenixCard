@@ -11,7 +11,7 @@ include_directories(
 add_subdirectory(lib/twofish)
 add_subdirectory(lib/rc6)
 
-add_library(OpenixIMG src/OpenixIMG.c ../Genimage/GenimageWrapper.c)
+add_library(OpenixIMG src/OpenixIMG.c ../GenIMG/GenimageWrapper.c)
 target_link_libraries(OpenixIMG twofish rc6)
 
 option(BUILD_T_OpenixIMG "Set to ON to build OpenixIMG Test" OFF)

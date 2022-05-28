@@ -632,7 +632,7 @@ out:
 }
 #endif
 
-int main(int argc, char *argv[])
+int GenimageWrapper(int argc, char *argv[])
 {
     unsigned int i;
     unsigned int num_images;

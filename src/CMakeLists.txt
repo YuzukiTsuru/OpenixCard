@@ -1,3 +1,3 @@
-add_subdirectory(Genimage)
+add_subdirectory(GenIMG)
 add_subdirectory(OpenixIMG)
 add_subdirectory(OpenixCard)
