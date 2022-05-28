@@ -40,7 +40,6 @@ else ()
     set(INICPP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 
     add_subdirectory(src/OpenixIMG)
-    add_subdirectory(src/Genimage)
     add_subdirectory(lib/inicpp EXCLUDE_FROM_ALL)
     add_subdirectory(lib/argparse EXCLUDE_FROM_ALL)
     add_subdirectory(lib/ftxui EXCLUDE_FROM_ALL)

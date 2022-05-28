@@ -632,6 +632,7 @@ out:
 }
 #endif
 
+#if 0
 int main(int argc, char *argv[])
 {
 	unsigned int i;
@@ -823,3 +824,4 @@ cleanup:
 	cleanup();
 	return ret ? 1 : 0;
 }
+#endif
