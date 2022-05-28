@@ -31,8 +31,6 @@ else ()
 
     find_package(Threads REQUIRED)
 
-    include(CMake/genimage.cmake)
-
     set(FTXUI_BUILD_DOCS OFF CACHE BOOL "" FORCE)
     set(FTXUI_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
     set(FTXUI_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
