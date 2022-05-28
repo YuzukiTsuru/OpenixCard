@@ -10,3 +10,6 @@
 [submodule "lib/cpp-subprocess"]
 	path = lib/cpp-subprocess
 	url = https://github.com/arun11299/cpp-subprocess
+[submodule "lib/inicpp"]
+	path = lib/inicpp
+	url = https://github.com/SemaiCZE/inicpp
