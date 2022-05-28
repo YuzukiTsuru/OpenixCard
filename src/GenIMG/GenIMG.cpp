@@ -60,7 +60,7 @@ void GenIMG::run_genimage() {
             nullptr
     };
 
-    int argc = (int) (sizeof(argv) / sizeof(argv[0])) - 1;
+    int argc = static_cast<int>((sizeof(argv) / sizeof(argv[0]))) - 1;
 
     GenimageWrapper(argc, argv);
 
