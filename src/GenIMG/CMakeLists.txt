@@ -18,9 +18,18 @@ add_custom_command(
 )
 
 # autotools build
+
+# autotools build
 add_custom_command(
         TARGET GenIMG
         PRE_LINK
         WORKING_DIRECTORY ${LIBGENIMAGE_TARGET_BUILD_DIR}
-        COMMAND autoconf -i && ./configure && make
+        COMMAND automake
+)
+
+add_custom_command(
+        TARGET GenIMG
+        PRE_LINK
+        WORKING_DIRECTORY ${LIBGENIMAGE_TARGET_BUILD_DIR}
+        COMMAND automake && autoconf -i && ./configure && make
 )
