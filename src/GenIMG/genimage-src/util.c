@@ -106,25 +106,24 @@ static void image_log(struct image *image, int level, const char *fmt,
 
 	switch (level) {
 		case 0:
-			p = "ERROR";
+			p = "[GenIMG ERROR]";
 			break;
 		case 1:
-			p = "INFO";
+			p = "[GenIMG INFO]";
 			break;
 		case 2:
-			p = "DEBUG";
+			p = "[GenIMG DEBUG]";
 			break;
 		case 3:
 		default:
-			p = "VDEBUG";
+			p = "[GenIMG VDEBUG]";
 			break;
 	}
 
 	if (image)
-		fprintf(stderr, "%s: %s(%s): %s", p, image->handler ?
-			image->handler->type : "unknown", image->file, buf);
+		printf("%s: %s(%s): %s", p, image->handler ? image->handler->type : "unknown", image->file, buf);
 	else
-		fprintf(stderr, "%s: %s", p, buf);
+		printf("%s: %s", p, buf);
 
 	free(buf);
 }
