@@ -268,7 +268,7 @@ static LIST_HEAD(flashlist);
 
 static int parse_flashes(cfg_t *cfg)
 {
-    int num_flashes;
+    unsigned int num_flashes;
     int i;
 
     num_flashes = cfg_size(cfg, "flash");
@@ -304,7 +304,7 @@ struct flash_type *flash_type_get(const char *name)
 static int parse_partitions(struct image *image, cfg_t *imagesec)
 {
     struct partition *part;
-    int num_partitions;
+    unsigned int num_partitions;
     int i;
 
     num_partitions = cfg_size(imagesec, "partition");
@@ -704,6 +704,8 @@ int GenimageWrapper(int argc, char *argv[])
         case CFG_FILE_ERROR:
             error("could not open config file '%s'\n", get_opt("config"));
             goto cleanup;
+        default:
+            break;
     }
 
     /* again, with config file this time */

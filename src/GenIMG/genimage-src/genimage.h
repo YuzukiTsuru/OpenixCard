@@ -88,12 +88,12 @@ struct image_handler {
 
 struct flash_type {
 	const char *name;
-	int pebsize;
-	int lebsize;
-	int numpebs;
-	int minimum_io_unit_size;
-	int vid_header_offset;
-	int sub_page_size;
+	unsigned int pebsize;
+    unsigned int lebsize;
+    unsigned int numpebs;
+    unsigned int minimum_io_unit_size;
+    unsigned int vid_header_offset;
+    unsigned int sub_page_size;
 	struct list_head list;
 };
 

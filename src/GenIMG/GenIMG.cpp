@@ -14,6 +14,7 @@
 #include <fstream>
 #include <iostream>
 
+#include <ColorCout.hpp>
 #include <subprocess.hpp>
 
 #include "GenIMG.h"
@@ -62,21 +63,9 @@ void GenIMG::run_genimage() {
 
     int argc = static_cast<int>((sizeof(argv) / sizeof(argv[0]))) - 1;
 
+    std::cout << cc::cyan;
     GenimageWrapper(argc, argv);
-
-    /*
-    auto process = subprocess::Popen({genimage_bin,
-                                      "--config", this->config_path,
-                                      "--rootpath", temp_dir[0],
-                                      "--tmppath", temp_dir[1],
-                                      "--inputpath", this->image_path,
-                                      "--outputpath", this->output_path
-                                     }, subprocess::output{subprocess::PIPE}, subprocess::error{subprocess::PIPE});
-    process.wait();
-    auto output = process.communicate().first;
-    auto error = process.communicate().second;
-    this->status = process.retcode();
-     */
+    std::cout << cc::reset;
 }
 
 [[maybe_unused]] void GenIMG::print() {
