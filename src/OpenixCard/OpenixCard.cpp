@@ -139,10 +139,10 @@ void OpenixCard::pack() {
         return;
     }
 
-    GenIMG genimage(target_cfg_path, this->input_file, this->input_file);
+    GenIMG gen_img(target_cfg_path, this->input_file, this->input_file);
 
-    // check genimage-src result
-    if (genimage.get_status() != 0) {
+    // check gen_img-src result
+    if (gen_img.get_status() != 0) {
         LOG::ERROR("Generate image failed!");
         std::exit(1);
     }
