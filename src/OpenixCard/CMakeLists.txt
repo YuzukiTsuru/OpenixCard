@@ -1,5 +1,5 @@
-file(GLOB OpenixCardSource *.cpp)
-file(GLOB OpenixCardPayloads payloads/*.cpp)
+file(GLOB libOpenixCardSource *.cpp)
+file(GLOB libOpenixCardPayloads payloads/*.cpp)
 
-add_executable(OpenixCard ${OpenixCardSource} ${OpenixCardPayloads})
-target_link_libraries(OpenixCard PRIVATE OpenixIMG inicpp GenIMG)
+add_library(libOpenixCard ${libOpenixCardSource} ${libOpenixCardPayloads})
+target_link_libraries(libOpenixCard PRIVATE OpenixIMG inicpp GenIMG)
