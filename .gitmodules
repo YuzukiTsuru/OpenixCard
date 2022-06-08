@@ -1,9 +1,6 @@
 [submodule "lib/argparse"]
 	path = lib/argparse
 	url = https://github.com/p-ranav/argparse
-[submodule "lib/inicpp"]
-	path = lib/inicpp
-	url = https://github.com/SemaiCZE/inicpp
 [submodule "lib/ftxui"]
 	path = lib/ftxui
 	url = https://github.com/ArthurSonzogni/FTXUI
@@ -13,3 +10,6 @@
 [submodule "lib/cpp-subprocess"]
 	path = lib/cpp-subprocess
 	url = https://github.com/arun11299/cpp-subprocess
+[submodule "lib/inicpp"]
+	path = lib/inicpp
+	url = https://github.com/SemaiCZE/inicpp

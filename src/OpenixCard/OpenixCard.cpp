@@ -17,7 +17,7 @@
 #include "exception.h"
 #include "config.h"
 #include "FEX2CFG.h"
-#include "Genimage.h"
+#include "GenIMG.h"
 
 extern "C" {
 #include "OpenixIMG.h"
@@ -139,10 +139,10 @@ void OpenixCard::pack() {
         return;
     }
 
-    Genimage genimage(target_cfg_path, this->input_file, this->input_file);
+    GenIMG gen_img(target_cfg_path, this->input_file, this->input_file);
 
-    // check genimage result
-    if (genimage.get_status() != 0) {
+    // check gen_img-src result
+    if (gen_img.get_status() != 0) {
         LOG::ERROR("Generate image failed!");
         std::exit(1);
     }
@@ -167,9 +167,9 @@ void OpenixCard::dump_and_clean() {
     // generate the image
     LOG::INFO("Prase Done! Generating target image...");
 
-    Genimage genimage(target_cfg_path, this->temp_file_path, this->output_file_path);
+    GenIMG genimage(target_cfg_path, this->temp_file_path, this->output_file_path);
 
-    // check genimage result
+    // check genimage-src result
     if (genimage.get_status() != 0) {
         LOG::ERROR("Generate image failed!");
         std::exit(1);
