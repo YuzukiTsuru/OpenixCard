@@ -64,9 +64,9 @@ else ()
     add_subdirectory(src)
 
     install(
-            FILES "${EXECUTABLE_OUTPUT_PATH}/bin/genimage"
+            TARGETS OpenixCard
             COMPONENT applications
-            DESTINATION "opt/openixcard/bin/bin"
+            DESTINATION "opt/openixcard/bin"
     )
 
     include(CMake/cpack.cmake)
