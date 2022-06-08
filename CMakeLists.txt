@@ -64,12 +64,6 @@ else ()
     add_subdirectory(src)
 
     install(
-            TARGETS OpenixCard
-            COMPONENT applications
-            DESTINATION "opt/openixcard/bin"
-    )
-
-    install(
             FILES "${EXECUTABLE_OUTPUT_PATH}/bin/genimage"
             COMPONENT applications
             DESTINATION "opt/openixcard/bin/bin"
