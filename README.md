@@ -56,6 +56,17 @@ cd build
 cmake .. && make -j
 ```
 
+> Note: Ubuntu 20.04 compilation will report an error, This is caused by the bug of ar, you can compile and install the new version.
+
+```
+wget https://ftp.gnu.org/gnu/binutils/binutils-2.38.tar.xz
+tar xzf binutils-2.38.tar.xz
+cd binutils-2.38
+./configure --prefix=/usr/local
+make
+sudo make install
+```
+
 ## LICENSE
 ```
 GNU GENERAL PUBLIC LICENSE Version 2, June 1991
