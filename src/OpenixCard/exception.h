@@ -20,4 +20,14 @@ public:
     explicit file_open_error(const std::string &what) : std::runtime_error("Fail to open file: " + what + ".") {};
 };
 
+class operate_error : public std::runtime_error {
+public:
+    explicit operate_error(const std::string &what) : std::runtime_error("Operate ERROR: " + what + ".") {};
+};
+
+class operate_missing_error : public std::runtime_error {
+public:
+    explicit operate_missing_error() : std::runtime_error("Operate ERROR, You must specify a Operator.") {};
+};
+
 #endif //OPENIXCARD_EXCEPTION_H
