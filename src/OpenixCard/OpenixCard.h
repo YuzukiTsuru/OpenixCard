@@ -23,10 +23,15 @@ private:
     std::string temp_file_path;
     std::string output_file_path;
 
-    bool is_pack = false;
-    bool is_unpack = false;
-    bool is_dump = false;
-    bool is_cfg = false;
+    enum OpenixCardOperator {
+        PACK,
+        UNPACK,
+        DUMP,
+        CFG,
+        SIZE
+    };
+
+    OpenixCardOperator mode;
     bool is_absolute = false;
 
 private:
