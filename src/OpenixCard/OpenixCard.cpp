@@ -28,7 +28,6 @@ extern "C" {
 OpenixCard::OpenixCard(int argc, char **argv) {
     parse_args(argc, argv);
 
-    // FIXME: 采用cfg模式与unpack混合模式
     if (mode == OpenixCardOperator::DUMP) {
         LOG::INFO("Input file: " + input_file + " Now converting...");
         check_file(input_file);
@@ -39,10 +38,12 @@ OpenixCard::OpenixCard(int argc, char **argv) {
         LOG::INFO("Input file: " + input_file + " Now converting...");
         check_file(input_file);
         unpack_target_image();
-        if (mode == OpenixCardOperator::CFG)
+        if (mode_ext == OpenixCardOperatorExt::CFG) {
             LOG::INFO("Unpack Done! Your image file and cfg file at " + temp_file_path);
-        else
+            save_cfg_file();
+        } else {
             LOG::INFO("Unpack Done! Your image file at " + temp_file_path);
+        }
     } else if (mode == OpenixCardOperator::PACK) {
         pack();
     }
@@ -100,6 +101,7 @@ void OpenixCard::parse_args(int argc, char **argv) {
     temp_file_path = input_file + ".dump";
     output_file_path = temp_file_path + ".out";
 
+    // Basic Operator
     mode = [&]() {
         if (parser.get<bool>("pack")) {
             return OpenixCardOperator::PACK;
@@ -107,14 +109,20 @@ void OpenixCard::parse_args(int argc, char **argv) {
             return OpenixCardOperator::UNPACK;
         } else if (parser.get<bool>("dump")) {
             return OpenixCardOperator::DUMP;
-        } else if (parser.get<bool>("cfg")) {
-            return OpenixCardOperator::CFG;
         } else if (parser.get<bool>("size")) {
             return OpenixCardOperator::SIZE;
         } else {
             std::cout << parser; // show help
             throw operate_error("No Operate Selected.");
         }
+    }();
+
+    // Addition Operator
+    mode_ext = [&]() {
+        if (parser.get<bool>("cfg")) {
+            return OpenixCardOperatorExt::CFG;
+        }
+        return OpenixCardOperatorExt::NONE;
     }();
 }
 
@@ -166,9 +174,6 @@ void OpenixCard::unpack_target_image() {
     std::filesystem::create_directories(temp_file_path);
     crypto_init();
     unpack_image(input_file.c_str(), temp_file_path.c_str(), is_absolute);
-    if (mode == OpenixCardOperator::CFG) {
-        save_cfg_file();
-    }
 }
 
 void OpenixCard::dump_and_clean() {

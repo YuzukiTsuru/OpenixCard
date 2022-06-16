@@ -27,11 +27,16 @@ private:
         PACK,
         UNPACK,
         DUMP,
-        CFG,
         SIZE
     };
 
+    enum OpenixCardOperatorExt {
+        NONE,
+        CFG,
+    };
+
     OpenixCardOperator mode;
+    OpenixCardOperatorExt mode_ext;
     bool is_absolute = false;
 
 private:
