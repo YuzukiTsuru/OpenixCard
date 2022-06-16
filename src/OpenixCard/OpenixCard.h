@@ -44,8 +44,6 @@ private:
 
     static void check_file(const std::string& file_path);
 private:
-    void parse_args(int argc, char **argv);
-
     void pack();
 
     void unpack_target_image();

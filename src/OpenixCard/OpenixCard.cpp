@@ -26,30 +26,6 @@ extern "C" {
 #include "OpenixCard.h"
 
 OpenixCard::OpenixCard(int argc, char **argv) {
-    parse_args(argc, argv);
-
-    if (mode == OpenixCardOperator::DUMP) {
-        LOG::INFO("Input file: " + input_file + " Now converting...");
-        check_file(input_file);
-        unpack_target_image();
-        LOG::INFO("Convert Done! Prasing the partition tables...");
-        dump_and_clean();
-    } else if (mode == OpenixCardOperator::UNPACK) {
-        LOG::INFO("Input file: " + input_file + " Now converting...");
-        check_file(input_file);
-        unpack_target_image();
-        if (mode_ext == OpenixCardOperatorExt::CFG) {
-            LOG::INFO("Unpack Done! Your image file and cfg file at " + temp_file_path);
-            save_cfg_file();
-        } else {
-            LOG::INFO("Unpack Done! Your image file at " + temp_file_path);
-        }
-    } else if (mode == OpenixCardOperator::PACK) {
-        pack();
-    }
-}
-
-void OpenixCard::parse_args(int argc, char **argv) {
     argparse::ArgumentParser parser("OpenixCard", []() {
         if (std::string(PROJECT_GIT_HASH).empty())
             return PROJECT_VER;
@@ -124,6 +100,26 @@ void OpenixCard::parse_args(int argc, char **argv) {
         }
         return OpenixCardOperatorExt::NONE;
     }();
+
+    if (mode == OpenixCardOperator::DUMP) {
+        LOG::INFO("Input file: " + input_file + " Now converting...");
+        check_file(input_file);
+        unpack_target_image();
+        LOG::INFO("Convert Done! Prasing the partition tables...");
+        dump_and_clean();
+    } else if (mode == OpenixCardOperator::UNPACK) {
+        LOG::INFO("Input file: " + input_file + " Now converting...");
+        check_file(input_file);
+        unpack_target_image();
+        if (mode_ext == OpenixCardOperatorExt::CFG) {
+            LOG::INFO("Unpack Done! Your image file and cfg file at " + temp_file_path);
+            save_cfg_file();
+        } else {
+            LOG::INFO("Unpack Done! Your image file at " + temp_file_path);
+        }
+    } else if (mode == OpenixCardOperator::PACK) {
+        pack();
+    }
 }
 
 void OpenixCard::show_logo() {
