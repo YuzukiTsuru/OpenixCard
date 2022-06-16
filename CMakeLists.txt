@@ -65,8 +65,9 @@ else ()
 
     install(
             TARGETS OpenixCard
+            EXPORT OpenixCard
             COMPONENT applications
-            DESTINATION "/usr/bin"
+            RUNTIME DESTINATION bin
     )
 
     include(CMake/cpack.cmake)
