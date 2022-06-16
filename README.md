@@ -60,7 +60,7 @@ cmake .. && make -j
 
 ```
 wget https://ftp.gnu.org/gnu/binutils/binutils-2.38.tar.xz
-tar xzf binutils-2.38.tar.xz
+tar xvf binutils-2.38.tar.xz
 cd binutils-2.38
 ./configure --prefix=/usr/local
 make
