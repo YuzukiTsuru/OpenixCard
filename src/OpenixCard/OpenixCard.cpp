@@ -88,17 +88,22 @@ OpenixCard::OpenixCard(int argc, char **argv) {
         } else if (parser.get<bool>("size")) {
             return OpenixCardOperator::SIZE;
         } else {
-            std::cout << parser; // show help
-            throw operate_error("No Operate Selected.");
+            return OpenixCardOperator::NONE;
         }
     }();
+
+    if (mode == OpenixCardOperator::NONE) {
+        std::cout << parser;
+        throw operator_missing_error();
+    }
 
     // Addition Operator
     mode_ext = [&]() {
         if (parser.get<bool>("cfg")) {
-            return OpenixCardOperatorExt::CFG;
+            return OpenixCardOperator::UNPACKCFG;
+        } else {
+            return OpenixCardOperator::NONE;
         }
-        return OpenixCardOperatorExt::NONE;
     }();
 
     if (mode == OpenixCardOperator::DUMP) {
@@ -111,7 +116,7 @@ OpenixCard::OpenixCard(int argc, char **argv) {
         LOG::INFO("Input file: " + input_file + " Now converting...");
         check_file(input_file);
         unpack_target_image();
-        if (mode_ext == OpenixCardOperatorExt::CFG) {
+        if (mode_ext == OpenixCardOperator::UNPACKCFG) {
             LOG::INFO("Unpack Done! Your image file and cfg file at " + temp_file_path);
             save_cfg_file();
         } else {

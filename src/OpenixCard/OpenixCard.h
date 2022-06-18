@@ -24,19 +24,16 @@ private:
     std::string output_file_path;
 
     enum OpenixCardOperator {
+        NONE,
         PACK,
         UNPACK,
+        UNPACKCFG,
         DUMP,
         SIZE
     };
 
-    enum OpenixCardOperatorExt {
-        NONE,
-        CFG,
-    };
-
     OpenixCardOperator mode;
-    OpenixCardOperatorExt mode_ext;
+    OpenixCardOperator mode_ext;
     bool is_absolute = false;
 
 private:
