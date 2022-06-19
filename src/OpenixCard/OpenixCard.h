@@ -23,10 +23,17 @@ private:
     std::string temp_file_path;
     std::string output_file_path;
 
-    bool is_pack = false;
-    bool is_unpack = false;
-    bool is_dump = false;
-    bool is_cfg = false;
+    enum OpenixCardOperator {
+        NONE,
+        PACK,
+        UNPACK,
+        UNPACKCFG,
+        DUMP,
+        SIZE
+    };
+
+    OpenixCardOperator mode;
+    OpenixCardOperator mode_ext;
     bool is_absolute = false;
 
 private:
@@ -34,8 +41,6 @@ private:
 
     static void check_file(const std::string& file_path);
 private:
-    void parse_args(int argc, char **argv);
-
     void pack();
 
     void unpack_target_image();

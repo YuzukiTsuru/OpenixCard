@@ -39,6 +39,14 @@ OpenixCard -d -i <img>      - Convert Allwinner image to regular image
 OpenixCard -p -i <dir>      - Pack dumped Allwinner image to regular image from folder
 ```
 
+## Download
+### ArchLinux
+OpenixCard Now available at [AUR](https://aur.archlinux.org/packages/openixcard) [#3](https://github.com/YuzukiTsuru/OpenixCard/issues/3#issuecomment-1135317155)
+```
+yay -S openixcard
+```
+
+
 ## Build from source
 
 ```

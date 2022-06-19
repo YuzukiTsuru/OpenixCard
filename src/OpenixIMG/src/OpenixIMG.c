@@ -21,6 +21,14 @@
 
 int flag_encryption_enabled;
 
+#define OpenixIMG_LOG(fmt, arg...) \
+    do {                           \
+        printf(fmt, ##arg);        \
+    } while (0)
+
+#define O_LOG(fmt, arg...) OpenixIMG_LOG("[OpenixIMG INFO] " fmt, ##arg)
+#define O_ERR(fmt, arg...) OpenixIMG_LOG("[OpenixIMG ERROR] " fmt, ##arg)
+
 /* Crypto */
 rc6_ctx_t header_ctx;
 rc6_ctx_t fileheaders_ctx;
@@ -130,7 +138,7 @@ int unpack_image(const char *infn, const char *outdn, int is_absolute) {
 
     ifp = fopen(infn, "rb");
     if (ifp == NULL) {
-        fprintf(stderr, "Error: unable to open %s!\n", infn);
+        O_ERR("Error: unable to open %s!\n", infn);
         return 2;
     }
 
@@ -139,14 +147,13 @@ int unpack_image(const char *infn, const char *outdn, int is_absolute) {
     fseek(ifp, 0, SEEK_SET);
 
     if (imagesize <= 0) {
-        fprintf(stderr, "Error: Invalid file size %ld (%s)\n",
-                imagesize, strerror(errno));
+        O_ERR("Error: Invalid file size %ld (%s)\n", imagesize, strerror(errno));
         return 3;
     }
 
     image = malloc(imagesize);
     if (!image) {
-        fprintf(stderr, "Error: Unable to allocate memory for image: %ld\n", imagesize);
+        O_ERR("Error: Unable to allocate memory for image: %ld\n", imagesize);
         return 4;
     }
 
@@ -159,10 +166,11 @@ int unpack_image(const char *infn, const char *outdn, int is_absolute) {
         flag_encryption_enabled = 0;
 
     /* Decrypt header (padded to 1024 bytes) */
+    O_LOG("Now Decrypt IMG header...\n");
     curr = rc6_decrypt_inplace(image, 1024, &header_ctx);
 
-
     /* Check version of header and setup our local state */
+    O_LOG("The IMG version is: 0x%0x\n", header->header_version);
     if (header->header_version == 0x0300) {
         num_files = header->v3.num_files;
         hardware_id = header->v3.hardware_id;
@@ -181,6 +189,7 @@ int unpack_image(const char *infn, const char *outdn, int is_absolute) {
     curr = rc6_decrypt_inplace(curr, num_files * 1024, &fileheaders_ctx);
 
     /* Decrypt file contents */
+    O_LOG("Now Decrypt IMG file contents...\n");
     for (i = 0; i < num_files; i++) {
         struct imagewty_file_header *filehdr;
         uint64_t stored_length;
@@ -197,6 +206,7 @@ int unpack_image(const char *infn, const char *outdn, int is_absolute) {
         curr = next;
     }
 
+    O_LOG("Writing the IMG config data...\n");
     cfp = dir_fopen(outdn, "image.cfg", "wb", is_absolute);
     if (cfp != NULL) {
         char timestr[256];
@@ -223,9 +233,8 @@ int unpack_image(const char *infn, const char *outdn, int is_absolute) {
     }
 
     for (i = 0; i < num_files; i++) {
-        uint32_t stored_length, original_length;
+        uint32_t original_length;
         struct imagewty_file_header *filehdr;
-        char hdrfname[32], contfname[32];
         const char *filename;
         uint32_t offset;
 
@@ -239,7 +248,6 @@ int unpack_image(const char *infn, const char *outdn, int is_absolute) {
             filename = filehdr->v1.filename;
             offset = filehdr->v1.offset;
         }
-
         ofp = dir_fopen(outdn, filename, "wb", is_absolute);
         if (ofp) {
             fwrite(image + offset, original_length, 1, ofp);
