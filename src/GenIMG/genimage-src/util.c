@@ -203,12 +203,7 @@ int systemp(struct image *image, const char *fmt, ...)
 	if (!buf)
 		return -ENOMEM;
 
-	if (loglevel() >= 3)
-		o = " (stderr+stdout):";
-	else if (loglevel() >= 1)
-		o = " (stderr):";
-	else
-		o = "";
+    o = "";
 
 	image_info(image, "cmd: \"%s\"%s\n", buf, o);
 

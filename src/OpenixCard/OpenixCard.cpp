@@ -174,7 +174,9 @@ void OpenixCard::unpack_target_image() {
     // dump the packed image
     std::filesystem::create_directories(temp_file_path);
     crypto_init();
+    std::cout << cc::cyan;
     unpack_image(input_file.c_str(), temp_file_path.c_str(), is_absolute);
+    std::cout << cc::reset;
 }
 
 void OpenixCard::dump_and_clean() {
