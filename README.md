@@ -32,7 +32,6 @@ Optional arguments:
 
 eg.
 
-OpenixCard                  - TUI Interface -> NOT AVALIABLE
 OpenixCard -u -i <img>      - Unpack Allwinner image to target
 OpenixCard -u -c -i <img>   - Unpack Allwinner image to target and generate Allwinner image partition table cfg
 OpenixCard -d -i <img>      - Convert Allwinner image to regular image

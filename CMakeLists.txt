@@ -59,6 +59,7 @@ else ()
             lib/argparse/include
             lib/inicpp/include
             lib/cpp-subprocess
+            lib/ftxui/include
     )
 
     add_subdirectory(src)
