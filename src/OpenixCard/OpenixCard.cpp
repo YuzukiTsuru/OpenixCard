@@ -54,9 +54,8 @@ OpenixCard::OpenixCard(int argc, char **argv) {
             .help("Dump the real size of Allwinner image")
             .default_value(false)
             .implicit_value(true);
-    parser.add_argument("-i", "--input")
-            .help("Input Allwinner image file or dumped image directory")
-            .required();
+    parser.add_argument("input")
+            .remaining();
 
     try {
         // parser args
@@ -68,7 +67,8 @@ OpenixCard::OpenixCard(int argc, char **argv) {
         std::exit(1);
     }
 
-    input_file = parser.get<std::string>("input");
+    input_file_vector = parser.get<std::vector<std::string>>("input");
+    input_file = input_file_vector[0];
 
     // if input file path is absolute path, convert to relative path, #1
     std::filesystem::path input_path(input_file);
