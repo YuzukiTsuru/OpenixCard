@@ -24,6 +24,8 @@ endif ()
 
 project(OpenixCard LANGUAGES C CXX VERSION ${_git_version})
 
+set(CMAKE_CXX_STANDARD 17)
+
 if (MSVC)
     message(ERROR "OpenixCard does not support MSVC")
 else ()
