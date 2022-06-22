@@ -55,6 +55,7 @@ OpenixCard::OpenixCard(int argc, char **argv) {
             .default_value(false)
             .implicit_value(true);
     parser.add_argument("input")
+            .required()
             .remaining();
 
     try {
@@ -67,7 +68,13 @@ OpenixCard::OpenixCard(int argc, char **argv) {
         std::exit(1);
     }
 
-    input_file_vector = parser.get<std::vector<std::string>>("input");
+    try {
+        input_file_vector = parser.get<std::vector<std::string>>("input");
+    } catch (const std::runtime_error &err) {
+        std::cout << parser; // show help
+        std::exit(1);
+    }
+
     input_file = input_file_vector[0];
 
     // if input file path is absolute path, convert to relative path, #1
