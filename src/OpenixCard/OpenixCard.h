@@ -13,12 +13,14 @@
 #define OPENIXCARD_OPENIXCARD_H
 
 #include <iostream>
+#include <vector>
 
 class OpenixCard {
 public:
     OpenixCard(int argc, char **argv);
 
 private:
+    std::vector<std::string> input_file_vector;
     std::string input_file;
     std::string temp_file_path;
     std::string output_file_path;

@@ -2,9 +2,9 @@ name: CMake
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, dev ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, dev ]
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -38,3 +38,15 @@ jobs:
       
     - name: pack
       run: cd ${{github.workspace}}/build && cpack
+
+    - name: Prepare test
+      run: cd ${{github.workspace}}/test && mv tina_d1-h-yuzuki_ruler_pro_uart0.img.bin tina_d1-h-yuzuki_ruler_pro_uart0.img
+
+    - name: Test dump
+      run: cd ${{github.workspace}}/build/dist && ./OpenixCard -d ${{github.workspace}}/test/tina_d1-h-yuzuki_ruler_pro_uart0.img
+
+    - name: Test unpack
+      run: cd ${{github.workspace}}/build/dist && ./OpenixCard -uc ${{github.workspace}}/test/tina_d1-h-yuzuki_ruler_pro_uart0.img
+
+    - name: Test pack
+      run: cd ${{github.workspace}}/build/dist && ./OpenixCard -p ${{github.workspace}}/test/tina_d1-h-yuzuki_ruler_pro_uart0.img.dump
