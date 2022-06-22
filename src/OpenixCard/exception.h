@@ -20,6 +20,11 @@ public:
     explicit file_open_error(const std::string &what) : std::runtime_error("Fail to open file: " + what + ".") {};
 };
 
+class no_file_provide_error : public std::runtime_error {
+public:
+    no_file_provide_error() : std::runtime_error("No file Provide.") {};
+};
+
 class operator_error : public std::runtime_error {
 public:
     explicit operator_error(const std::string &what) : std::runtime_error("Operate ERROR: " + what + ".") {};

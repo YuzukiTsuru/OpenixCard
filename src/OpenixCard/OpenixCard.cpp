@@ -63,16 +63,15 @@ OpenixCard::OpenixCard(int argc, char **argv) {
         parser.parse_args(argc, argv);
     }
     catch (const std::runtime_error &err) {
-        std::cout << cc::red << "INPUT ERROR: " << err.what() << cc::reset << std::endl; // args invalid
         std::cout << parser; // show help
-        std::exit(1);
+        throw operator_error(err.what());
     }
 
     try {
         input_file_vector = parser.get<std::vector<std::string>>("input");
-    } catch (const std::runtime_error &err) {
+    } catch (const std::logic_error& err) {
         std::cout << parser; // show help
-        std::exit(1);
+        throw no_file_provide_error();
     }
 
     input_file = input_file_vector[0];
