@@ -25,7 +25,7 @@ jobs:
       run: sudo apt-get install -y libconfuse-dev pkg-config autoconf automake 
       
     - name: Binutils 
-      run: wget https://ftp.gnu.org/gnu/binutils/binutils-2.38.tar.xz && tar xvf binutils-2.38.tar.xz && cd binutils-2.38 && ./configure --prefix=/usr/local && make && sudo make install
+      run: wget https://ftp.gnu.org/gnu/binutils/binutils-2.38.tar.xz && tar xvf binutils-2.38.tar.xz && cd binutils-2.38 && ./configure --prefix=/usr/local && make -j && sudo make install
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
@@ -35,6 +35,12 @@ jobs:
     - name: Build
       # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -j
-      
+
     - name: pack
       run: cd ${{github.workspace}}/build && cpack
+
+    - name: Prepare test
+      run: cd ${{github.workspace}}/test && mv tina_d1-h-yuzuki_ruler_pro_uart0.img.bin tina_d1-h-yuzuki_ruler_pro_uart0.img
+
+    - name: test
+      run: cd ${{github.workspace}}/build/dist && ./OpenixCard -d ${{github.workspace}}/test/tina_d1-h-yuzuki_ruler_pro_uart0.img
