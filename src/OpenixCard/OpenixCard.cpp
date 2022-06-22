@@ -34,6 +34,11 @@ OpenixCard::OpenixCard(int argc, char **argv) {
     }());
     show_logo();
 
+    if (argc < 2) {
+        std::cout << parser; // show help
+        return;
+    }
+
     parser.add_argument("-u", "--unpack")
             .help("Unpack Allwinner Image to folder")
             .default_value(false)
@@ -69,7 +74,7 @@ OpenixCard::OpenixCard(int argc, char **argv) {
 
     try {
         input_file_vector = parser.get<std::vector<std::string>>("input");
-    } catch (const std::logic_error& err) {
+    } catch (const std::logic_error &err) {
         std::cout << parser; // show help
         throw no_file_provide_error();
     }
