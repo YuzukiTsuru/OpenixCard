@@ -19,15 +19,19 @@ Open Source Version of Allwinner PhoenixCard to Dump, Unpack, Flash Allwinner IM
       |_| 
 Copyright (c) 2022, YuzukiTsuru <GloomyGhost@GloomyGhost.com>
 
-Usage: OpenixCard [options] <input path>
+Usage: OpenixCard [options] input 
+
+Positional arguments:
+input        	Input image file or directory path [required]
 
 Optional arguments:
--h --help       shows help message and exits [default: false]
--v --version    prints version information and exits [default: false]
--u --unpack     Unpack Allwinner Image to folder [default: false]
--d --dump       Convert Allwinner image to regular image [default: false]
--c --cfg        Get Allwinner image partition table cfg file [default: false]
--p --Pack       pack dumped Allwinner image to regular image from folder [default: false]
+-h --help    	shows help message and exits [default: false]
+-v --version 	prints version information and exits [default: false]
+-u --unpack  	Unpack Allwinner Image to folder [default: false]
+-d --dump    	Convert Allwinner image to regular image [default: false]
+-c --cfg     	Get Allwinner image partition table cfg file [default: false]
+-p --pack    	pack dumped Allwinner image to regular image from folder [default: false]
+-s --size    	Get the accurate size of Allwinner image [default: false]
 
 eg.
 

@@ -55,6 +55,7 @@ OpenixCard::OpenixCard(int argc, char **argv) {
             .default_value(false)
             .implicit_value(true);
     parser.add_argument("input")
+            .help("Input image file or directory path")
             .required()
             .remaining();
 
