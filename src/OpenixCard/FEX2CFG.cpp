@@ -103,27 +103,20 @@ void FEX2CFG::parse_fex() {
     return awImgCfg;
 }
 
+uint FEX2CFG::get_image_real_size() {
+    get_partition_real_size();
+    uint total_size = 0;
+    for (auto &size: partition_size_list) {
+        total_size += size;
+    }
+    return total_size + linux_common_fex_compensate();
+}
+
 void FEX2CFG::gen_cfg() {
+    // Generate Prefix
     awImgCfg += "image ";
     awImgCfg += awImgPara.image_name;
     awImgCfg += ".img {\n";
-    awImgCfg += "\thdimage{\n";
-    awImgCfg += "\t\tpartition-table-type = \"hybrid\"\n";
-    awImgCfg += "\t\tgpt-location = 1M\n";
-    awImgCfg += "\t}\n";
-
-    // add sdcard boot image
-    awImgCfg += "\tpartition boot0 {\n"
-                "\t\tin-partition-table = \"no\"\n"
-                "\t\timage = \"boot0_sdcard.fex\"\n"
-                "\t\toffset = 8K\n"
-                "\t}\n";
-
-    awImgCfg += "\tpartition boot-packages {\n"
-                "\t\tin-partition-table = \"no\"\n"
-                "\t\timage = \"boot_package.fex\"\n"
-                "\t\toffset = 16400K\n"
-                "\t}\n";
 
     // For Debug
     // print_partition_table();
@@ -141,6 +134,16 @@ void FEX2CFG::gen_cfg() {
         for (auto &opt: sect) {
             std::cout << "    Option: '" << opt.get_name() << "' with value(s): ";
             std::cout << "'" << opt.get<inicpp::string_ini_t>() << "'" << std::endl;
+        }
+    }
+}
+
+void FEX2CFG::get_partition_real_size() {
+    for (auto &sect: fex_classed) {
+        for (auto &opt: sect) {
+            if (opt.get_name() == "size") {
+                partition_size_list.emplace_back(opt.get<inicpp::unsigned_ini_t>() / 2);
+            }
         }
     }
 }

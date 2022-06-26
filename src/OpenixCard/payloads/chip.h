@@ -23,13 +23,14 @@ typedef struct partition_table_struct {
     uint64_t user_type;
 } partition_table_struct;
 
-template<typename T>
-std::string tostring(const T &t) {
-    std::ostringstream ss;
-    ss << t;
-    return ss.str();
-}
+typedef struct linux_compensate {
+    uint64_t gpt_location = 0x100000;
+    uint64_t boot0_offset = 0x2000;
+    uint64_t boot_packages_offset = 0x1004000;
+} linux_compensate;
 
-std::string gen_linux_cfg_from_fex_map(const inicpp::config& fex);
+std::string gen_linux_cfg_from_fex_map(const inicpp::config &fex);
+
+[[maybe_unused]] uint linux_common_fex_compensate();
 
 #endif //OPENIXCARD_CHIP_H

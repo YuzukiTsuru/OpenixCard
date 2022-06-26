@@ -14,10 +14,28 @@
 
 #include <chip.h>
 
-
 std::string gen_linux_cfg_from_fex_map(const inicpp::config &fex) {
     partition_table_struct patab;
+    linux_compensate compensate;
     std::string cfg_data;
+    cfg_data += "\thdimage{\n";
+    cfg_data += "\t\tpartition-table-type = \"hybrid\"\n";
+    cfg_data += "\t\tgpt-location = " + std::to_string(compensate.gpt_location / 0x100000) + "M\n";
+    cfg_data += "\t}\n";
+
+    // add sdcard boot image
+    cfg_data += "\tpartition boot0 {\n"
+                "\t\tin-partition-table = \"no\"\n"
+                "\t\timage = \"boot0_sdcard.fex\"\n"
+                "\t\toffset = " + std::to_string(compensate.boot0_offset / 0x400) + "K\n" +
+                "\t}\n";
+
+    cfg_data += "\tpartition boot-packages {\n"
+                "\t\tin-partition-table = \"no\"\n"
+                "\t\timage = \"boot_package.fex\"\n"
+                "\t\toffset = " + std::to_string(compensate.boot_packages_offset / 0x400) + "K\n" +
+                "\t}\n";
+
     for (auto &sect: fex) {
         patab = {}; // reflash struce
         for (auto &opt: sect) {
@@ -42,11 +60,16 @@ std::string gen_linux_cfg_from_fex_map(const inicpp::config &fex) {
                 cfg_data += "\t\timage = \"blank.fex\"\n";
             else
                 cfg_data += "\t\timage = " + patab.downloadfile + "\n";
-            cfg_data += "\t\tsize = " + tostring(patab.size / 2) + "K\n";
+            cfg_data += "\t\tsize = " + std::to_string(patab.size / 2) + "K\n";
             cfg_data += "\t}\n";
         }
     }
     return cfg_data;
+}
+
+uint linux_common_fex_compensate() {
+    linux_compensate compensate;
+    return compensate.gpt_location / 0x400 + compensate.boot0_offset / 0x400 + compensate.boot_packages_offset / 0x400;
 }
 
 #endif //OPENIXCARD_LINUX_H

@@ -51,7 +51,7 @@ OpenixCard::OpenixCard(int argc, char **argv) {
             .default_value(false)
             .implicit_value(true);
     parser.add_argument("-s", "--size")
-            .help("Dump the real size of Allwinner image")
+            .help("Get the accurate size of Allwinner image")
             .default_value(false)
             .implicit_value(true);
     parser.add_argument("input")
@@ -105,6 +105,7 @@ OpenixCard::OpenixCard(int argc, char **argv) {
 
     if (mode == OpenixCardOperator::NONE) {
         std::cout << parser;
+        // Break here.
         throw operator_missing_error();
     }
 
@@ -131,7 +132,7 @@ OpenixCard::OpenixCard(int argc, char **argv) {
         }
     } else if (mode == OpenixCardOperator::PACK) {
         pack();
-    } else if (mode == OpenixCardOperator::SIZE) {
+    } else {
         unpack_target_image();
         get_real_size();
     }
@@ -223,6 +224,9 @@ void OpenixCard::check_file(const std::string &file_path) {
 }
 
 void OpenixCard::get_real_size() {
-
+    LOG::INFO("Getting accurate size of Allwinner img...");
+    FEX2CFG fex2Cfg(temp_file_path);
+    auto real_size = fex2Cfg.get_image_real_size();
+    LOG::DATA("The accurate size of image: " + std::to_string(real_size / 1024) + "MB, " + std::to_string(real_size) + "KB");
 }
 

@@ -34,11 +34,16 @@ public:
     // get image name
     [[maybe_unused]] [[nodiscard]] std::string get_image_name() const;
 
+    // get image real size
+    [[maybe_unused]] uint get_image_real_size();
+
+    // Print out the partition table
     [[maybe_unused]] void print_partition_table();
 
 private:
     AW_IMG_PARA awImgPara;
     inicpp::config fex_classed;
+    std::vector <u_int> partition_size_list;
     std::string awImgFex = {};
     std::string awImgCfg = {};
     std::string awImgFexClassed = {};
@@ -50,6 +55,8 @@ private:
     void parse_fex();
 
     void gen_cfg();
+
+    void get_partition_real_size();
 };
 
 
