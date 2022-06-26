@@ -31,7 +31,7 @@ private:
         UNPACK,
         UNPACKCFG,
         DUMP,
-        SIZE
+        SIZE,
     };
 
     OpenixCardOperator mode;
@@ -50,6 +50,8 @@ private:
     void dump_and_clean();
 
     void save_cfg_file();
+
+    void get_real_size();
 };
 
 

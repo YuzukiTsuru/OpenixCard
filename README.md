@@ -27,14 +27,14 @@ Optional arguments:
 -u --unpack     Unpack Allwinner Image to folder [default: false]
 -d --dump       Convert Allwinner image to regular image [default: false]
 -c --cfg        Get Allwinner image partition table cfg file [default: false]
--p --pack       Pack dumped Allwinner image to regular image from folder [default: false]
+-p --Pack       pack dumped Allwinner image to regular image from folder [default: false]
 
 eg.
 
 OpenixCard -u <img>      - Unpack Allwinner image to target
 OpenixCard -u -c <img>   - Unpack Allwinner image to target and generate Allwinner image partition table cfg
 OpenixCard -d <img>      - Convert Allwinner image to regular image
-OpenixCard -p <dir>      - Pack dumped Allwinner image to regular image from folder
+OpenixCard -p <dir>      - pack dumped Allwinner image to regular image from folder
 ```
 
 ## Download

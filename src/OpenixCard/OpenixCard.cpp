@@ -47,7 +47,7 @@ OpenixCard::OpenixCard(int argc, char **argv) {
             .default_value(false)
             .implicit_value(true);
     parser.add_argument("-p", "--pack")
-            .help("Pack dumped Allwinner image to regular image from folder")
+            .help("pack dumped Allwinner image to regular image from folder")
             .default_value(false)
             .implicit_value(true);
     parser.add_argument("-s", "--size")
@@ -57,7 +57,6 @@ OpenixCard::OpenixCard(int argc, char **argv) {
     parser.add_argument("input")
             .required()
             .remaining();
-
 
     if (argc < 2) {
         std::cout << parser; // show help
@@ -119,14 +118,10 @@ OpenixCard::OpenixCard(int argc, char **argv) {
     }();
 
     if (mode == OpenixCardOperator::DUMP) {
-        LOG::INFO("Input file: " + input_file + " Now converting...");
-        check_file(input_file);
         unpack_target_image();
         LOG::INFO("Convert Done! Prasing the partition tables...");
         dump_and_clean();
     } else if (mode == OpenixCardOperator::UNPACK) {
-        LOG::INFO("Input file: " + input_file + " Now converting...");
-        check_file(input_file);
         unpack_target_image();
         if (mode_ext == OpenixCardOperator::UNPACKCFG) {
             LOG::INFO("Unpack Done! Your image file and cfg file at " + temp_file_path);
@@ -136,6 +131,9 @@ OpenixCard::OpenixCard(int argc, char **argv) {
         }
     } else if (mode == OpenixCardOperator::PACK) {
         pack();
+    } else if (mode == OpenixCardOperator::SIZE) {
+        unpack_target_image();
+        get_real_size();
     }
 }
 
@@ -184,6 +182,8 @@ void OpenixCard::pack() {
 
 void OpenixCard::unpack_target_image() {
     // dump the packed image
+    LOG::INFO("Input file: " + input_file + " Now converting...");
+    check_file(input_file);
     std::filesystem::create_directories(temp_file_path);
     crypto_init();
     std::cout << cc::cyan;
@@ -220,5 +220,9 @@ void OpenixCard::check_file(const std::string &file_path) {
     if (!std::filesystem::exists(file_path)) {
         throw file_open_error(file_path);
     }
+}
+
+void OpenixCard::get_real_size() {
+
 }
 
