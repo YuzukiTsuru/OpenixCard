@@ -16,6 +16,8 @@
 
 class LOG {
 public:
+    [[maybe_unused]] static void DATA(const std::string &msg);
+
     [[maybe_unused]] static void INFO(const std::string &msg);
 
     [[maybe_unused]] static void DEBUG(const std::string &msg);
