@@ -39,6 +39,7 @@ OpenixCard -u <img>      - Unpack Allwinner image to target
 OpenixCard -u -c <img>   - Unpack Allwinner image to target and generate Allwinner image partition table cfg
 OpenixCard -d <img>      - Convert Allwinner image to regular image
 OpenixCard -p <dir>      - pack dumped Allwinner image to regular image from folder
+OpenixCard -s <img>      - Get the accurate size of Allwinner image
 ```
 
 ## Download
