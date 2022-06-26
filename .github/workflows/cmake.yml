@@ -38,6 +38,9 @@ jobs:
       
     - name: pack
       run: cd ${{github.workspace}}/build && cpack
+      
+    - name: Get test
+      run: cd ${{github.workspace}}/test && wget https://github.com/YuzukiTsuru/OpenixCard/releases/download/TEST/tina_d1-h-yuzuki_ruler_pro_uart0.img.bin
 
     - name: Prepare test
       run: cd ${{github.workspace}}/test && mv tina_d1-h-yuzuki_ruler_pro_uart0.img.bin tina_d1-h-yuzuki_ruler_pro_uart0.img
