@@ -35,7 +35,7 @@ public:
     [[maybe_unused]] [[nodiscard]] std::string get_image_name() const;
 
     // get image real size
-    [[maybe_unused]] uint get_image_real_size();
+    [[maybe_unused]] uint get_image_real_size(bool print);
 
     // Print out the partition table
     [[maybe_unused]] void print_partition_table();

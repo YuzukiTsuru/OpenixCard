@@ -12,9 +12,11 @@
 #include <string>
 #include <sstream>
 
-#include "FEX2CFG.h"
-#include "exception.h"
+#include <ColorCout.hpp>
 
+#include "FEX2CFG.h"
+#include "LOG.h"
+#include "exception.h"
 #include <payloads/chip.h>
 
 FEX2CFG::FEX2CFG(const std::string &dump_path) {
@@ -103,11 +105,15 @@ void FEX2CFG::parse_fex() {
     return awImgCfg;
 }
 
-uint FEX2CFG::get_image_real_size() {
+uint FEX2CFG::get_image_real_size(bool print) {
     get_partition_real_size();
     uint total_size = 0;
     for (auto &size: partition_size_list) {
         total_size += size;
+    }
+    if (print) {
+        LOG::DATA("Partition Table: ");
+        print_partition_table();
     }
     return total_size + linux_common_fex_compensate();
 }
@@ -128,14 +134,24 @@ void FEX2CFG::gen_cfg() {
 }
 
 [[maybe_unused]] void FEX2CFG::print_partition_table() {
+    std::cout << cc::green;
     for (auto &sect: fex_classed) {
-        std::cout << "  Partition: '" << sect.get_name() << "'" << std::endl;
+        std::cout << "  Partition: '";
         // Iterate through options in a section
         for (auto &opt: sect) {
-            std::cout << "    Option: '" << opt.get_name() << "' with value(s): ";
-            std::cout << "'" << opt.get<inicpp::string_ini_t>() << "'" << std::endl;
+            if (opt.get_name() == "name") {
+                auto name = opt.get<inicpp::string_ini_t>();
+                std::cout << name << "' ";
+                if (name == "UDISK") {
+                    std::cout << "Remaining space.";
+                }
+            } else if (opt.get_name() == "size") {
+                std::cout << opt.get<inicpp::unsigned_ini_t>() / 0x300 << "MB - " << opt.get<inicpp::unsigned_ini_t>() << "KB";
+            }
         }
+        std::cout << std::endl;
     }
+    std::cout << cc::reset;
 }
 
 void FEX2CFG::get_partition_real_size() {

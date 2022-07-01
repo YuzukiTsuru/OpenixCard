@@ -140,13 +140,13 @@ OpenixCard::OpenixCard(int argc, char **argv) {
 }
 
 void OpenixCard::show_logo() {
-    std::cout << cc::blue <<
+    std::cout << cc::green <<
               " _____             _     _____           _ \n"
               "|     |___ ___ ___|_|_ _|     |___ ___ _| |\n"
               "|  |  | . | -_|   | |_'_|   --| .'|  _| . |\n"
               "|_____|  _|___|_|_|_|_,_|_____|__,|_| |___|\n"
               "      |_| Version: " << PROJECT_GIT_HASH
-              << cc::yellow <<
+              << cc::magenta <<
               "\nCopyright (c) 2022, YuzukiTsuru <GloomyGhost@GloomyGhost.com>\n"
               << cc::reset << std::endl;
 }
@@ -227,7 +227,7 @@ void OpenixCard::check_file(const std::string &file_path) {
 void OpenixCard::get_real_size() {
     LOG::INFO("Getting accurate size of Allwinner img...");
     FEX2CFG fex2Cfg(temp_file_path);
-    auto real_size = fex2Cfg.get_image_real_size();
+    auto real_size = fex2Cfg.get_image_real_size(true);
     LOG::DATA("The accurate size of image: " + std::to_string(real_size / 1024) + "MB, " + std::to_string(real_size) + "KB");
 }
 
