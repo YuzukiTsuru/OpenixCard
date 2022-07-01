@@ -1,0 +1,36 @@
+name: openixcard
+adopt-info: openixcard
+summary: Open Source Version of Allwinner PhoenixCard to Dump, Unpack, Flash Allwinner IMG Files on Linux.
+description: |
+  OpenixCard is a Open Source Version of Allwinner PhoenixCard to Dump, Unpack, Flash Allwinner IMG Files on Linux, Support Linux images.
+grade: stable
+confinement: strict
+icon: "./favicon.png"
+apps:
+  openixcard:
+    command: openixcard
+base: core18
+parts:
+  openixcard:
+    plugin: cmake
+    source: https://github.com/YuzukiTsuru/OpenixCard
+    source-type: git
+    source-depth: 1
+    build-snaps: [cmake/latest/edge]
+    build-packages:
+    - pkg-config
+    - libconfuse-dev
+    - automake
+    - autoconf
+    - aclocal
+    override-build: |
+      /snap/bin/cmake \
+        -DCMAKE_INSTALL_PREFIX=$SNAPCRAFT_PART_INSTALL/usr/local \
+        -DCMAKE_BUILD_TYPE=Release \
+        $SNAPCRAFT_PART_SRC
+      make -j 4
+      make install
+      snapcraftctl set-version "$(git rev-list --count HEAD)"
+passthrough:
+  title: OpenixCard
+  license: GPL

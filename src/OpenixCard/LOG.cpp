@@ -14,7 +14,7 @@
 #include "LOG.h"
 
 void LOG::DATA(const std::string &msg) {
-    std::cout << cc::green << "[OpenixCard INFO] " << msg << cc::reset << std::endl;
+    std::cout << cc::green << msg << cc::reset << std::endl;
 }
 
 void LOG::INFO(const std::string &msg) {
