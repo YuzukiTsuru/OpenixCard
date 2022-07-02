@@ -242,5 +242,6 @@ void OpenixCard::get_real_size() {
     FEX2CFG fex2Cfg(temp_file_path);
     auto real_size = fex2Cfg.get_image_real_size(true);
     LOG::DATA("The accurate size of image: " + std::to_string(real_size / 1024) + "MB, " + std::to_string(real_size) + "KB");
+    std::filesystem::remove_all(temp_file_path);
 }
 
