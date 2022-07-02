@@ -45,11 +45,14 @@ jobs:
     - name: Prepare test
       run: cd ${{github.workspace}}/test && mv tina_d1-h-yuzuki_ruler_pro_uart0.img.bin tina_d1-h-yuzuki_ruler_pro_uart0.img
 
-    - name: Test dump
+    - name: Test Dump
       run: cd ${{github.workspace}}/build/dist && ./OpenixCard -d ${{github.workspace}}/test/tina_d1-h-yuzuki_ruler_pro_uart0.img
 
-    - name: Test unpack
+    - name: Test Unpack & cfg
       run: cd ${{github.workspace}}/build/dist && ./OpenixCard -uc ${{github.workspace}}/test/tina_d1-h-yuzuki_ruler_pro_uart0.img
 
-    - name: Test pack
+    - name: Test Pack
       run: cd ${{github.workspace}}/build/dist && ./OpenixCard -p ${{github.workspace}}/test/tina_d1-h-yuzuki_ruler_pro_uart0.img.dump
+      
+    - name: Test Size
+      run: cd ${{github.workspace}}/build/dist && ./OpenixCard -s ${{github.workspace}}/test/tina_d1-h-yuzuki_ruler_pro_uart0.img
