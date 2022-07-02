@@ -20,6 +20,16 @@ public:
     explicit file_open_error(const std::string &what) : std::runtime_error("Fail to open file: " + what + ".") {};
 };
 
+class file_format_error : public std::runtime_error {
+public:
+    explicit file_format_error(const std::string &what) : std::runtime_error("File: " + what + " is not Allwinner image.") {};
+};
+
+class file_size_error : public std::runtime_error {
+public:
+    explicit file_size_error(const std::string &what) : std::runtime_error("Invalid file size: " + what + ".") {};
+};
+
 class no_file_provide_error : public std::runtime_error {
 public:
     no_file_provide_error() : std::runtime_error("No file Provide.") {};
