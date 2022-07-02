@@ -145,7 +145,7 @@ void OpenixCard::show_logo() {
               "|     |___ ___ ___|_|_ _|     |___ ___ _| |\n"
               "|  |  | . | -_|   | |_'_|   --| .'|  _| . |\n"
               "|_____|  _|___|_|_|_|_,_|_____|__,|_| |___|\n"
-              "      |_| Version: " << PROJECT_GIT_HASH
+              "      |_| Version: " << PROJECT_GIT_HASH << " Commit: " << PROJECT_VER
               << cc::magenta <<
               "\nCopyright (c) 2022, YuzukiTsuru <GloomyGhost@GloomyGhost.com>\n"
               << cc::reset << std::endl;
@@ -189,8 +189,21 @@ void OpenixCard::unpack_target_image() {
     std::filesystem::create_directories(temp_file_path);
     crypto_init();
     std::cout << cc::cyan;
-    unpack_image(input_file.c_str(), temp_file_path.c_str(), is_absolute);
+    auto unpack_img_ret = unpack_image(input_file.c_str(), temp_file_path.c_str(), is_absolute);
     std::cout << cc::reset;
+
+    switch (unpack_img_ret) {
+        case 2:
+            throw file_open_error(input_file);
+        case 3:
+            throw file_size_error(input_file);
+        case 4:
+            throw std::runtime_error("Unable to allocate memory for image: "+ input_file);
+        case 5:
+            throw file_format_error(input_file);
+        default:
+            break;
+    }
 }
 
 void OpenixCard::dump_and_clean() {

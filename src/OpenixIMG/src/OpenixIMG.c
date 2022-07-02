@@ -27,7 +27,6 @@ int flag_encryption_enabled;
     } while (0)
 
 #define O_LOG(fmt, arg...) OpenixIMG_LOG("[OpenixIMG INFO] " fmt, ##arg)
-#define O_ERR(fmt, arg...) OpenixIMG_LOG("[OpenixIMG ERROR] " fmt, ##arg)
 
 /* Crypto */
 rc6_ctx_t header_ctx;
@@ -138,7 +137,6 @@ int unpack_image(const char *infn, const char *outdn, int is_absolute) {
 
     ifp = fopen(infn, "rb");
     if (ifp == NULL) {
-        O_ERR("Error: unable to open %s!\n", infn);
         return 2;
     }
 
@@ -147,13 +145,11 @@ int unpack_image(const char *infn, const char *outdn, int is_absolute) {
     fseek(ifp, 0, SEEK_SET);
 
     if (imagesize <= 0) {
-        O_ERR("Error: Invalid file size %ld (%s)\n", imagesize, strerror(errno));
         return 3;
     }
 
     image = malloc(imagesize);
     if (!image) {
-        O_ERR("Error: Unable to allocate memory for image: %ld\n", imagesize);
         return 4;
     }
 
@@ -177,12 +173,14 @@ int unpack_image(const char *infn, const char *outdn, int is_absolute) {
         firmware_id = header->v3.firmware_id;
         pid = header->v3.pid;
         vid = header->v3.vid;
-    } else /*if (header->header_version == 0x0100)*/ {
+    } else if (header->header_version == 0x0100) {
         num_files = header->v1.num_files;
         hardware_id = header->v1.hardware_id;
         firmware_id = header->v1.firmware_id;
         pid = header->v1.pid;
         vid = header->v1.vid;
+    } else {
+        return 5;
     }
 
     /* Decrypt file headers */
