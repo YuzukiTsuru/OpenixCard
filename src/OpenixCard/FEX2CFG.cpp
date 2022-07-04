@@ -10,7 +10,9 @@
  */
 
 #include <string>
+#include <string_view>
 #include <sstream>
+#include <iomanip>
 
 #include <ColorCout.hpp>
 
@@ -136,17 +138,18 @@ void FEX2CFG::gen_cfg() {
 [[maybe_unused]] void FEX2CFG::print_partition_table() {
     std::cout << cc::green;
     for (auto &sect: fex_classed) {
-        std::cout << "  Partition: '";
+        std::cout << std::left << std::setw(13) << "  Partition: '";
         // Iterate through options in a section
         for (auto &opt: sect) {
             if (opt.get_name() == "name") {
                 auto name = opt.get<inicpp::string_ini_t>();
-                std::cout << name << "' ";
+                std::cout << std::left << std::setw(18) << name + "'";
                 if (name == "UDISK") {
                     std::cout << "Remaining space.";
                 }
             } else if (opt.get_name() == "size") {
-                std::cout << static_cast<double>(opt.get<inicpp::unsigned_ini_t>()) / 2 / 0x300 << "MB - " << opt.get<inicpp::unsigned_ini_t>() / 2 << "KB";
+                std::cout << std::left << std::setw(9) << static_cast<double>(opt.get<inicpp::unsigned_ini_t>()) / 2 / 0x300 << "MB - "
+                          << std::left << std::setw(7) << opt.get<inicpp::unsigned_ini_t>() / 2 << "KB";
             }
         }
         std::cout << std::endl;
