@@ -139,7 +139,7 @@ void FEX2CFG::gen_cfg() {
     std::cout << cc::green;
     for (auto &sect: fex_classed) {
         std::cout << std::setiosflags(std::ios::fixed) << std::setprecision(4) << setiosflags(std::ios::left);
-        std::cout << std::left << "  Partition: '";
+        std::cout << "  Partition: '";
         // Iterate through options in a section
         for (auto &opt: sect) {
             if (opt.get_name() == "name") {
@@ -149,8 +149,8 @@ void FEX2CFG::gen_cfg() {
                     std::cout << "Remaining space.";
                 }
             } else if (opt.get_name() == "size") {
-                std::cout << std::setw(23) << std::right << static_cast<double>(opt.get<inicpp::unsigned_ini_t>()) / 2 / 0x300
-                          << std::setw(23) << "MB - " << opt.get<inicpp::unsigned_ini_t>() / 2 << "KB";
+                std::cout << std::setw(12) << std::right << static_cast<double>(opt.get<inicpp::unsigned_ini_t>()) / 2 / 0x300
+                          << "MB - " << std::setw(12) << opt.get<inicpp::unsigned_ini_t>() / 2 << "KB";
             }
         }
         std::cout << "\n";
