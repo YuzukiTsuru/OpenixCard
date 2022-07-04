@@ -136,10 +136,9 @@ void FEX2CFG::gen_cfg() {
 }
 
 [[maybe_unused]] void FEX2CFG::print_partition_table() {
-    std::cout << cc::green;
+    std::cout << cc::green << std::endl;
     for (auto &sect: fex_classed) {
-        std::cout << std::setiosflags(std::ios::fixed) << std::setprecision(4) << setiosflags(std::ios::left);
-        std::cout << std::left << std::setw(15) << "  Partition: '";
+        std::cout << std::left << std::setw(13) << "  Partition: '";
         // Iterate through options in a section
         for (auto &opt: sect) {
             if (opt.get_name() == "name") {
