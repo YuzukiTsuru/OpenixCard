@@ -138,6 +138,7 @@ void FEX2CFG::gen_cfg() {
 [[maybe_unused]] void FEX2CFG::print_partition_table() {
     std::stringstream partition_table;
     for (auto &sect: fex_classed) {
+        partition_table << std::setiosflags(std::ios::fixed) << std::setprecision(4) << setiosflags(std::ios::left);
         partition_table << std::left << "  Partition: '";
         // Iterate through options in a section
         for (auto &opt: sect) {
@@ -149,7 +150,7 @@ void FEX2CFG::gen_cfg() {
                 }
             } else if (opt.get_name() == "size") {
                 partition_table << std::setw(23) << std::right << static_cast<double>(opt.get<inicpp::unsigned_ini_t>()) / 2 / 0x300
-                          << std::setw(23) << "MB - " << opt.get<inicpp::unsigned_ini_t>() / 2 << "KB";
+                                << std::setw(23) << "MB - " << opt.get<inicpp::unsigned_ini_t>() / 2 << "KB";
             }
         }
         partition_table << "\n";
