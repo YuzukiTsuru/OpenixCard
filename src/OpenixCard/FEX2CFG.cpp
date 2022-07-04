@@ -148,7 +148,7 @@ void FEX2CFG::gen_cfg() {
                     partition_table << "Remaining space.";
                 }
             } else if (opt.get_name() == "size") {
-                std::cout << std::setw(23) << static_cast<double>(opt.get<inicpp::unsigned_ini_t>()) / 2 / 0x300
+                partition_table << std::setw(23) << static_cast<double>(opt.get<inicpp::unsigned_ini_t>()) / 2 / 0x300
                           << std::setw(23) << "MB - " << opt.get<inicpp::unsigned_ini_t>() / 2 << "KB";
             }
         }
