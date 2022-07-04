@@ -136,14 +136,14 @@ void FEX2CFG::gen_cfg() {
 }
 
 [[maybe_unused]] void FEX2CFG::print_partition_table() {
-    std::cout << cc::green << std::endl;
+    std::cout << cc::green;
     for (auto &sect: fex_classed) {
         std::cout << std::left << std::setw(13) << "  Partition: '";
         // Iterate through options in a section
         for (auto &opt: sect) {
             if (opt.get_name() == "name") {
                 auto name = opt.get<inicpp::string_ini_t>();
-                std::cout << name << "' ";
+                std::cout << std::left << std::setw(18) << name << "' ";
                 if (name == "UDISK") {
                     std::cout << "Remaining space.";
                 }
