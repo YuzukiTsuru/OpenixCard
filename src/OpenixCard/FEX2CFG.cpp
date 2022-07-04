@@ -10,7 +10,9 @@
  */
 
 #include <string>
+#include <string_view>
 #include <sstream>
+#include <iomanip>
 
 #include <ColorCout.hpp>
 
@@ -134,25 +136,25 @@ void FEX2CFG::gen_cfg() {
 }
 
 [[maybe_unused]] void FEX2CFG::print_partition_table() {
-    std::cout << cc::green;
+    std::stringstream partition_table;
     for (auto &sect: fex_classed) {
-        std::cout << "  Partition: '";
+        partition_table << std::left << "  Partition: '";
         // Iterate through options in a section
         for (auto &opt: sect) {
             if (opt.get_name() == "name") {
                 auto name = opt.get<inicpp::string_ini_t>();
-                std::cout << name << "' ";
+                partition_table << name << "' ";
                 if (name == "UDISK") {
-                    std::cout << "Remaining space.";
+                    partition_table << "Remaining space.";
                 }
             } else if (opt.get_name() == "size") {
-                std::cout << static_cast<double>(opt.get<inicpp::unsigned_ini_t>()) / 2 / 0x300
-                          << "MB - " << opt.get<inicpp::unsigned_ini_t>() / 2 << "KB";
+                std::cout << std::setw(23) << static_cast<double>(opt.get<inicpp::unsigned_ini_t>()) / 2 / 0x300
+                          << std::setw(23) << "MB - " << opt.get<inicpp::unsigned_ini_t>() / 2 << "KB";
             }
         }
-        std::cout << std::endl;
+        partition_table << "\n";
     }
-    std::cout << cc::reset;
+    std::cout << cc::green << partition_table.str() << cc::reset;
 }
 
 void FEX2CFG::get_partition_real_size() {
