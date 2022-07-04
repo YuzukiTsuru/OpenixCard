@@ -148,7 +148,7 @@ void FEX2CFG::gen_cfg() {
                     std::cout << "Remaining space.";
                 }
             } else if (opt.get_name() == "size") {
-                std::cout << std::left << std::setw(7) << static_cast<double>(opt.get<inicpp::unsigned_ini_t>()) / 2 / 0x300 << "MB - "
+                std::cout << std::left << std::setw(9) << static_cast<double>(opt.get<inicpp::unsigned_ini_t>()) / 2 / 0x300 << "MB - "
                           << std::left << std::setw(7) << opt.get<inicpp::unsigned_ini_t>() / 2 << "KB";
             }
         }
