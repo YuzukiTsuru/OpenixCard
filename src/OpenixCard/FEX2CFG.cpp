@@ -143,13 +143,13 @@ void FEX2CFG::gen_cfg() {
         for (auto &opt: sect) {
             if (opt.get_name() == "name") {
                 auto name = opt.get<inicpp::string_ini_t>();
-                std::cout << std::left << std::setw(18) << name << "' ";
+                std::cout << std::left << std::setw(18) << name + "'";
                 if (name == "UDISK") {
                     std::cout << "Remaining space.";
                 }
             } else if (opt.get_name() == "size") {
-                std::cout << std::left << std::setw(15) << static_cast<double>(opt.get<inicpp::unsigned_ini_t>()) / 2 / 0x300 << "MB - "
-                          << opt.get<inicpp::unsigned_ini_t>() / 2 << "KB";
+                std::cout << std::left << std::setw(7) << static_cast<double>(opt.get<inicpp::unsigned_ini_t>()) / 2 / 0x300 << "MB - "
+                          << std::left << std::setw(7) << opt.get<inicpp::unsigned_ini_t>() / 2 << "KB";
             }
         }
         std::cout << std::endl;
