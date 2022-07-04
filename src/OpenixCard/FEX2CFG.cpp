@@ -136,26 +136,26 @@ void FEX2CFG::gen_cfg() {
 }
 
 [[maybe_unused]] void FEX2CFG::print_partition_table() {
-    std::stringstream partition_table;
+    std::cout << cc::green;
     for (auto &sect: fex_classed) {
-        partition_table << std::setiosflags(std::ios::fixed) << std::setprecision(4) << setiosflags(std::ios::left);
-        partition_table << std::left << "  Partition: '";
+        std::cout << std::setiosflags(std::ios::fixed) << std::setprecision(4) << setiosflags(std::ios::left);
+        std::cout << std::left << "  Partition: '";
         // Iterate through options in a section
         for (auto &opt: sect) {
             if (opt.get_name() == "name") {
                 auto name = opt.get<inicpp::string_ini_t>();
-                partition_table << name << "' ";
+                std::cout << name << "' ";
                 if (name == "UDISK") {
-                    partition_table << "Remaining space.";
+                    std::cout << "Remaining space.";
                 }
             } else if (opt.get_name() == "size") {
-                partition_table << std::setw(23) << std::right << static_cast<double>(opt.get<inicpp::unsigned_ini_t>()) / 2 / 0x300
-                                << std::setw(23) << "MB - " << opt.get<inicpp::unsigned_ini_t>() / 2 << "KB";
+                std::cout << std::setw(23) << std::right << static_cast<double>(opt.get<inicpp::unsigned_ini_t>()) / 2 / 0x300
+                          << std::setw(23) << "MB - " << opt.get<inicpp::unsigned_ini_t>() / 2 << "KB";
             }
         }
-        partition_table << "\n";
+        std::cout << "\n";
     }
-    std::cout << cc::green << partition_table.str() << cc::reset;
+    std::cout << cc::reset;
 }
 
 void FEX2CFG::get_partition_real_size() {
