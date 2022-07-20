@@ -54,7 +54,7 @@ yay -S openixcard
 
 ```
 # Download the source code
-git clone --recursive https://github.com/YuzukiTsuru/OpenixCard
+git clone --recursive --depth 1 https://github.com/YuzukiTsuru/OpenixCard
 
 # Download the depends
 sudo apt install cmake build-essential automake autoconf libconfuse-dev pkg-config aclocal
