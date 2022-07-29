@@ -18,6 +18,7 @@ int main(int argc, char *argv[]) {
         OpenixCard openixCard(argc, argv);
     } catch (const std::runtime_error& error) {
         LOG::ERROR(error.what());
+        return -1;
     }
     return 0;
 }
