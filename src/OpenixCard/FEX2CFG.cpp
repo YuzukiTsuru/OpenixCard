@@ -78,7 +78,14 @@ void FEX2CFG::open_file(const std::string &file_path) {
 void FEX2CFG::classify_fex() {
     int occ = 0;
     std::string::size_type pos = 0;
-    std::string _temp = awImgFex;
+    std::string _temp = {};
+    std::string _temp_str = {};
+    
+    while (std::getline(awImgFex, _temp_str)){
+        if (_temp_str.substr(0, 1) != ";"){
+            _temp.insert(0, _temp_str);
+        }
+    }
 
     _temp = _temp.substr(_temp.find("[partition_start]"));
 
