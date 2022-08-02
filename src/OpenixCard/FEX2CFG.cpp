@@ -93,6 +93,8 @@ void FEX2CFG::classify_fex() {
         _less_out = _less_out.substr(0, _less_out.rfind("[partition]"));
         awImgFexClassed.insert(0, "[partition" + std::to_string(occ - i) + "]" + _section);
     }
+    
+    LOG::DATA(awImgFexClassed);
 }
 
 void FEX2CFG::parse_fex() {
