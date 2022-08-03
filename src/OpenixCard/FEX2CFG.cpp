@@ -32,6 +32,7 @@ FEX2CFG::FEX2CFG(const std::string &dump_path) {
     // Parse File
     open_file(awImgPara.partition_table_fex_path);
     classify_fex();
+    
     parse_fex();
     gen_cfg();
 }
@@ -105,7 +106,13 @@ void FEX2CFG::classify_fex() {
 }
 
 void FEX2CFG::parse_fex() {
-    fex_classed = inicpp::parser::load(awImgFexClassed);
+    // Quick Fix for #26
+    try {
+        fex_classed = inicpp::parser::load(awImgFexClassed);
+    } catch(const inicpp::ambiguity_exception &e) {
+        LOG::ERROR("Partition table error, bad format. " + e.what());
+        return;
+    }
 }
 
 [[maybe_unused]] std::string FEX2CFG::get_image_name() const {
@@ -139,12 +146,7 @@ void FEX2CFG::gen_cfg() {
     // print_partition_table();
 
     // Generate file from FEX
-    try {
-    	awImgCfg += gen_linux_cfg_from_fex_map(fex_classed);
-    } catch(const inicpp::ambiguity_exception &e) {
-        LOG::ERROR(e.what());
-        return;
-    }
+    awImgCfg += gen_linux_cfg_from_fex_map(fex_classed);
 
     awImgCfg += "}";
 }
