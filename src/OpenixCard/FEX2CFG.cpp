@@ -110,7 +110,7 @@ void FEX2CFG::parse_fex() {
     try {
         fex_classed = inicpp::parser::load(awImgFexClassed);
     } catch(const inicpp::ambiguity_exception &e) {
-        LOG::ERROR("Partition table error, bad format. " + e.what());
+        LOG::ERROR(std::string("Partition table error, bad format. ") + std::striing(e.what()));
         return;
     }
 }
