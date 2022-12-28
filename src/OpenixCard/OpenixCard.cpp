@@ -95,6 +95,9 @@ OpenixCard::OpenixCard(int argc, char **argv) {
         if (parser.get<bool>("pack")) {
             return OpenixCardOperator::PACK;
         } else if (parser.get<bool>("unpack")) {
+            if (parser.get<bool>("cfg")) {
+                return OpenixCardOperator::UNPACKCFG;
+            }
             return OpenixCardOperator::UNPACK;
         } else if (parser.get<bool>("dump")) {
             return OpenixCardOperator::DUMP;
@@ -111,29 +114,22 @@ OpenixCard::OpenixCard(int argc, char **argv) {
         throw operator_missing_error();
     }
 
-    // Addition Operator
-    mode_ext = [&]() {
-        if (parser.get<bool>("cfg")) {
-            return OpenixCardOperator::UNPACKCFG;
-        } else {
-            return OpenixCardOperator::NONE;
-        }
-    }();
 
     if (mode == OpenixCardOperator::DUMP) {
         unpack_target_image();
         LOG::INFO("Convert Done! Parsing the partition tables...");
         dump_and_clean();
-    } else if (mode == OpenixCardOperator::UNPACK) {
+    } else if (mode == OpenixCardOperator::UNPACK || mode == OpenixCardOperator::UNPACKCFG) {
         unpack_target_image();
         LOG::INFO("Unpack Done! Your image file is at " + temp_file_path);
-        if (mode_ext == OpenixCardOperator::UNPACKCFG) {
+        if (mode == OpenixCardOperator::UNPACKCFG) {
             save_cfg_file();
         }
     } else if (mode == OpenixCardOperator::PACK) {
         pack();
-    } else {
-        unpack_target_image();
+    }
+
+    if (parser.get<bool>("size")) {
         get_real_size();
     }
 }
@@ -156,6 +152,7 @@ void OpenixCard::pack() {
     std::string target_cfg_path = {};
 
     auto a = std::filesystem::directory_iterator(input_file);
+    temp_file_path = input_file; // for potential size query
 
     for (const auto &entry: std::filesystem::directory_iterator(input_file)) {
         if (entry.path().extension() == ".cfg") {
