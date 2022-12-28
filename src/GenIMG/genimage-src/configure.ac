@@ -1,12 +1,13 @@
 AC_PREREQ(2.60)
 AC_INIT([genimage],
-        [15],
+        [16],
         [oss-tools@pengutronix.de],
         [genimage],
         [http://www.pengutronix.de/genimage/])
+AC_CONFIG_SRCDIR([genimage.c])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([foreign 1.11 -Wall -Wno-portability silent-rules tar-pax no-dist-gzip dist-xz subdir-objects])
-AC_PROG_CC
+AC_PROG_CC_STDC
 AC_PROG_RANLIB
 
 # If possible, enable extensions to Posix
@@ -18,6 +19,9 @@ AC_CONFIG_MACRO_DIR([m4])
 
 # default is less output while building the package
 AM_SILENT_RULES([yes])
+
+# change if 'usr/local' as the default install path isn't a good choice
+#AC_PREFIX_DEFAULT([/usr/local])
 
 AC_CHECK_FUNCS([memset setenv strdup strcasecmp strerror strstr strtoull])
 
@@ -106,5 +110,21 @@ AC_CONFIG_HEADERS(config.h)
 AC_CONFIG_FILES([
         Makefile
 ])
+
 AC_REQUIRE_AUX_FILE([tap-driver.sh])
+
 AC_OUTPUT
+AC_MSG_RESULT([
+        $PACKAGE $VERSION
+        =====
+
+        prefix:                 ${prefix}
+
+        compiler:               ${CC}
+        cflags:                 ${CFLAGS} ${AM_CFLAGS}
+        ldflags:                ${LDFLAGS} ${AM_LDFLAGS}
+
+        debug:                  ${enable_debug}
+        hide symbols:           ${enable_hide}
+        libconfuse:             ${CONFUSE_LIBS}
+])

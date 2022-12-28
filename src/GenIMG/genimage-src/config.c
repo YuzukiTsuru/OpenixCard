@@ -284,14 +284,19 @@ const char *inputpath(void)
 	return inputpath;
 }
 
+static const char *cached_rootpath;
+
+void disable_rootpath(void)
+{
+	cached_rootpath = "";
+}
+
 const char *rootpath(void)
 {
-	static const char *rootpath;
+	if (!cached_rootpath)
+		cached_rootpath = abspath(get_opt("rootpath"));
 
-	if (!rootpath)
-		rootpath = abspath(get_opt("rootpath"));
-
-	return rootpath;
+	return cached_rootpath;
 }
 
 const char *tmppath(void)
@@ -399,6 +404,16 @@ static struct config opts[] = {
 		.env = "GENIMAGE_MKFJFFS2",
 		.def = "mkfs.jffs2",
 	}, {
+		.name = "mkfsf2fs",
+		.opt = CFG_STR("mkfsf2fs", NULL, CFGF_NONE),
+		.env = "GENIMAGE_MKFSF2FS",
+		.def = "mkfs.f2fs",
+	}, {
+		.name = "sloadf2fs",
+		.opt = CFG_STR("sloadf2fs", NULL, CFGF_NONE),
+		.env = "GENIMAGE_SLOADF2FS",
+		.def = "sload.f2fs",
+	}, {
 		.name = "mkfsubifs",
 		.opt = CFG_STR("mkfsubifs", NULL, CFGF_NONE),
 		.env = "GENIMAGE_MKFSUBIFS",
@@ -439,9 +454,18 @@ static struct config opts[] = {
 		.env = "GENIMAGE_MKIMAGE",
 		.def = "mkimage",
 	}, {
+		.name = "fiptool",
+		.opt = CFG_STR("fiptool", NULL, CFGF_NONE),
+		.env = "GENIMAGE_FIPTOOL",
+		.def = "fiptool",
+	}, {
 		.name = "config",
 		.env = "GENIMAGE_CONFIG",
 		.def = "genimage.cfg",
+	}, {
+		.name = "configdump",
+		.env = "GENIMAGE_CONFIGDUMP",
+		.def = NULL,
 	},
 };
 
