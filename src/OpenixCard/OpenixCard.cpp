@@ -43,11 +43,11 @@ OpenixCard::OpenixCard(int argc, char **argv) {
             .default_value(false)
             .implicit_value(true);
     parser.add_argument("-c", "--cfg")
-            .help("Get Allwinner image partition table cfg file")
+            .help("Get Allwinner image partition table cfg file (use together with unpack)")
             .default_value(false)
             .implicit_value(true);
     parser.add_argument("-p", "--pack")
-            .help("pack dumped Allwinner image to regular image from folder")
+            .help("pack dumped Allwinner image to regular image from folder (needs cfg file)")
             .default_value(false)
             .implicit_value(true);
     parser.add_argument("-s", "--size")
@@ -58,6 +58,7 @@ OpenixCard::OpenixCard(int argc, char **argv) {
             .help("Input image file or directory path")
             .required()
             .remaining();
+    parser.add_epilog("\r\neg.:\r\nOpenixCard -u  <img>   - Unpack Allwinner image to target\r\nOpenixCard -uc <img>   - Unpack Allwinner image to target and generate Allwinner image partition table cfg\r\nOpenixCard -d  <img>   - Convert Allwinner image to regular image\r\nOpenixCard -p  <dir>   - pack dumped Allwinner image to regular image from folder\r\nOpenixCard -s  <img>   - Get the accurate size of Allwinner image\")\r\n");
 
     if (argc < 2) {
         std::cout << parser; // show help
@@ -121,15 +122,13 @@ OpenixCard::OpenixCard(int argc, char **argv) {
 
     if (mode == OpenixCardOperator::DUMP) {
         unpack_target_image();
-        LOG::INFO("Convert Done! Prasing the partition tables...");
+        LOG::INFO("Convert Done! Parsing the partition tables...");
         dump_and_clean();
     } else if (mode == OpenixCardOperator::UNPACK) {
         unpack_target_image();
+        LOG::INFO("Unpack Done! Your image file is at " + temp_file_path);
         if (mode_ext == OpenixCardOperator::UNPACKCFG) {
-            LOG::INFO("Unpack Done! Your image file and cfg file at " + temp_file_path);
             save_cfg_file();
-        } else {
-            LOG::INFO("Unpack Done! Your image file at " + temp_file_path);
         }
     } else if (mode == OpenixCardOperator::PACK) {
         pack();
@@ -179,12 +178,12 @@ void OpenixCard::pack() {
         std::exit(1);
     }
 
-    LOG::INFO("Generate Done! Your image file at " + input_file + " Cleaning up...");
+    LOG::INFO("Generate Done! Your image file is at " + input_file + " Cleaning up...");
 }
 
 void OpenixCard::unpack_target_image() {
     // dump the packed image
-    LOG::INFO("Input file: " + input_file + " Now converting...");
+    LOG::INFO("Converting input file: " + input_file);
     check_file(input_file);
     std::filesystem::create_directories(temp_file_path);
     crypto_init();
@@ -211,7 +210,7 @@ void OpenixCard::dump_and_clean() {
     auto target_cfg_path = fex2Cfg.save_file(temp_file_path);
     auto image_name = fex2Cfg.get_image_name();
     // generate the image
-    LOG::INFO("Prase Done! Generating target image...");
+    LOG::INFO("Parse Done! Generating target image...");
 
     GenIMG genimage(target_cfg_path, temp_file_path, output_file_path);
 
@@ -221,14 +220,15 @@ void OpenixCard::dump_and_clean() {
         std::exit(1);
     }
 
-    LOG::INFO("Generate Done! Your image file at " + output_file_path + " Cleaning up...");
+    LOG::INFO("Generate Done! Your image file is at " + output_file_path);
+    LOG::INFO("Cleaning up...");
     std::filesystem::remove_all(temp_file_path);
 }
 
 void OpenixCard::save_cfg_file() {
     FEX2CFG fex2Cfg(temp_file_path);
     auto target_cfg_path = fex2Cfg.save_file(temp_file_path);
-    LOG::INFO("Prase Done! Your cfg file at " + target_cfg_path);
+    LOG::INFO("Parse Done! Your cfg file is at " + target_cfg_path);
 }
 
 void OpenixCard::check_file(const std::string &file_path) {
