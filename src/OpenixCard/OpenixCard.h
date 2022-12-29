@@ -35,7 +35,6 @@ private:
     };
 
     OpenixCardOperator mode;
-    OpenixCardOperator mode_ext;
     bool is_absolute = false;
 
 private:

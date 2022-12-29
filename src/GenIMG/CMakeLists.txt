@@ -18,8 +18,6 @@ add_custom_command(
 )
 
 # autotools build
-
-# autotools build
 add_custom_command(
         TARGET GenIMG
         PRE_LINK
