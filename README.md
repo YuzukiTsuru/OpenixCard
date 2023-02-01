@@ -56,7 +56,7 @@ yay -S openixcard
 git clone --recursive --depth 1 https://github.com/YuzukiTsuru/OpenixCard
 
 # Download the depends
-sudo apt install cmake build-essential automake autoconf libconfuse-dev pkg-config aclocal
+sudo apt install cmake build-essential automake autoconf libconfuse-dev pkg-config
 
 # Make build directory
 mkdir build
