@@ -29,5 +29,12 @@ add_custom_command(
         TARGET GenIMG
         PRE_LINK
         WORKING_DIRECTORY ${LIBGENIMAGE_TARGET_BUILD_DIR}
-        COMMAND autoconf -i && automake --add-missing && ./configure && make
+        COMMAND autoconf -i && automake --add-missing
+)
+
+add_custom_command(
+        TARGET GenIMG
+        PRE_LINK
+        WORKING_DIRECTORY ${LIBGENIMAGE_TARGET_BUILD_DIR}
+        COMMAND chmod a+x configure && ./configure && make
 )
