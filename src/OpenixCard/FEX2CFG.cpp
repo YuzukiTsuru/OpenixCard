@@ -139,7 +139,7 @@ void FEX2CFG::gen_cfg() {
     // print_partition_table();
 
     // Generate file from FEX
-    awImgCfg += gen_linux_cfg_from_fex_map(fex_classed);
+    awImgCfg += gen_linux_cfg_from_fex_map(fex_classed, hybrid);
 
     awImgCfg += "}";
 }

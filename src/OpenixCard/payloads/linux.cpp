@@ -14,12 +14,27 @@
 
 #include <chip.h>
 
-std::string gen_linux_cfg_from_fex_map(const inicpp::config &fex) {
+std::string gen_linux_cfg_from_fex_map(const inicpp::config &fex, partition_table_type type) {
     partition_table_struct patab;
     linux_compensate compensate;
     std::string cfg_data;
     cfg_data += "\thdimage{\n";
-    cfg_data += "\t\tpartition-table-type = \"hybrid\"\n";
+
+    switch(type){
+        case partition_table_type::hybrid:
+            cfg_data += "\t\tpartition-table-type = \"hybrid\"\n";
+            break;
+        case partition_table_type::gpt:
+            cfg_data += "\t\tpartition-table-type = \"gpt\"\n";
+            break;
+        case partition_table_type::mbr:
+            cfg_data += "\t\tpartition-table-type = \"mbr\"\n";
+            break;
+        default:
+            cfg_data += "\t\tpartition-table-type = \"hybrid\"\n";
+            break;
+    }
+
     cfg_data += "\t\tgpt-location = " + std::to_string(compensate.gpt_location / 0x100000) + "M\n";
     cfg_data += "\t}\n";
 

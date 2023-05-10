@@ -29,7 +29,13 @@ typedef struct linux_compensate {
     uint64_t boot_packages_offset = 0x1004000;
 } linux_compensate;
 
-std::string gen_linux_cfg_from_fex_map(const inicpp::config &fex);
+enum partition_table_type {
+    hybrid,
+    gpt,
+    mbr
+};
+
+std::string gen_linux_cfg_from_fex_map(const inicpp::config &fex, partition_table_type type);
 
 [[maybe_unused]] uint linux_common_fex_compensate();
 
