@@ -32,7 +32,7 @@ private:
 
 private:
     // subprocess runner for genimage-src
-    void run_genimage();
+    int run_genimage();
 
     void generate_blank_fex();
 };
