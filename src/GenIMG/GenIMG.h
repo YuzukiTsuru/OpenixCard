@@ -22,6 +22,8 @@ public:
 
     [[maybe_unused]] [[nodiscard]] int get_status() const;
 
+    void re_run_genimage();
+
 private:
     std::string config_path;
     std::string name;

@@ -174,7 +174,10 @@ void OpenixCard::pack() {
     GenIMG gen_img(target_cfg_path, input_file, input_file);
 
     // check gen_img-src result
-    if (gen_img.get_status() != 0) {
+    if (gen_img.get_status() == -EINVAL) {
+        LOG::ERROR("Generate image failed! Check your cfg file in: " + target_cfg_path);
+        std::exit(1);
+    } else if (gen_img.get_status() != 0) {
         LOG::ERROR("Generate image failed!");
         std::exit(1);
     }
@@ -198,7 +201,7 @@ void OpenixCard::unpack_target_image() {
         case 3:
             throw file_size_error(input_file);
         case 4:
-            throw std::runtime_error("Unable to allocate memory for image: "+ input_file);
+            throw std::runtime_error("Unable to allocate memory for image: " + input_file);
         case 5:
             throw file_format_error(input_file);
         default:
@@ -216,7 +219,22 @@ void OpenixCard::dump_and_clean() {
     GenIMG genimage(target_cfg_path, temp_file_path, output_file_path);
 
     // check genimage-src result
-    if (genimage.get_status() != 0) {
+    // check gen_img-src result
+    if (genimage.get_status() == -EINVAL) {
+        LOG::INFO("Generate image Error, try with different partition table: GPT");
+        fex2Cfg.regenerate_cfg_file(partition_table_type::gpt);
+        fex2Cfg.save_file(temp_file_path);
+        genimage.re_run_genimage();
+        if (genimage.get_status() == -EINVAL) {
+            LOG::INFO("Generate image Error, try with different partition table, MBR");
+            fex2Cfg.regenerate_cfg_file(partition_table_type::mbr);
+            fex2Cfg.save_file(temp_file_path);
+            genimage.re_run_genimage();
+        } else if (genimage.get_status() != 0) {
+            LOG::ERROR("Generate image failed!");
+            std::exit(1);
+        }
+    } else if (genimage.get_status() != 0) {
         LOG::ERROR("Generate image failed!");
         std::exit(1);
     }

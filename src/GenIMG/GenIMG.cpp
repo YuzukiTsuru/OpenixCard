@@ -87,3 +87,7 @@ void GenIMG::generate_blank_fex() {
 [[maybe_unused]] int GenIMG::get_status() const {
     return this->status;
 }
+
+void GenIMG::re_run_genimage() {
+    run_genimage();
+}
