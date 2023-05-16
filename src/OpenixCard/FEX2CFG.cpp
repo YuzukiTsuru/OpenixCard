@@ -32,6 +32,7 @@ FEX2CFG::FEX2CFG(const std::string &dump_path) {
     // Parse File
     open_file(awImgPara.partition_table_fex_path);
     classify_fex();
+    
     parse_fex();
     gen_cfg();
 }
@@ -78,13 +79,15 @@ void FEX2CFG::open_file(const std::string &file_path) {
 void FEX2CFG::classify_fex() {
     int occ = 0;
     std::string::size_type pos = 0;
+    std::istringstream _temp_aw_img_fex(awImgFex);
     std::string _temp = {};
     std::istringstream _temp_aw_img_fex(awImgFex);
     std::string _temp_str = {};
 
-    while (std::getline(_temp_aw_img_fex, _temp_str)){
+    // clean the comment message
+    while(std::getline(_temp_aw_img_fex, _temp_str)){
         if (_temp_str.substr(0, 1) != ";"){
-            _temp.insert(0, _temp_str);
+            _temp += _temp_str + "\n";
         }
     }
 
@@ -101,12 +104,16 @@ void FEX2CFG::classify_fex() {
         _less_out = _less_out.substr(0, _less_out.rfind("[partition]"));
         awImgFexClassed.insert(0, "[partition" + std::to_string(occ - i) + "]" + _section);
     }
-    
-    LOG::DATA(awImgFexClassed);
 }
 
 void FEX2CFG::parse_fex() {
-    fex_classed = inicpp::parser::load(awImgFexClassed);
+    // Quick Fix for #26
+    try {
+        fex_classed = inicpp::parser::load(awImgFexClassed);
+    } catch(const inicpp::ambiguity_exception &e) {
+        LOG::ERROR(std::string("Partition table error, bad format. ") + std::string(e.what()));
+        return;
+    }
 }
 
 [[maybe_unused]] std::string FEX2CFG::get_image_name() const {

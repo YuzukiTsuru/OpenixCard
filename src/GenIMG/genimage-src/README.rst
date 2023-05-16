@@ -80,6 +80,10 @@ Here are all options for images:
 :mountpoint:	mountpoint if image refers to a filesystem image. The
 		default is "/". The content of "${rootpath}${mountpoint}"
 		will be used to fill the filesystem.
+:srcpath:	If this is set, specified path will be directly used
+		to fill the filesystem. Ignoring rootpath/mountpoint logic.
+		Path might be absolute or relative
+		to current working directory.
 :empty:		If this is set to true, then the specified rootpath and
 		mountpoint are ignored for this image and an empty
 		filesystem is created. This option is only used for
@@ -250,6 +254,7 @@ Options:
 			using the debugfs commands ``set_current_time``,
 			``set_super_value mkfs_time`` and ``set_super_value lastcheck``
 :root-owner:		User and group IDs for the root directory. Defaults to ``0:0``.
+			Only valid with mke2fs.
 :usage-type:		Specify the usage type for the filesystem. Only valid with mke2fs.
 			More details can be found in the mke2fs man-page.
 
@@ -496,6 +501,45 @@ Options:
 Note: If no content is specified with ``file`` or ``files`` then
 ``rootpath`` and ``mountpoint`` are used to provide the content.
 
+fip
+***
+Generates a Firmware Image Package (FIP). A format used to bundle
+firmware to be loaded by ARM Trusted Firmware.
+
+Options:
+
+:extraargs:		Extra arguments passed to fiptool
+:fw-config:		Firmware Configuration (device tree), usually provided by BL2 (Trusted Firmware)
+:nt-fw:			Non-Trusted Firmware (BL33)
+:hw-config:		Hardware Configuration (device tree), passed to BL33
+:tos-fw:		Trusted OS (BL32) binaries. Second and third binary are used as
+			extra1 and extra2 binaries if specified. Example:
+			``tos-fw = {"tee-header_v2.bin", "tee-pager_v2.bin", "tee-pageable_v2.bin"}``
+:scp-fwu-cfg:		SCP Firmware Updater Configuration FWU SCP_BL2U
+:ap-fwu-cfg:		AP Firmware Updater Configuration BL2U
+:fwu:			Firmware Updater NS_BL2U
+:fwu-cert:		Non-Trusted Firmware Updater certificate
+:tb-fw:			Trusted Boot Firmware BL2
+:scp-fw:		SCP Firmware SCP_BL2
+:soc-fw:		EL3 Runtime Firmware BL31
+:tb-fw-config:		TB_FW_CONFIG
+:soc-fw-config:		SOC_FW_CONFIG
+:tos-fw-config:		TOS_FW_CONFIG
+:nt-fw-config:		NT_FW_CONFIG
+:rot-cert:		Root Of Trust key certificate
+:trusted-key-cert:	Trusted key certificate
+:scp-fw-key-cert:	SCP Firmware key certificate
+:soc-fw-key-cert:	SoC Firmware key certificate
+:tos-fw-key-cert:	Trusted OS Firmware key certificate
+:nt-fw-key-cert:	Non-Trusted Firmware key certificate
+:tb-fw-cert:		Trusted Boot Firmware BL2 certificate
+:scp-fw-cert:		SCP Firmware content certificate
+:soc-fw-cert:		SoC Firmware content certificate
+:tos-fw-cert:		Trusted OS Firmware content certificate
+:nt-fw-cert:		Non-Trusted Firmware content certificate
+:sip-sp-cert:		SiP owned Secure Partition content certificate
+:plat-sp-cert:		Platform owned Secure Partition content certificate
+
 The Flash Section
 -----------------
 
@@ -562,10 +606,14 @@ variable.
 		Optional path to a temporary directory. There must be enough space
 		available here to hold a copy of the root filesystem.
 :includepath:	Colon-separated list of directories to search for files
-		included via the ``include'' function. The current
+		included via the ``include`` function. The current
 		directory is searched after these. Thus, if this
 		option is not given, only the current directory is
 		searched. This has no effect when given in the config file.
+:configdump:	File to write the final configuration to. This includes
+		the results of all ``include`` directives, expansions
+		of environment variables and application of default
+		values - think ``gcc -E``. Use ``-`` for stdout.
 
 :cpio:		path to the cpio program (default cpio)
 :dd:		path to the dd program (default dd)

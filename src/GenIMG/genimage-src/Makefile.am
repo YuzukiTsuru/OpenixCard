@@ -21,7 +21,9 @@ libgenimage_a_SOURCES = \
 	image-cpio.c \
 	image-cramfs.c \
 	image-ext2.c \
+	image-f2fs.c \
 	image-file.c \
+	image-fip.c \
 	image-fit.c \
 	image-flash.c \
 	image-hd.c \
@@ -46,8 +48,16 @@ noinst_HEADERS = \
 	genimage.h \
 	list.h
 
+# when "make clean" runs
+CLEANFILES = \
+	test-results/*.test*.counts
+
 # when "make distclean" runs
 DISTCLEAN = \
+	Makefile
+
+# when "make maintainer-clean" runs
+MAINTAINERCLEANFILES = \
 	configure \
 	autoscan.log \
 	config.h.in~ \
@@ -59,7 +69,4 @@ DISTCLEAN = \
 	build-aux/depcomp \
 	build-aux/install-sh \
 	build-aux/missing \
-	Makefile \
-	.deps \
-	autom4te.cache \
 	$(DIST_ARCHIVES)

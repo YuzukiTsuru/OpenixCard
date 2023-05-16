@@ -203,7 +203,7 @@ int systemp(struct image *image, const char *fmt, ...)
 	if (!buf)
 		return -ENOMEM;
 
-    o = "";
+	o = "";
 
 	image_info(image, "cmd: \"%s\"%s\n", buf, o);
 
@@ -481,6 +481,45 @@ static int write_bytes(int fd, size_t size, off_t offset, unsigned char byte)
 }
 
 /*
+ * For regular files this makes sure that:
+ * - the file exists
+ * - the file has the specified size
+ * - any previous date is cleared
+ * For block devices this makes sure that:
+ * - any existing filesystem header is cleared
+ */
+int prepare_image(struct image *image, unsigned long long size)
+{
+	if (is_block_device(imageoutfile(image))) {
+		insert_image(image, NULL, 2048, 0, 0);
+	} else {
+		int ret;
+		/* for regular files, create the file or truncate it to zero
+		 * size to remove all existing content */
+		int fd = open_file(image, imageoutfile(image), O_TRUNC);
+		if (fd < 0)
+			return fd;
+
+		/*
+		 * Resize the file immediately to the final size. This is not
+		 * strictly necessary but this circumvents XFS preallocation
+		 * heuristics. Without this, the holes in the image may be smaller
+		 * than necessary.
+		 */
+		ret = ftruncate(fd, size);
+		close(fd);
+		if (ret < 0) {
+			ret = -errno;
+			image_error(image, "failed to truncate %s to %lld: %s\n",
+				    imageoutfile(image), size,
+				    strerror(-ret));
+			return ret;
+		}
+	}
+	return 0;
+}
+
+/*
  * Insert the image @sub at offset @offset in @image. If @sub is
  * smaller than @size (including if @sub is NULL), insert @byte bytes for
  * the remainder. If @sub is larger than @size, only the first @size
@@ -727,6 +766,38 @@ char *uuid_random(void)
 		  random() & 0xffff, random() & 0xffff, random() & 0xffff);
 
 	return uuid;
+}
+
+int block_device_size(struct image *image, const char *blkdev, unsigned long long *size)
+{
+	struct stat st;
+	int fd, ret;
+	off_t offset;
+
+	fd = open(blkdev, O_RDONLY);
+	if (fd < 0 || fstat(fd, &st) < 0) {
+		ret = -errno;
+		goto out;
+	}
+	if ((st.st_mode & S_IFMT) != S_IFBLK) {
+		ret = -EINVAL;
+		goto out;
+	}
+	offset = lseek(fd, 0, SEEK_END);
+	if (offset < 0) {
+		ret = -errno;
+		goto out;
+	}
+	*size = offset;
+	ret = 0;
+
+out:
+	if (ret)
+		image_error(image, "failed to determine size of block device %s: %s",
+			    blkdev, strerror(-ret));
+	if (fd >= 0)
+		close(fd);
+	return ret;
 }
 
 int reload_partitions(struct image *image)

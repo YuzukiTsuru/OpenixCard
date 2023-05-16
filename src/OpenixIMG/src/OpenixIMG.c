@@ -162,11 +162,11 @@ int unpack_image(const char *infn, const char *outdn, int is_absolute) {
         flag_encryption_enabled = 0;
 
     /* Decrypt header (padded to 1024 bytes) */
-    O_LOG("Now Decrypt IMG header...\n");
+    O_LOG("Decrypting IMG header...\n");
     curr = rc6_decrypt_inplace(image, 1024, &header_ctx);
 
     /* Check version of header and setup our local state */
-    O_LOG("The IMG version is: 0x%0x\n", header->header_version);
+    O_LOG("IMG version is: 0x%0x\n", header->header_version);
     if (header->header_version == 0x0300) {
         num_files = header->v3.num_files;
         hardware_id = header->v3.hardware_id;
@@ -187,7 +187,7 @@ int unpack_image(const char *infn, const char *outdn, int is_absolute) {
     curr = rc6_decrypt_inplace(curr, num_files * 1024, &fileheaders_ctx);
 
     /* Decrypt file contents */
-    O_LOG("Now Decrypt IMG file contents...\n");
+    O_LOG("Decrypting IMG file contents...\n");
     for (i = 0; i < num_files; i++) {
         struct imagewty_file_header *filehdr;
         uint64_t stored_length;

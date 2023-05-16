@@ -64,7 +64,8 @@ void GenIMG::run_genimage() {
     int argc = static_cast<int>((sizeof(argv) / sizeof(argv[0]))) - 1;
 
     std::cout << cc::cyan;
-    this->status = GenimageWrapper(argc, argv);
+    status = GenimageWrapper(argc, argv);
+    status != 0 ? std::cout << cc::red : std::cout << cc::reset;
     std::cout << cc::reset;
 }
 

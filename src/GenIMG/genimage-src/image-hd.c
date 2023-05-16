@@ -408,29 +408,9 @@ static int hdimage_generate(struct image *image)
 	struct stat s;
 	int ret;
 
-	if (!is_block_device(imageoutfile(image))) {
-		/* for regular files, create the file or truncate it to zero
-		 * size to remove all existing content */
-		int fd = open_file(image, imageoutfile(image), O_TRUNC);
-		if (fd < 0)
-			return fd;
-
-		/*
-		 * Resize the file immediately to the final size. This is not
-		 * strictly necessary but this circumvents XFS preallocation
-		 * heuristics. Without this, the holes in the image may be smaller
-		 * than necessary.
-		 */
-		ret = ftruncate(fd, hd->file_size);
-		close(fd);
-		if (ret < 0) {
-			ret = -errno;
-			image_error(image, "failed to truncate %s to %lld: %s\n",
-				    imageoutfile(image), hd->file_size,
-				    strerror(-ret));
-			return ret;
-		}
-	}
+	ret = prepare_image(image, hd->file_size);
+	if (ret < 0)
+		return ret;
 
 	list_for_each_entry(part, &image->partitions, list) {
 		struct image *child;
@@ -456,6 +436,12 @@ static int hdimage_generate(struct image *image)
 
 		if (child->size == 0)
 			continue;
+
+		if (child->size > part->size) {
+			image_error(image, "part %s size (%lld) too small for %s (%lld)\n",
+				    part->name, part->size, child->file, child->size);
+			return -E2BIG;
+		}
 
 		ret = insert_image(image, child, child->size, part->offset, 0);
 		if (ret) {
@@ -486,17 +472,19 @@ static int hdimage_generate(struct image *image)
 		}
 	}
 
-	ret = stat(imageoutfile(image), &s);
-	if (ret) {
-		ret = -errno;
-		image_error(image, "stat(%s) failed: %s\n", imageoutfile(image),
-				strerror(errno));
-		return ret;
-	}
-	if (hd->file_size != (unsigned long long)s.st_size) {
-		image_error(image, "unexpected output file size: %llu != %llu\n",
-				hd->file_size, (unsigned long long)s.st_size);
-		return -EINVAL;
+	if (!is_block_device(imageoutfile(image))) {
+		ret = stat(imageoutfile(image), &s);
+		if (ret) {
+			ret = -errno;
+			image_error(image, "stat(%s) failed: %s\n", imageoutfile(image),
+				    strerror(errno));
+			return ret;
+		}
+		if (hd->file_size != (unsigned long long)s.st_size) {
+			image_error(image, "unexpected output file size: %llu != %llu\n",
+				    hd->file_size, (unsigned long long)s.st_size);
+			return -EINVAL;
+		}
 	}
 
 	if (hd->table_type != TYPE_NONE)
@@ -620,6 +608,20 @@ static int hdimage_setup(struct image *image, cfg_t *cfg)
 	hd->fill = cfg_getbool(cfg, "fill");
 	hd->disk_uuid = cfg_getstr(cfg, "disk-uuid");
 
+	if (is_block_device(imageoutfile(image))) {
+		int ret;
+
+		if (image->size) {
+			image_error(image, "image size must not be specified for a block device target\n");
+			return -EINVAL;
+		}
+		ret = block_device_size(image, imageoutfile(image), &image->size);
+		if (ret)
+			return ret;
+		image_info(image, "determined size of block device %s to be %llu\n",
+			   imageoutfile(image), image->size);
+	}
+
 	if (!strcmp(table_type, "none"))
 		hd->table_type = TYPE_NONE;
 	else if (!strcmp(table_type, "mbr") || !strcmp(table_type, "dos"))
@@ -642,6 +644,9 @@ static int hdimage_setup(struct image *image, cfg_t *cfg)
 		image_info(image, "The option 'gpt' is deprecated. Use 'partition-table-type' instead\n");
 	}
 
+	if (!hd->align)
+		hd->align = hd->table_type == TYPE_NONE ? 1 : 512;
+
 	if (hd->extended_partition > 4) {
 		image_error(image, "invalid extended partition index (%i). must be "
 				"inferior or equal to 4 (0 for automatic)\n",
@@ -649,7 +654,7 @@ static int hdimage_setup(struct image *image, cfg_t *cfg)
 		return -EINVAL;
 	}
 
-	if ((hd->align % 512) || (hd->align == 0)) {
+	if ((hd->table_type != TYPE_NONE) && ((hd->align % 512) || (hd->align == 0))) {
 		image_error(image, "partition alignment (%lld) must be a "
 				"multiple of 1 sector (512 bytes)\n", hd->align);
 		return -EINVAL;
@@ -660,7 +665,7 @@ static int hdimage_setup(struct image *image, cfg_t *cfg)
 		if (part->in_partition_table)
 			++partition_table_entries;
 		if (!part->align)
-			part->align = part->in_partition_table ? hd->align : 1;
+			part->align = (part->in_partition_table || hd->table_type == TYPE_NONE) ? hd->align : 1;
 		if (part->in_partition_table && part->align % hd->align) {
 			image_error(image, "partition alignment (%lld) of partition %s "
 				    "must be multiple of image alignment (%lld)",
@@ -807,7 +812,7 @@ static int hdimage_setup(struct image *image, cfg_t *cfg)
 			now += part->size;
 			part->offset = roundup(now, 4096) - part->size;
 		}
-		if (!part->offset && part->in_partition_table) {
+		if (!part->offset && (part->in_partition_table || hd->table_type == TYPE_NONE)) {
 			part->offset = roundup(now, part->align);
 		}
 		if (part->extended && !hd->extended_lba)
@@ -915,7 +920,7 @@ static int hdimage_setup(struct image *image, cfg_t *cfg)
 }
 
 static cfg_opt_t hdimage_opts[] = {
-	CFG_STR("align", "512", CFGF_NONE),
+	CFG_STR("align", NULL, CFGF_NONE),
 	CFG_STR("disk-signature", NULL, CFGF_NONE),
 	CFG_STR("disk-uuid", NULL, CFGF_NONE),
 	CFG_BOOL("partition-table", cfg_false, CFGF_NODEFAULT),
@@ -930,6 +935,7 @@ static cfg_opt_t hdimage_opts[] = {
 
 struct image_handler hdimage_handler = {
 	.type = "hdimage",
+	.no_rootpath = cfg_true,
 	.generate = hdimage_generate,
 	.setup = hdimage_setup,
 	.opts = hdimage_opts,

@@ -22,19 +22,18 @@ Copyright (c) 2022, YuzukiTsuru <GloomyGhost@GloomyGhost.com>
 Usage: OpenixCard [options] input 
 
 Positional arguments:
-input        	Input image file or directory path [required]
+input           Input image file or directory path [required]
 
 Optional arguments:
--h --help    	shows help message and exits [default: false]
--v --version 	prints version information and exits [default: false]
--u --unpack  	Unpack Allwinner Image to folder [default: false]
--d --dump    	Convert Allwinner image to regular image [default: false]
--c --cfg     	Get Allwinner image partition table cfg file [default: false]
--p --pack    	pack dumped Allwinner image to regular image from folder [default: false]
--s --size    	Get the accurate size of Allwinner image [default: false]
+-h --help       shows help message and exits [default: false]
+-v --version    prints version information and exits [default: false]
+-u --unpack     Unpack Allwinner Image to folder [default: false]
+-d --dump       Convert Allwinner image to regular image [default: false]
+-c --cfg        Get Allwinner image partition table cfg file (use together with unpack) [default: false]
+-p --pack       pack dumped Allwinner image to regular image from folder (needs cfg file) [default: false]
+-s --size       Get the accurate size of Allwinner image [default: false]
 
-eg.
-
+eg.:
 OpenixCard -u  <img>   - Unpack Allwinner image to target
 OpenixCard -uc <img>   - Unpack Allwinner image to target and generate Allwinner image partition table cfg
 OpenixCard -d  <img>   - Convert Allwinner image to regular image
@@ -57,7 +56,7 @@ yay -S openixcard
 git clone --recursive --depth 1 https://github.com/YuzukiTsuru/OpenixCard
 
 # Download the depends
-sudo apt install cmake build-essential automake autoconf libconfuse-dev pkg-config aclocal
+sudo apt install cmake build-essential automake autoconf libconfuse-dev pkg-config
 
 # Make build directory
 mkdir build

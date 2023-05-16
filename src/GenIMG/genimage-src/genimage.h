@@ -19,6 +19,7 @@ void image_debug(struct image *image, const char *fmt, ...) __attribute__ ((form
 void xasprintf(char **strp, const char *fmt, ...) __attribute__ ((format(printf, 2, 3)));
 void xstrcatf(char **strp, const char *fmt, ...) __attribute__ ((format(printf, 2, 3)));
 
+void disable_rootpath(void);
 const char *imagepath(void);
 const char *inputpath(void);
 const char *rootpath(void);
@@ -60,6 +61,7 @@ struct image {
 	int n_holes;
 	cfg_bool_t size_is_percent;
 	const char *mountpoint;
+	const char *srcpath;
 	cfg_bool_t empty;
 	cfg_bool_t temporary;
 	const char *exec_pre;
@@ -80,6 +82,7 @@ struct image {
 
 struct image_handler {
 	char *type;
+	cfg_bool_t no_rootpath;
 	int (*parse)(struct image *i, cfg_t *cfg);
 	int (*setup)(struct image *i, cfg_t *cfg);
 	int (*generate)(struct image *i);
@@ -88,12 +91,12 @@ struct image_handler {
 
 struct flash_type {
 	const char *name;
-	unsigned int pebsize;
-    unsigned int lebsize;
-    unsigned int numpebs;
-    unsigned int minimum_io_unit_size;
-    unsigned int vid_header_offset;
-    unsigned int sub_page_size;
+	int pebsize;
+	int lebsize;
+	int numpebs;
+	int minimum_io_unit_size;
+	int vid_header_offset;
+	int sub_page_size;
 	struct list_head list;
 };
 
@@ -105,6 +108,7 @@ extern struct image_handler cramfs_handler;
 extern struct image_handler ext2_handler;
 extern struct image_handler ext3_handler;
 extern struct image_handler ext4_handler;
+extern struct image_handler f2fs_handler;
 extern struct image_handler file_handler;
 extern struct image_handler flash_handler;
 extern struct image_handler hdimage_handler;
@@ -118,6 +122,7 @@ extern struct image_handler ubi_handler;
 extern struct image_handler ubifs_handler;
 extern struct image_handler vfat_handler;
 extern struct image_handler fit_handler;
+extern struct image_handler fip_handler;
 
 #define ARRAY_SIZE(arr)		(sizeof(arr) / sizeof((arr)[0]))
 
@@ -162,6 +167,9 @@ int open_file(struct image *image, const char *filename, int extra_flags);
 int map_file_extents(struct image *image, const char *filename, int fd,
 		     size_t size, struct extent **extents, size_t *extent_count);
 int is_block_device(const char *filename);
+int block_device_size(struct image *image, const char *blkdev,
+		      unsigned long long *size);
+int prepare_image(struct image *image, unsigned long long size);
 int insert_image(struct image *image, struct image *sub,
 		 unsigned long long size, unsigned long long offset,
 		 unsigned char byte);
