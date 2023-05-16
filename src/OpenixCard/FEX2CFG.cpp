@@ -111,7 +111,10 @@ void FEX2CFG::parse_fex() {
         fex_classed = inicpp::parser::load(awImgFexClassed);
     } catch(const inicpp::ambiguity_exception &e) {
         LOG::ERROR(std::string("Partition table error, bad format. ") + std::string(e.what()));
-        return;
+        LOG::ERROR(std::string("Your Partition table: "));
+        std::cout << awImgFexClassed << std::endl;
+        LOG::ERROR(std::string("Please fix in `sys_partition.fex` and re-pack with Allwinner BSP"));
+        std::exit(-1);
     }
 }
 
@@ -143,7 +146,7 @@ void FEX2CFG::gen_cfg() {
     awImgCfg += ".img {\n";
 
     // For Debug
-    // print_partition_table();
+    print_partition_table();
 
     // Generate file from FEX
     awImgCfg += gen_linux_cfg_from_fex_map(fex_classed, type);
