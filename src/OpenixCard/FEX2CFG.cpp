@@ -123,7 +123,6 @@ void FEX2CFG::parse_fex() {
     return awImgCfg;
 }
 
-
 uint FEX2CFG::get_image_real_size(bool print) {
     get_partition_real_size();
     uint total_size = 0;
