@@ -185,6 +185,7 @@ void FEX2CFG::get_partition_real_size() {
 }
 
 void FEX2CFG::regenerate_cfg_file(partition_table_type _type) {
+    awImgCfg = "";
     this->type = _type;
     gen_cfg();
 }
