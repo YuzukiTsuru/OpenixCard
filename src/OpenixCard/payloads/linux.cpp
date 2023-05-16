@@ -71,6 +71,9 @@ std::string gen_linux_cfg_from_fex_map(const inicpp::config &fex, partition_tabl
             if (patab.name == "boot-resource") {
                 cfg_data += "\t\tpartition-type = 0xC\n";
             }
+            if (patab.name == "boot-res") {
+                cfg_data += "\t\tpartition-type = 0xC\n";
+            }
             if (patab.downloadfile.empty())
                 cfg_data += "\t\timage = \"blank.fex\"\n";
             else
