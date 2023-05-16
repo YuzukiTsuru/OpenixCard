@@ -80,8 +80,10 @@ void FEX2CFG::classify_fex() {
     std::string::size_type pos = 0;
     std::string _temp = {};
     std::string _temp_str = {};
-    
-    while (std::getline(awImgFex, _temp_str)){
+    std::istringstream aw_img_fex_stream = {};
+    aw_img_fex_stream.str(awImgCfg);
+
+    while (std::getline(aw_img_fex_stream, _temp_str)){
         if (_temp_str.substr(0, 1) != ";"){
             _temp.insert(0, _temp_str);
         }
@@ -177,8 +179,8 @@ void FEX2CFG::get_partition_real_size() {
     }
 }
 
-void FEX2CFG::regenerate_cfg_file(partition_table_type type) {
-    this->type = type;
+void FEX2CFG::regenerate_cfg_file(partition_table_type _type) {
+    this->type = _type;
     gen_cfg();
 }
 

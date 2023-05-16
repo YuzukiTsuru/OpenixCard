@@ -17,12 +17,7 @@
 #include <inicpp/inicpp.h>
 
 #include "AW_IMG_PARA.h"
-
-enum partition_table_type {
-    hybrid,
-    gpt,
-    mbr
-};
+#include "payloads/chip.h"
 
 class FEX2CFG {
 public:
@@ -47,7 +42,7 @@ public:
     [[maybe_unused]] void print_partition_table();
 
     // regenerate cfg file
-    void regenerate_cfg_file(partition_table_type type);
+    void regenerate_cfg_file(partition_table_type _type);
 
 private:
     AW_IMG_PARA awImgPara;
