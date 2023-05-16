@@ -48,6 +48,9 @@ OpenixCard Now available at [AUR](https://aur.archlinux.org/packages/openixcard)
 yay -S openixcard
 ```
 
+### Other Linux
+You can find the new release file:  
+https://github.com/YuzukiTsuru/OpenixCard/releases
 
 ## Build from source
 
