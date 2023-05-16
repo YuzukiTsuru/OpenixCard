@@ -17,6 +17,7 @@
 #include <inicpp/inicpp.h>
 
 #include "AW_IMG_PARA.h"
+#include "payloads/chip.h"
 
 class FEX2CFG {
 public:
@@ -40,6 +41,9 @@ public:
     // Print out the partition table
     [[maybe_unused]] void print_partition_table();
 
+    // regenerate cfg file
+    void regenerate_cfg_file(partition_table_type _type);
+
 private:
     AW_IMG_PARA awImgPara;
     inicpp::config fex_classed;
@@ -47,6 +51,7 @@ private:
     std::string awImgFex = {};
     std::string awImgCfg = {};
     std::string awImgFexClassed = {};
+    partition_table_type type = partition_table_type::hybrid;
 
     void open_file(const std::string &file_path);
 

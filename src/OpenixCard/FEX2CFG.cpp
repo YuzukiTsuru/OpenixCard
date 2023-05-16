@@ -19,7 +19,7 @@
 #include "FEX2CFG.h"
 #include "LOG.h"
 #include "exception.h"
-#include <payloads/chip.h>
+#include "payloads/chip.h"
 
 FEX2CFG::FEX2CFG(const std::string &dump_path) {
     // parse basic files
@@ -81,6 +81,7 @@ void FEX2CFG::classify_fex() {
     std::string::size_type pos = 0;
     std::istringstream _temp_aw_img_fex(awImgFex);
     std::string _temp = {};
+    std::istringstream _temp_aw_img_fex(awImgFex);
     std::string _temp_str = {};
 
     // clean the comment message
@@ -123,6 +124,7 @@ void FEX2CFG::parse_fex() {
     return awImgCfg;
 }
 
+
 uint FEX2CFG::get_image_real_size(bool print) {
     get_partition_real_size();
     uint total_size = 0;
@@ -146,7 +148,7 @@ void FEX2CFG::gen_cfg() {
     // print_partition_table();
 
     // Generate file from FEX
-    awImgCfg += gen_linux_cfg_from_fex_map(fex_classed);
+    awImgCfg += gen_linux_cfg_from_fex_map(fex_classed, type);
 
     awImgCfg += "}";
 }
@@ -182,3 +184,9 @@ void FEX2CFG::get_partition_real_size() {
         }
     }
 }
+
+void FEX2CFG::regenerate_cfg_file(partition_table_type _type) {
+    this->type = _type;
+    gen_cfg();
+}
+

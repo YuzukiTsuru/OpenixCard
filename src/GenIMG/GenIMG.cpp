@@ -66,6 +66,7 @@ void GenIMG::run_genimage() {
     std::cout << cc::cyan;
     status = GenimageWrapper(argc, argv);
     status != 0 ? std::cout << cc::red : std::cout << cc::reset;
+    std::cout << cc::reset;
 }
 
 [[maybe_unused]] void GenIMG::print() {
@@ -86,4 +87,8 @@ void GenIMG::generate_blank_fex() {
 
 [[maybe_unused]] int GenIMG::get_status() const {
     return this->status;
+}
+
+void GenIMG::re_run_genimage() {
+    run_genimage();
 }
