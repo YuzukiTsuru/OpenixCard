@@ -63,7 +63,7 @@ OpenixCard::OpenixCard(int argc, char **argv) {
             "\r\nOpenixCard -uc <img>   - Unpack Allwinner image to target and generate Allwinner image partition table cfg"
             "\r\nOpenixCard -d  <img>   - Convert Allwinner image to regular image"
             "\r\nOpenixCard -p  <dir>   - pack dumped Allwinner image to regular image from folder"
-            "\r\nOpenixCard -s  <img>   - Get the accurate size of Allwinner image\")"
+            "\r\nOpenixCard -s  <img>   - Get the accurate size of Allwinner image)"
             "\r\n");
 
     if (argc < 2) {
