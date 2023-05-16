@@ -218,14 +218,13 @@ void OpenixCard::dump_and_clean() {
     if (genimage.get_status() == 1) {
         LOG::INFO("Generate image Error, try with different partition table: GPT");
         fex2Cfg.regenerate_cfg_file(partition_table_type::gpt);
-        LOG::WARNING(target_cfg_path);
-        fex2Cfg.save_file(temp_file_path);
-        genimage.re_run_genimage();
+        target_cfg_path = fex2Cfg.save_file(temp_file_path);
+        genimage.re_run_genimage(target_cfg_path, temp_file_path, output_file_path);
         if (genimage.get_status() == 1) {
             LOG::INFO("Generate image Error, try with different partition table, MBR");
             fex2Cfg.regenerate_cfg_file(partition_table_type::mbr);
-            fex2Cfg.save_file(temp_file_path);
-            genimage.re_run_genimage();
+            target_cfg_path = fex2Cfg.save_file(temp_file_path);
+            genimage.re_run_genimage(target_cfg_path, temp_file_path, output_file_path);
         } else if (genimage.get_status() != 0) {
             LOG::ERROR("Generate image failed!");
             std::exit(1);

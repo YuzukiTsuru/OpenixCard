@@ -29,10 +29,13 @@ private:
     std::string name;
     std::string image_path;
     std::string output_path;
+    std::vector<std::string> temp_dir = std::vector<std::string>{};
 
     int status = 0;
 
 private:
+    void generate_tmp_dir();
+
     // subprocess runner for genimage-src
     void run_genimage();
 

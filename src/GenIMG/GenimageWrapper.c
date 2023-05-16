@@ -713,10 +713,6 @@ int GenimageWrapper(int argc, char *argv[])
 
     check_tmp_path();
 
-    ret = systemp(NULL, "rm -rf \"%s\"/*", tmppath());
-    if (ret)
-        goto cleanup;
-
     parse_flashes(cfg);
 
     num_images = cfg_size(cfg, "image");
