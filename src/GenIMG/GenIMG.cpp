@@ -89,6 +89,9 @@ void GenIMG::generate_blank_fex() {
     return this->status;
 }
 
-void GenIMG::re_run_genimage(std::string config_path, std::string image_path, std::string output_path) {
+void GenIMG::re_run_genimage(std::string _config_path, std::string _image_path, std::string _output_path) {
+    config_path = std::move(_config_path);
+    image_path = std::move(_image_path);
+    output_path = std::move(_output_path);
     run_genimage();
 }

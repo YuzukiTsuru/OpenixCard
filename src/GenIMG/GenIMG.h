@@ -22,7 +22,7 @@ public:
 
     [[maybe_unused]] [[nodiscard]] int get_status() const;
 
-    void re_run_genimage(std::string config_path, std::string image_path, std::string output_path);
+    void re_run_genimage(std::string _config_path, std::string _image_path, std::string _output_path);
 
 private:
     std::string config_path;
