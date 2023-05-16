@@ -70,8 +70,7 @@ std::string gen_linux_cfg_from_fex_map(const inicpp::config &fex, partition_tabl
             cfg_data += "\tpartition " + patab.name + " {\n";
             if (patab.name == "boot-resource") {
                 cfg_data += "\t\tpartition-type = 0xC\n";
-            }
-            if (patab.name == "boot-res") {
+            } else if (patab.downloadfile == "boot-resource.fex") {
                 cfg_data += "\t\tpartition-type = 0xC\n";
             }
             if (patab.downloadfile.empty())
