@@ -65,7 +65,6 @@ void GenIMG::run_genimage() {
 
     std::cout << cc::cyan;
     status = GenimageWrapper(argc, argv);
-    std::cout << "============== " << status;
     status != 0 ? std::cout << cc::red : std::cout << cc::reset;
     std::cout << cc::reset;
 }

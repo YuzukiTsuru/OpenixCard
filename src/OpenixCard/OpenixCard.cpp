@@ -216,12 +216,12 @@ void OpenixCard::dump_and_clean() {
 
     // check genimage-src result
     // check gen_img-src result
-    if (genimage.get_status() == -EINVAL) {
+    if (genimage.get_status() == 1) {
         LOG::INFO("Generate image Error, try with different partition table: GPT");
         fex2Cfg.regenerate_cfg_file(partition_table_type::gpt);
         fex2Cfg.save_file(temp_file_path);
         genimage.re_run_genimage();
-        if (genimage.get_status() == -EINVAL) {
+        if (genimage.get_status() == 1) {
             LOG::INFO("Generate image Error, try with different partition table, MBR");
             fex2Cfg.regenerate_cfg_file(partition_table_type::mbr);
             fex2Cfg.save_file(temp_file_path);
