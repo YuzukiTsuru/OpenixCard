@@ -81,7 +81,6 @@ void FEX2CFG::classify_fex() {
     std::string::size_type pos = 0;
     std::istringstream _temp_aw_img_fex(awImgFex);
     std::string _temp = {};
-    std::istringstream _temp_aw_img_fex(awImgFex);
     std::string _temp_str = {};
 
     // clean the comment message
@@ -186,6 +185,7 @@ void FEX2CFG::get_partition_real_size() {
 }
 
 void FEX2CFG::regenerate_cfg_file(partition_table_type _type) {
+    awImgCfg = "";
     this->type = _type;
     gen_cfg();
 }

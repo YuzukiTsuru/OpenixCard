@@ -58,7 +58,13 @@ OpenixCard::OpenixCard(int argc, char **argv) {
             .help("Input image file or directory path")
             .required()
             .remaining();
-    parser.add_epilog("\r\neg.:\r\nOpenixCard -u  <img>   - Unpack Allwinner image to target\r\nOpenixCard -uc <img>   - Unpack Allwinner image to target and generate Allwinner image partition table cfg\r\nOpenixCard -d  <img>   - Convert Allwinner image to regular image\r\nOpenixCard -p  <dir>   - pack dumped Allwinner image to regular image from folder\r\nOpenixCard -s  <img>   - Get the accurate size of Allwinner image\")\r\n");
+    parser.add_epilog(
+            "\r\neg.:\r\nOpenixCard -u  <img>   - Unpack Allwinner image to target"
+            "\r\nOpenixCard -uc <img>   - Unpack Allwinner image to target and generate Allwinner image partition table cfg"
+            "\r\nOpenixCard -d  <img>   - Convert Allwinner image to regular image"
+            "\r\nOpenixCard -p  <dir>   - pack dumped Allwinner image to regular image from folder"
+            "\r\nOpenixCard -s  <img>   - Get the accurate size of Allwinner image\")"
+            "\r\n");
 
     if (argc < 2) {
         std::cout << parser; // show help
@@ -215,29 +221,13 @@ void OpenixCard::dump_and_clean() {
     GenIMG genimage(target_cfg_path, temp_file_path, output_file_path);
 
     // check genimage-src result
-    // check gen_img-src result
-    if (genimage.get_status() == -EINVAL) {
-        LOG::INFO("Generate image Error, try with different partition table: GPT");
-        fex2Cfg.regenerate_cfg_file(partition_table_type::gpt);
-        fex2Cfg.save_file(temp_file_path);
-        genimage.re_run_genimage();
-        if (genimage.get_status() == -EINVAL) {
-            LOG::INFO("Generate image Error, try with different partition table, MBR");
-            fex2Cfg.regenerate_cfg_file(partition_table_type::mbr);
-            fex2Cfg.save_file(temp_file_path);
-            genimage.re_run_genimage();
-        } else if (genimage.get_status() != 0) {
-            LOG::ERROR("Generate image failed!");
-            std::exit(1);
-        }
-    } else if (genimage.get_status() != 0) {
+    if (genimage.get_status() != 0) {
         LOG::ERROR("Generate image failed!");
         std::exit(1);
     }
 
     LOG::INFO("Generate Done! Your image file is at " + output_file_path);
     LOG::INFO("Cleaning up...");
-    std::filesystem::remove_all(temp_file_path);
 }
 
 void OpenixCard::save_cfg_file() {
