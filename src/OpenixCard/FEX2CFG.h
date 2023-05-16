@@ -51,7 +51,7 @@ private:
     std::string awImgFex = {};
     std::string awImgCfg = {};
     std::string awImgFexClassed = {};
-    partition_table_type type = partition_table_type::hybrid;
+    partition_table_type type = partition_table_type::gpt;
 
     void open_file(const std::string &file_path);
 

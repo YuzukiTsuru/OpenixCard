@@ -18,6 +18,30 @@ std::string gen_linux_cfg_from_fex_map(const inicpp::config &fex, partition_tabl
     partition_table_struct patab;
     linux_compensate compensate;
     std::string cfg_data;
+
+    // check type
+    for (auto &sect: fex) {
+        patab = {}; // reflash struce
+        for (auto &opt: sect) {
+            if (opt.get_name() == "name") {
+                patab.name = opt.get<inicpp::string_ini_t>();
+            } else if (opt.get_name() == "size") {
+                patab.size = opt.get<inicpp::unsigned_ini_t>();
+            } else if (opt.get_name() == "downloadfile") {
+                patab.downloadfile = opt.get<inicpp::string_ini_t>();
+            } else if (opt.get_name() == "user_type") {
+                patab.user_type = opt.get<inicpp::unsigned_ini_t>();
+            } else {
+                // Droped.
+            }
+        }
+        if (patab.name == "boot-resource") {
+            type = partition_table_type::hybrid;
+        } else if (patab.downloadfile == "\"boot-resource.fex\"") {
+            type = partition_table_type::hybrid;
+        }
+    }
+
     cfg_data += "\thdimage{\n";
 
     switch(type){
@@ -31,7 +55,7 @@ std::string gen_linux_cfg_from_fex_map(const inicpp::config &fex, partition_tabl
             cfg_data += "\t\tpartition-table-type = \"mbr\"\n";
             break;
         default:
-            cfg_data += "\t\tpartition-table-type = \"hybrid\"\n";
+            cfg_data += "\t\tpartition-table-type = \"gpt\"\n";
             break;
     }
 
