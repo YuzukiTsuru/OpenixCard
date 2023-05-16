@@ -79,11 +79,10 @@ void FEX2CFG::classify_fex() {
     int occ = 0;
     std::string::size_type pos = 0;
     std::string _temp = {};
+    std::istringstream _temp_aw_img_fex(awImgFex);
     std::string _temp_str = {};
-    std::istringstream aw_img_fex_stream = {};
-    aw_img_fex_stream.str(awImgCfg);
 
-    while (std::getline(aw_img_fex_stream, _temp_str)){
+    while (std::getline(_temp_aw_img_fex, _temp_str)){
         if (_temp_str.substr(0, 1) != ";"){
             _temp.insert(0, _temp_str);
         }
