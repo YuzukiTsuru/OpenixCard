@@ -162,7 +162,7 @@ void OpenixCard::pack() {
 
     for (const auto &entry: std::filesystem::directory_iterator(input_file)) {
         if (entry.path().extension() == ".cfg") {
-            if (entry.path().filename() != "image.cfg") {
+            if (entry.path().filename() == "image.cfg") {
                 target_cfg_path = entry.path().string();
             }
         }
