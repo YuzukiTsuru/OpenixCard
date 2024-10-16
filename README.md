@@ -9,7 +9,9 @@ Open Source Version of Allwinner PhoenixCard to Dump, Unpack, Flash Allwinner Li
 
 [![CMake](https://github.com/YuzukiTsuru/OpenixCard/actions/workflows/cmake.yml/badge.svg)](https://github.com/YuzukiTsuru/OpenixCard/actions/workflows/cmake.yml)
 
-
+## About Android IMG File Supporting
+> Android firmware will not support and will not adapt to support it in the future. Due to the large number of Android GKI, GMS, and GRF versions, it is impossible to cover all firmware versions, and Android firmware partitioning is very complex. There is no universal method to generate usable firmware, nor is there a fixed address to make it run. Even if it can be adapted, there will be situations where the functionality is unavailable like fastboot, GMS service and more.
+> Finally, Android firmware modifications are often used to crack and modify firmware, and this project does not support such behavior
 
 ## Usage
 
