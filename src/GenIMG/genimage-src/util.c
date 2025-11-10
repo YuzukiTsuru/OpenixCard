@@ -24,12 +24,28 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
-#include <linux/fs.h>
-#include <linux/fiemap.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <ctype.h>
 #include <dirent.h>
+
+#ifdef __linux__
+#include <linux/fs.h>
+#include <linux/fiemap.h>
+#include <linux/falloc.h>
+#define HAVE_FIEMAP 1
+#define HAVE_FALLOCATE 1
+#define HAVE_BLKRRPART 1
+#elif defined(__APPLE__)
+#define HAVE_FIEMAP 0
+#define HAVE_FALLOCATE 0
+#define HAVE_BLKRRPART 0
+#else
+/* Other Unix-like systems - assume no Linux-specific features */
+#define HAVE_FIEMAP 0
+#define HAVE_FALLOCATE 0
+#define HAVE_BLKRRPART 0
+#endif
 
 #include "genimage.h"
 
@@ -371,6 +387,7 @@ static int whole_file_exent(size_t size, struct extent **extents,
 int map_file_extents(struct image *image, const char *filename, int f,
 		     size_t size, struct extent **extents, size_t *extent_count)
 {
+#if HAVE_FIEMAP
 	struct fiemap *fiemap;
 	unsigned i;
 	int ret;
@@ -416,6 +433,10 @@ err_out:
 
 	image_error(image, "fiemap %s: %d %s\n", filename, errno, strerror(errno));
 	return ret;
+#else
+	/* On non-Linux systems (e.g., macOS), use whole file extent */
+	return whole_file_exent(size, extents, extent_count);
+#endif
 }
 
 /*
@@ -453,16 +474,20 @@ static int write_bytes(int fd, size_t size, off_t offset, unsigned char byte)
 			 */
 			size = st.st_size - offset;
 		}
+#if HAVE_FALLOCATE
 		/*
-		 * Maybe this should be guarded by a #ifdef
-		 * HAVE_FALLOCATE. That's easy to add, and the code
-		 * will just automatically fall through to the write
-		 * loop, the same way as if the filesystem doesn't
-		 * support FALLOC_FL_PUNCH_HOLE.
+		 * Use fallocate on Linux for efficient hole punching
 		 */
 		if (fallocate(fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
 			      offset, size) == 0)
 			return 0;
+#elif defined(__APPLE__)
+		/*
+		 * On macOS, we can use fcntl with F_PREALLOCATE, but for simplicity
+		 * and compatibility, we just fall through to the write loop below.
+		 * The write loop will handle zero-filling efficiently.
+		 */
+#endif
 	}
 
 	/* Not a regular file, non-zero pattern, or fallocate not applicable. */
@@ -803,12 +828,12 @@ out:
 int reload_partitions(struct image *image)
 {
 	const char *outfile = imageoutfile(image);
-	int fd;
 
 	if (!is_block_device(outfile))
 		return 0;
 
-	fd = open(outfile, O_WRONLY|O_EXCL);
+#if HAVE_BLKRRPART
+	int fd = open(outfile, O_WRONLY|O_EXCL);
 	if (fd < 0) {
 		int ret = -errno;
 		image_error(image, "open: %s\n", strerror(errno));
@@ -819,6 +844,11 @@ int reload_partitions(struct image *image)
 		image_info(image, "failed to re-read partition table: %s\n",
 			strerror(errno));
 	close(fd);
+#else
+	/* On non-Linux systems (e.g., macOS), partition reload is not supported */
+	/* This is typically not needed for file-based images anyway */
+	image_info(image, "partition table reload not supported on this platform\n");
+#endif
 	return 0;
 }
 

@@ -22,11 +22,28 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <inttypes.h>
-#include <endian.h>
 #include <stdbool.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+
+#ifdef __APPLE__
+#include <libkern/OSByteOrder.h>
+#define be16toh(x) OSSwapBigToHostInt16(x)
+#define htobe16(x) OSSwapHostToBigInt16(x)
+#define be32toh(x) OSSwapBigToHostInt32(x)
+#define htobe32(x) OSSwapHostToBigInt32(x)
+#define le16toh(x) OSSwapLittleToHostInt16(x)
+#define htole16(x) OSSwapHostToLittleInt16(x)
+#define le32toh(x) OSSwapLittleToHostInt32(x)
+#define htole32(x) OSSwapHostToLittleInt32(x)
+#define le64toh(x) OSSwapLittleToHostInt64(x)
+#define htole64(x) OSSwapHostToLittleInt64(x)
+#elif defined(__linux__)
+#include <endian.h>
+#else
+#include <sys/endian.h>
+#endif
 
 #include "genimage.h"
 

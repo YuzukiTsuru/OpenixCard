@@ -41,8 +41,8 @@ libgenimage_a_CFLAGS = \
 	$(AM_CFLAGS) \
 	$(CONFUSE_CFLAGS)
 
-libgenimage_a_LIBADD = \
-	$(CONFUSE_LIBS)
+# Note: LIBADD is not used for static libraries in autotools
+# libconfuse will be linked when the final executable is built
 
 noinst_HEADERS = \
 	genimage.h \
