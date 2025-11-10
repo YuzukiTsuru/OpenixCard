@@ -1,4 +1,18 @@
-# OpenixCard 使用指南
+# OpenixCard
+
+[English](README.md) ｜ 简体中文
+
+Allwinner PhoenixCard 的开源版本，用于在 Linux 和 MacOS 上解包、转储、烧录 Allwinner Linux IMG 文件
+
+[![forthebadge](https://forthebadge.com/images/badges/made-with-c-plus-plus.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/made-with-c.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/powered-by-black-magic.svg)](https://forthebadge.com)
+[![forthebadge](https://forthebadge.com/images/badges/uses-git.svg)](https://forthebadge.com)
+
+[![CMake](https://github.com/YuzukiTsuru/OpenixCard/actions/workflows/cmake.yml/badge.svg)](https://github.com/YuzukiTsuru/OpenixCard/actions/workflows/cmake.yml)
+
+## 关于 Android IMG 文件支持
+> Android 固件将不被支持，未来也不会适配支持。由于 Android GKI、GMS、GRF 版本众多，无法覆盖所有固件版本，且 Android 固件分区非常复杂，没有通用的方法生成可用的固件，也没有固定的地址使其运行。即使能够适配，也会出现功能不可用的情况，如 fastboot、GMS 服务等。最后，Android 固件修改常用于破解和修改固件，本项目不支持此类行为。
 
 ## 程序位置
 
@@ -227,3 +241,57 @@ A: 主要用于 Allwinner 芯片的 Linux 固件镜像，不支持 Android 固�
 ./build/dist/OpenixCard -p <dir>
 ```
 
+## 下载
+### ArchLinux
+OpenixCard 现在可在 [AUR](https://aur.archlinux.org/packages/openixcard) 上获取 [#3](https://github.com/YuzukiTsuru/OpenixCard/issues/3#issuecomment-1135317155)
+```
+yay -S openixcard
+```
+
+### 其他 Linux
+您可以在以下链接找到最新的发布文件：  
+https://github.com/YuzukiTsuru/OpenixCard/releases
+
+## 从源码构建
+
+```bash
+# 下载源代码
+git clone --recursive --depth 1 https://github.com/YuzukiTsuru/OpenixCard
+
+# 安装依赖
+sudo apt install cmake build-essential automake autoconf libconfuse-dev pkg-config
+
+# 创建构建目录
+mkdir build
+cd build
+
+# 编译
+cmake .. && make -j
+```
+
+> 注意：Ubuntu 20.04 编译会报错，这是由 ar 的 bug 导致的，您可以编译安装新版本。
+
+```bash
+sudo apt-get install texinfo
+
+wget https://ftp.gnu.org/gnu/binutils/binutils-2.38.tar.xz && \
+  tar xvf binutils-2.38.tar.xz && \
+  cd binutils-2.38 && \
+  ./configure --prefix=/usr/local && \
+  make
+  
+sudo make install
+```
+
+## LICENSE
+```
+GNU GENERAL PUBLIC LICENSE Version 2, June 1991
+                        
+Copyright (c) 2022, YuzukiTsuru <GloomyGhost@GloomyGhost.com>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License version 2 as
+published by the Free Software Foundation.
+
+See README and LICENSE for more details.
+ ```
