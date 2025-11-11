@@ -255,11 +255,35 @@ err_out:
 static char *abspath(const char *path)
 {
 	char *p;
+	char *cwd;
 
 	if (*path == '/')
 		return strdup(path);
 
-	xasprintf(&p, "%s/%s", get_current_dir_name(), path);
+#ifdef __linux__
+	cwd = get_current_dir_name();
+#else
+	/* On macOS and other systems, use getcwd */
+	char *buf = NULL;
+	size_t size = 0;
+	while ((buf = getcwd(buf, size)) == NULL && errno == ERANGE) {
+		if (buf)
+			free(buf);
+		size += 64;
+		buf = malloc(size);
+	}
+	cwd = buf;
+#endif
+
+	if (!cwd) {
+		error("getcwd failed: %s\n", strerror(errno));
+		return NULL;
+	}
+
+	xasprintf(&p, "%s/%s", cwd, path);
+
+	/* Free cwd in all cases - get_current_dir_name() on Linux and getcwd() on other systems both allocate memory */
+	free(cwd);
 
 	return p;
 }

@@ -1,6 +1,8 @@
 # OpenixCard
 
-Open Source Version of Allwinner PhoenixCard to Dump, Unpack, Flash Allwinner Linux IMG Files on Linux
+English ｜ [简体中文](README_ZH.md)
+
+Open Source Version of Allwinner PhoenixCard to Dump, Unpack, Flash Allwinner Linux IMG Files on Linux and MacOS
 
 [![forthebadge](https://forthebadge.com/images/badges/made-with-c-plus-plus.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/made-with-c.svg)](https://forthebadge.com)
@@ -90,7 +92,7 @@ sudo make install
 ## LICENSE
 ```
 GNU GENERAL PUBLIC LICENSE Version 2, June 1991
-                       
+                        
 Copyright (c) 2022, YuzukiTsuru <GloomyGhost@GloomyGhost.com>
 
 This program is free software; you can redistribute it and/or modify

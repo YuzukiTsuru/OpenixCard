@@ -133,9 +133,8 @@ OpenixCard::OpenixCard(int argc, char **argv) {
         }
     } else if (mode == OpenixCardOperator::PACK) {
         pack();
-    }
-
-    if (parser.get<bool>("size")) {
+    } else if (mode == OpenixCardOperator::SIZE) {
+        unpack_target_image();
         get_real_size();
     }
 }

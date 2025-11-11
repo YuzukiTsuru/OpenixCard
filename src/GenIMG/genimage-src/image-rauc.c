@@ -20,6 +20,16 @@
 #include <stdlib.h>
 #include <errno.h>
 
+#ifdef __APPLE__
+/* strdupa is a GNU extension, provide a compatible implementation for macOS */
+#include <alloca.h>
+#define strdupa(s) strcpy(alloca(strlen(s) + 1), s)
+#elif !defined(__GLIBC__)
+/* For other non-GNU systems */
+#include <alloca.h>
+#define strdupa(s) strcpy(alloca(strlen(s) + 1), s)
+#endif
+
 #include "genimage.h"
 
 #define RAUC_CONTENT	0
