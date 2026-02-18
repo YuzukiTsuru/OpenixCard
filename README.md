@@ -1,5 +1,7 @@
 # OpenixCard
 
+> Due to the limit of new partition map, OpenixCard will not working on the newer pack, try to use [OpenixSuit](https://github.com/YuzukiTsuru/OpenixSuit) to flash device
+
 English ｜ [简体中文](README_ZH.md)
 
 Open Source Version of Allwinner PhoenixCard to Dump, Unpack, Flash Allwinner Linux IMG Files on Linux and MacOS
