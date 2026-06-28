@@ -1,6 +1,11 @@
 # OpenixCard
 
-> Due to the limit of new partition map, OpenixCard will not working on the newer pack, try to use [OpenixSuit](https://github.com/YuzukiTsuru/OpenixSuit) to flash device
+## ⚠️ This project is no longer maintained
+
+**OpenixCard** has been deprecated. Please use the replacement projects:
+
+- **[OpenixCLI](https://github.com/YuzukiTsuru/OpenixCLI)** — Command-line tool for Allwinner image operations
+- **[OpenixSuit](https://github.com/YuzukiTsuru/OpenixSuit)** — GUI tool for flashing Allwinner devices
 
 English ｜ [简体中文](README_ZH.md)
 
