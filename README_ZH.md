@@ -1,5 +1,12 @@
 # OpenixCard
 
+## ⚠️ 本项目已停止维护
+
+**OpenixCard** 已弃用。请使用替代项目：
+
+- **[OpenixCLI](https://github.com/YuzukiTsuru/OpenixCLI)** — 用于 Allwinner 镜像操作的命令行工具
+- **[OpenixSuit](https://github.com/YuzukiTsuru/OpenixSuit)** — 用于刷写 Allwinner 设备的桌面工具
+
 [English](README.md) ｜ 简体中文
 
 Allwinner PhoenixCard 的开源版本，用于在 Linux 和 MacOS 上解包、转储、烧录 Allwinner Linux IMG 文件
